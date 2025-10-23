@@ -113,7 +113,14 @@ class Instruction:
         return val
 
     def _get_imm(self) -> int:
-        return (self._to_int(self.instruction) & Mask.IMM) >> Shift.IMM
+        # unsigned 32 bit int
+        org_imm = (self._to_int(self.instruction) & Mask.IMM) >> Shift.IMM
+
+        # make it signed
+        if org_imm > 0x7FFFFFFF:
+            return org_imm - 0xFFFFFFFF - 1
+
+        return org_imm
 
     def _get_off(self) -> int:
         # unsigned 16 bit int
@@ -138,7 +145,10 @@ class Instruction:
         return BpfClass(self.opcode & (Mask.CLASS >> Shift.CLASS))
 
     def __str__(self) -> str:
-        return str(self.instruction)
+        return " ".join([f"{b:02x}" for b in self.instruction])
+
+    def __repr__(self) -> str:
+        return str(self)
 
 
 def read_file(filename: str) -> list[Instruction]:
@@ -161,10 +171,7 @@ def get_blocks(instructions: list[Instruction]):
 
     for idx in range(1, len(instructions)):
         ins = instructions[idx]
-        print(f"instruction: {str(ins)}")
-
-        print(f"opcode: {ins.opcode}")
-        # print(f"last: {BpfCode.JMP.JSLE | BpfS.X | BpfClass.JMP}")
+        print(f"idx={idx}: instruction={str(ins)}")
 
         # python match case expressions are structural,
         # meaning they match structure (e.g. are you of type int?),
@@ -194,19 +201,62 @@ def get_blocks(instructions: list[Instruction]):
                 match (ins.src):
                     case 0:
                         print("calling helper function by static id")
-                        raise Exception(f"idx={idx}: not implemented")
+                        continue
                     case 1:
                         print(f"calling normal function")
                         jump_to = idx + ins.imm + 1
                         start.add(jump_to)
                     case 2:
                         print("calling helper function by BTF id")
-                        raise Exception(f"idx={idx}: not implemented")
+                        continue
 
-                pass
-
-            # conditional jumps
-            case x if x == BpfCode.JMP.JSLE | BpfS.X | BpfClass.JMP:
+            # conditional jumps, these jump to two blocks
+            case x if x in [
+                BpfCode.JMP.JEQ | BpfS.K | BpfClass.JMP,
+                BpfCode.JMP.JEQ | BpfS.K | BpfClass.JMP32,
+                BpfCode.JMP.JEQ | BpfS.X | BpfClass.JMP,
+                BpfCode.JMP.JEQ | BpfS.X | BpfClass.JMP32,
+                BpfCode.JMP.JGT | BpfS.K | BpfClass.JMP,
+                BpfCode.JMP.JGT | BpfS.K | BpfClass.JMP32,
+                BpfCode.JMP.JGT | BpfS.X | BpfClass.JMP,
+                BpfCode.JMP.JGT | BpfS.X | BpfClass.JMP32,
+                BpfCode.JMP.JGE | BpfS.K | BpfClass.JMP,
+                BpfCode.JMP.JGE | BpfS.K | BpfClass.JMP32,
+                BpfCode.JMP.JGE | BpfS.X | BpfClass.JMP,
+                BpfCode.JMP.JGE | BpfS.X | BpfClass.JMP32,
+                BpfCode.JMP.JSET | BpfS.K | BpfClass.JMP,
+                BpfCode.JMP.JSET | BpfS.K | BpfClass.JMP32,
+                BpfCode.JMP.JSET | BpfS.X | BpfClass.JMP,
+                BpfCode.JMP.JSET | BpfS.X | BpfClass.JMP32,
+                BpfCode.JMP.JNE | BpfS.K | BpfClass.JMP,
+                BpfCode.JMP.JNE | BpfS.K | BpfClass.JMP32,
+                BpfCode.JMP.JNE | BpfS.X | BpfClass.JMP,
+                BpfCode.JMP.JNE | BpfS.X | BpfClass.JMP32,
+                BpfCode.JMP.JSGT | BpfS.K | BpfClass.JMP,
+                BpfCode.JMP.JSGT | BpfS.K | BpfClass.JMP32,
+                BpfCode.JMP.JSGT | BpfS.X | BpfClass.JMP,
+                BpfCode.JMP.JSGT | BpfS.X | BpfClass.JMP32,
+                BpfCode.JMP.JSGE | BpfS.K | BpfClass.JMP,
+                BpfCode.JMP.JSGE | BpfS.K | BpfClass.JMP32,
+                BpfCode.JMP.JSGE | BpfS.X | BpfClass.JMP,
+                BpfCode.JMP.JSGE | BpfS.X | BpfClass.JMP32,
+                BpfCode.JMP.JLT | BpfS.K | BpfClass.JMP,
+                BpfCode.JMP.JLT | BpfS.K | BpfClass.JMP32,
+                BpfCode.JMP.JLT | BpfS.X | BpfClass.JMP,
+                BpfCode.JMP.JLT | BpfS.X | BpfClass.JMP32,
+                BpfCode.JMP.JLE | BpfS.K | BpfClass.JMP,
+                BpfCode.JMP.JLE | BpfS.K | BpfClass.JMP32,
+                BpfCode.JMP.JLE | BpfS.X | BpfClass.JMP,
+                BpfCode.JMP.JLE | BpfS.X | BpfClass.JMP32,
+                BpfCode.JMP.JSLT | BpfS.K | BpfClass.JMP,
+                BpfCode.JMP.JSLT | BpfS.K | BpfClass.JMP32,
+                BpfCode.JMP.JSLT | BpfS.X | BpfClass.JMP,
+                BpfCode.JMP.JSLT | BpfS.X | BpfClass.JMP32,
+                BpfCode.JMP.JSLE | BpfS.K | BpfClass.JMP,
+                BpfCode.JMP.JSLE | BpfS.K | BpfClass.JMP32,
+                BpfCode.JMP.JSLE | BpfS.X | BpfClass.JMP,
+                BpfCode.JMP.JSLE | BpfS.X | BpfClass.JMP32,
+            ]:
                 ends.add(idx)
                 jump_if = idx + ins.off + 1
                 jump_else = idx + 1
@@ -214,11 +264,15 @@ def get_blocks(instructions: list[Instruction]):
                 start.add(jump_if)
                 start.add(jump_else)
 
+            case x if x in [BpfCode.JMP.JSLT | BpfS.K | BpfClass.JMP32]:
+                ends.add(idx)
+
             case _:
                 if ins.get_class() in [BpfClass.JMP, BpfClass.JMP32]:
                     raise Exception(f"idx={idx}: couldn't catch opcode: {ins.opcode}")
-                print(f"got {ins.get_class().name}")
 
+    start = sorted(list(start))
+    ends = sorted(list(ends))
     blocks = [(s, e) for s, e in zip(start, ends)]
     return blocks
 
