@@ -3,6 +3,7 @@ import sys
 
 from bpf import BpfInstruction, BpfClass, BpfCode, BpfS
 from block import Block
+from dfs import dfs_blocks
 
 
 def read_bpf_file(filename: str) -> list[BpfInstruction]:
@@ -39,7 +40,7 @@ def get_blocks_tree(
         seen = set()
 
     if start_idx in seen:
-        raise Exception(f"detected loop: block at idx={start_idx} loops")
+        raise Exception(f"detected loop: block at idx={start_idx} loops" )
 
     seen.add(start_idx)
 
@@ -167,6 +168,8 @@ def main():
     first_block = get_blocks_tree(instructions)
 
     print(f"blocks: {first_block}")
+    runtime_ub: float = dfs_blocks(first_block, instructions)
+    print(f"runtime_ub: {runtime_ub}")
 
 
 if __name__ == "__main__":
