@@ -43,6 +43,7 @@ class Mask:
 
 code_in_opcode_shift = Shift.CODE - Shift.OPCODE
 s_in_opcode_shift = Shift.S - Shift.OPCODE
+mode_in_opcode_shift = Shift.MODE - Shift.OPCODE
 
 
 # for Arithmetic and Jump instructions
@@ -51,6 +52,12 @@ class BpfS:
     K = 0x0 << shift  # imm is source
     X = 0x1 << shift  # src is source
 
+# for Load and Store instructions
+class BpfSize:
+    W  = 0x00 << Shift.SZ   # 32
+    H  = 0x01 << Shift.SZ   # 16
+    B  = 0x02 << Shift.SZ   # 8
+    DW = 0x03 << Shift.SZ   # 64
 
 # for Arithmetic and Jump instructions
 class BpfCode:
@@ -89,6 +96,16 @@ class BpfCode:
         JLE = 0xB << shift
         JSLT = 0xC << shift
         JSLE = 0xD << shift
+
+
+class BpfMode(IntEnum):
+    shift = mode_in_opcode_shift
+    IMM = 0x0 << shift
+    ABS = 0x1 << shift
+    IND = 0x2 << shift
+    MEM = 0x3 << shift
+    MEMSX = 0x4 << shift
+    ATOMIC = 0x6 << shift
 
 
 class BpfInstruction:
