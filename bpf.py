@@ -219,18 +219,12 @@ class BpfInstruction:
         ]
 
     def class_is_alu_jmp(self) -> bool:
-        needle = self.get_class()
-
-        haystack = [
+        return self.get_class() in [
             BpfClass.ALU,
             BpfClass.JMP,
             BpfClass.JMP32,
             BpfClass.ALU64,
         ]
-        print(f"needle: {needle}")
-        print(f"haystack: {haystack}")
-
-        return needle in haystack
 
     def is_wide_instruction(self) -> bool:
         """As defined in https://docs.kernel.org/bpf/standardization/instruction-set.html#wide-instruction-encoding"""
