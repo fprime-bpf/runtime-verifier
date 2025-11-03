@@ -1,14 +1,14 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from block import Block
-from bpf import BpfInstruction, BpfClass, BpfCode, BpfS, BpfSize
+from bpf import BpfClass, BpfCode, BpfS, BpfSize, BpfMode
 
 from typing import Set, Optional, Dict
 
 @dataclass(frozen=True)
 class OpInfo:
     name: str
-    latency: Optional[float]  # None as default
+    latency: Optional[int]  # None as default
 
 
 BPF_ATOMIC_OP_MASK = 0x0F
@@ -131,140 +131,140 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfCode.JMP.JSLE | BpfS.X | BpfClass.JMP32: OpInfo("JSLE32_X", 3),
     
     # ===== LD =====
-    BpfCode.LOAD_STORE.IMM | BpfSize.W  | BpfClass.LD:  OpInfo("LD_IMM_W",  4),
-    BpfCode.LOAD_STORE.IMM | BpfSize.H  | BpfClass.LD:  OpInfo("LD_IMM_H",  4),
-    BpfCode.LOAD_STORE.IMM | BpfSize.B  | BpfClass.LD:  OpInfo("LD_IMM_B",  4),
-    BpfCode.LOAD_STORE.IMM | BpfSize.DW | BpfClass.LD:  OpInfo("LDDW",  4),   # 
+    BpfMode.IMM | BpfSize.W  | BpfClass.LD:  OpInfo("LD_IMM_W",  4),
+    BpfMode.IMM | BpfSize.H  | BpfClass.LD:  OpInfo("LD_IMM_H",  4),
+    BpfMode.IMM | BpfSize.B  | BpfClass.LD:  OpInfo("LD_IMM_B",  4),
+    BpfMode.IMM | BpfSize.DW | BpfClass.LD:  OpInfo("LDDW",  4),   # 
 
-    BpfCode.LOAD_STORE.ABS | BpfSize.W  | BpfClass.LD:  OpInfo("LD_ABS_W",  None),
-    BpfCode.LOAD_STORE.ABS | BpfSize.H  | BpfClass.LD:  OpInfo("LD_ABS_H",  None),
-    BpfCode.LOAD_STORE.ABS | BpfSize.B  | BpfClass.LD:  OpInfo("LD_ABS_B",  None),
-    BpfCode.LOAD_STORE.ABS | BpfSize.DW | BpfClass.LD:  OpInfo("LD_ABS_DW", None),
+    BpfMode.ABS | BpfSize.W  | BpfClass.LD:  OpInfo("LD_ABS_W",  None),
+    BpfMode.ABS | BpfSize.H  | BpfClass.LD:  OpInfo("LD_ABS_H",  None),
+    BpfMode.ABS | BpfSize.B  | BpfClass.LD:  OpInfo("LD_ABS_B",  None),
+    BpfMode.ABS | BpfSize.DW | BpfClass.LD:  OpInfo("LD_ABS_DW", None),
 
-    BpfCode.LOAD_STORE.IND | BpfSize.W  | BpfClass.LD:  OpInfo("LD_IND_W",  None),
-    BpfCode.LOAD_STORE.IND | BpfSize.H  | BpfClass.LD:  OpInfo("LD_IND_H",  None),
-    BpfCode.LOAD_STORE.IND | BpfSize.B  | BpfClass.LD:  OpInfo("LD_IND_B",  None),
-    BpfCode.LOAD_STORE.IND | BpfSize.DW | BpfClass.LD:  OpInfo("LD_IND_DW", None),
+    BpfMode.IND | BpfSize.W  | BpfClass.LD:  OpInfo("LD_IND_W",  None),
+    BpfMode.IND | BpfSize.H  | BpfClass.LD:  OpInfo("LD_IND_H",  None),
+    BpfMode.IND | BpfSize.B  | BpfClass.LD:  OpInfo("LD_IND_B",  None),
+    BpfMode.IND | BpfSize.DW | BpfClass.LD:  OpInfo("LD_IND_DW", None),
 
-    BpfCode.LOAD_STORE.MEM   | BpfSize.W  | BpfClass.LD: OpInfo("LD_MEM_W",  None),
-    BpfCode.LOAD_STORE.MEM   | BpfSize.H  | BpfClass.LD: OpInfo("LD_MEM_H",  None),
-    BpfCode.LOAD_STORE.MEM   | BpfSize.B  | BpfClass.LD: OpInfo("LD_MEM_B",  None),
-    BpfCode.LOAD_STORE.MEM   | BpfSize.DW | BpfClass.LD: OpInfo("LD_MEM_DW", None),
+    BpfMode.MEM   | BpfSize.W  | BpfClass.LD: OpInfo("LD_MEM_W",  None),
+    BpfMode.MEM   | BpfSize.H  | BpfClass.LD: OpInfo("LD_MEM_H",  None),
+    BpfMode.MEM   | BpfSize.B  | BpfClass.LD: OpInfo("LD_MEM_B",  None),
+    BpfMode.MEM   | BpfSize.DW | BpfClass.LD: OpInfo("LD_MEM_DW", None),
 
-    BpfCode.LOAD_STORE.MEMSX | BpfSize.W  | BpfClass.LD: OpInfo("LD_MEMSX_W",  None),
-    BpfCode.LOAD_STORE.MEMSX | BpfSize.H  | BpfClass.LD: OpInfo("LD_MEMSX_H",  None),
-    BpfCode.LOAD_STORE.MEMSX | BpfSize.B  | BpfClass.LD: OpInfo("LD_MEMSX_B",  None),
-    BpfCode.LOAD_STORE.MEMSX | BpfSize.DW | BpfClass.LD: OpInfo("LD_MEMSX_DW", None),
+    BpfMode.MEMSX | BpfSize.W  | BpfClass.LD: OpInfo("LD_MEMSX_W",  None),
+    BpfMode.MEMSX | BpfSize.H  | BpfClass.LD: OpInfo("LD_MEMSX_H",  None),
+    BpfMode.MEMSX | BpfSize.B  | BpfClass.LD: OpInfo("LD_MEMSX_B",  None),
+    BpfMode.MEMSX | BpfSize.DW | BpfClass.LD: OpInfo("LD_MEMSX_DW", None),
     
     # ===== LDX =====
-    BpfCode.LOAD_STORE.IMM   | BpfSize.W  | BpfClass.LDX: OpInfo("LDX_IMM_W",  None),
-    BpfCode.LOAD_STORE.IMM   | BpfSize.H  | BpfClass.LDX: OpInfo("LDX_IMM_H",  None),
-    BpfCode.LOAD_STORE.IMM   | BpfSize.B  | BpfClass.LDX: OpInfo("LDX_IMM_B",  None),
-    BpfCode.LOAD_STORE.IMM   | BpfSize.DW | BpfClass.LDX: OpInfo("LDX_IMM_DW", None),
+    BpfMode.IMM   | BpfSize.W  | BpfClass.LDX: OpInfo("LDX_IMM_W",  None),
+    BpfMode.IMM   | BpfSize.H  | BpfClass.LDX: OpInfo("LDX_IMM_H",  None),
+    BpfMode.IMM   | BpfSize.B  | BpfClass.LDX: OpInfo("LDX_IMM_B",  None),
+    BpfMode.IMM   | BpfSize.DW | BpfClass.LDX: OpInfo("LDX_IMM_DW", None),
 
-    BpfCode.LOAD_STORE.ABS   | BpfSize.W  | BpfClass.LDX: OpInfo("LDX_ABS_W",  None),
-    BpfCode.LOAD_STORE.ABS   | BpfSize.H  | BpfClass.LDX: OpInfo("LDX_ABS_H",  None),
-    BpfCode.LOAD_STORE.ABS   | BpfSize.B  | BpfClass.LDX: OpInfo("LDX_ABS_B",  None),
-    BpfCode.LOAD_STORE.ABS   | BpfSize.DW | BpfClass.LDX: OpInfo("LDX_ABS_DW", None),
+    BpfMode.ABS   | BpfSize.W  | BpfClass.LDX: OpInfo("LDX_ABS_W",  None),
+    BpfMode.ABS   | BpfSize.H  | BpfClass.LDX: OpInfo("LDX_ABS_H",  None),
+    BpfMode.ABS   | BpfSize.B  | BpfClass.LDX: OpInfo("LDX_ABS_B",  None),
+    BpfMode.ABS   | BpfSize.DW | BpfClass.LDX: OpInfo("LDX_ABS_DW", None),
 
-    BpfCode.LOAD_STORE.IND   | BpfSize.W  | BpfClass.LDX: OpInfo("LDX_IND_W",  None),
-    BpfCode.LOAD_STORE.IND   | BpfSize.H  | BpfClass.LDX: OpInfo("LDX_IND_H",  None),
-    BpfCode.LOAD_STORE.IND   | BpfSize.B  | BpfClass.LDX: OpInfo("LDX_IND_B",  None),
-    BpfCode.LOAD_STORE.IND   | BpfSize.DW | BpfClass.LDX: OpInfo("LDX_IND_DW", None),
+    BpfMode.IND   | BpfSize.W  | BpfClass.LDX: OpInfo("LDX_IND_W",  None),
+    BpfMode.IND   | BpfSize.H  | BpfClass.LDX: OpInfo("LDX_IND_H",  None),
+    BpfMode.IND   | BpfSize.B  | BpfClass.LDX: OpInfo("LDX_IND_B",  None),
+    BpfMode.IND   | BpfSize.DW | BpfClass.LDX: OpInfo("LDX_IND_DW", None),
     
-    BpfCode.LOAD_STORE.MEM   | BpfSize.W  | BpfClass.LDX: OpInfo("LDX_W",  11),
-    BpfCode.LOAD_STORE.MEM   | BpfSize.H  | BpfClass.LDX: OpInfo("LDX_H",  11),
-    BpfCode.LOAD_STORE.MEM   | BpfSize.B  | BpfClass.LDX: OpInfo("LDX_B",  11),
-    BpfCode.LOAD_STORE.MEM   | BpfSize.DW | BpfClass.LDX: OpInfo("LDX_DW", 11),
+    BpfMode.MEM   | BpfSize.W  | BpfClass.LDX: OpInfo("LDX_W",  11),
+    BpfMode.MEM   | BpfSize.H  | BpfClass.LDX: OpInfo("LDX_H",  11),
+    BpfMode.MEM   | BpfSize.B  | BpfClass.LDX: OpInfo("LDX_B",  11),
+    BpfMode.MEM   | BpfSize.DW | BpfClass.LDX: OpInfo("LDX_DW", 11),
 
-    BpfCode.LOAD_STORE.MEMSX | BpfSize.W  | BpfClass.LDX: OpInfo("LDX_MEMSX_W", 11),
-    BpfCode.LOAD_STORE.MEMSX | BpfSize.H  | BpfClass.LDX: OpInfo("LDX_MEMSX_H", 11),
-    BpfCode.LOAD_STORE.MEMSX | BpfSize.B  | BpfClass.LDX: OpInfo("LDX_MEMSX_B", 11),
-    BpfCode.LOAD_STORE.MEMSX | BpfSize.DW | BpfClass.LDX: OpInfo("LDX_MEMSX_DW", 11),
+    BpfMode.MEMSX | BpfSize.W  | BpfClass.LDX: OpInfo("LDX_MEMSX_W", 11),
+    BpfMode.MEMSX | BpfSize.H  | BpfClass.LDX: OpInfo("LDX_MEMSX_H", 11),
+    BpfMode.MEMSX | BpfSize.B  | BpfClass.LDX: OpInfo("LDX_MEMSX_B", 11),
+    BpfMode.MEMSX | BpfSize.DW | BpfClass.LDX: OpInfo("LDX_MEMSX_DW", 11),
     
     # ===== ST =====
-    BpfCode.LOAD_STORE.IMM   | BpfSize.W  | BpfClass.ST:  OpInfo("ST_IMM_W",  None),
-    BpfCode.LOAD_STORE.IMM   | BpfSize.H  | BpfClass.ST:  OpInfo("ST_IMM_H",  None),
-    BpfCode.LOAD_STORE.IMM   | BpfSize.B  | BpfClass.ST:  OpInfo("ST_IMM_B",  None),
-    BpfCode.LOAD_STORE.IMM   | BpfSize.DW | BpfClass.ST:  OpInfo("ST_IMM_DW", None),
+    BpfMode.IMM   | BpfSize.W  | BpfClass.ST:  OpInfo("ST_IMM_W",  None),
+    BpfMode.IMM   | BpfSize.H  | BpfClass.ST:  OpInfo("ST_IMM_H",  None),
+    BpfMode.IMM   | BpfSize.B  | BpfClass.ST:  OpInfo("ST_IMM_B",  None),
+    BpfMode.IMM   | BpfSize.DW | BpfClass.ST:  OpInfo("ST_IMM_DW", None),
 
-    BpfCode.LOAD_STORE.ABS   | BpfSize.W  | BpfClass.ST:  OpInfo("ST_ABS_W",  0),
-    BpfCode.LOAD_STORE.ABS   | BpfSize.H  | BpfClass.ST:  OpInfo("ST_ABS_H",  0),
-    BpfCode.LOAD_STORE.ABS   | BpfSize.B  | BpfClass.ST:  OpInfo("ST_ABS_B",  0),
-    BpfCode.LOAD_STORE.ABS   | BpfSize.DW | BpfClass.ST:  OpInfo("ST_ABS_DW", 0),
+    BpfMode.ABS   | BpfSize.W  | BpfClass.ST:  OpInfo("ST_ABS_W",  0),
+    BpfMode.ABS   | BpfSize.H  | BpfClass.ST:  OpInfo("ST_ABS_H",  0),
+    BpfMode.ABS   | BpfSize.B  | BpfClass.ST:  OpInfo("ST_ABS_B",  0),
+    BpfMode.ABS   | BpfSize.DW | BpfClass.ST:  OpInfo("ST_ABS_DW", 0),
 
-    BpfCode.LOAD_STORE.IND   | BpfSize.W  | BpfClass.ST:  OpInfo("ST_IND_W",  0),
-    BpfCode.LOAD_STORE.IND   | BpfSize.H  | BpfClass.ST:  OpInfo("ST_IND_H",  0),
-    BpfCode.LOAD_STORE.IND   | BpfSize.B  | BpfClass.ST:  OpInfo("ST_IND_B",  0),
-    BpfCode.LOAD_STORE.IND   | BpfSize.DW | BpfClass.ST:  OpInfo("ST_IND_DW", 0),
+    BpfMode.IND   | BpfSize.W  | BpfClass.ST:  OpInfo("ST_IND_W",  0),
+    BpfMode.IND   | BpfSize.H  | BpfClass.ST:  OpInfo("ST_IND_H",  0),
+    BpfMode.IND   | BpfSize.B  | BpfClass.ST:  OpInfo("ST_IND_B",  0),
+    BpfMode.IND   | BpfSize.DW | BpfClass.ST:  OpInfo("ST_IND_DW", 0),
     
-    BpfCode.LOAD_STORE.MEM   | BpfSize.W  | BpfClass.ST:  OpInfo("ST_W",  11),
-    BpfCode.LOAD_STORE.MEM   | BpfSize.H  | BpfClass.ST:  OpInfo("ST_H",  11),
-    BpfCode.LOAD_STORE.MEM   | BpfSize.B  | BpfClass.ST:  OpInfo("ST_B",  11),
-    BpfCode.LOAD_STORE.MEM   | BpfSize.DW | BpfClass.ST:  OpInfo("ST_DW", 11),
+    BpfMode.MEM   | BpfSize.W  | BpfClass.ST:  OpInfo("ST_W",  11),
+    BpfMode.MEM   | BpfSize.H  | BpfClass.ST:  OpInfo("ST_H",  11),
+    BpfMode.MEM   | BpfSize.B  | BpfClass.ST:  OpInfo("ST_B",  11),
+    BpfMode.MEM   | BpfSize.DW | BpfClass.ST:  OpInfo("ST_DW", 11),
 
-    BpfCode.LOAD_STORE.MEMSX | BpfSize.W  | BpfClass.ST:  OpInfo("ST_MEMSX_W",  11),
-    BpfCode.LOAD_STORE.MEMSX | BpfSize.H  | BpfClass.ST:  OpInfo("ST_MEMSX_H",  11),
-    BpfCode.LOAD_STORE.MEMSX | BpfSize.B  | BpfClass.ST:  OpInfo("ST_MEMSX_B",  11),
-    BpfCode.LOAD_STORE.MEMSX | BpfSize.DW | BpfClass.ST:  OpInfo("ST_MEMSX_DW", 11),
+    BpfMode.MEMSX | BpfSize.W  | BpfClass.ST:  OpInfo("ST_MEMSX_W",  11),
+    BpfMode.MEMSX | BpfSize.H  | BpfClass.ST:  OpInfo("ST_MEMSX_H",  11),
+    BpfMode.MEMSX | BpfSize.B  | BpfClass.ST:  OpInfo("ST_MEMSX_B",  11),
+    BpfMode.MEMSX | BpfSize.DW | BpfClass.ST:  OpInfo("ST_MEMSX_DW", 11),
     
     # ===== STX =====
-    BpfCode.LOAD_STORE.IMM   | BpfSize.W  | BpfClass.STX: OpInfo("STX_IMM_W",  None),
-    BpfCode.LOAD_STORE.IMM   | BpfSize.H  | BpfClass.STX: OpInfo("STX_IMM_H",  None),
-    BpfCode.LOAD_STORE.IMM   | BpfSize.B  | BpfClass.STX: OpInfo("STX_IMM_B",  None),
-    BpfCode.LOAD_STORE.IMM   | BpfSize.DW | BpfClass.STX: OpInfo("STX_IMM_DW", None),
+    BpfMode.IMM   | BpfSize.W  | BpfClass.STX: OpInfo("STX_IMM_W",  None),
+    BpfMode.IMM   | BpfSize.H  | BpfClass.STX: OpInfo("STX_IMM_H",  None),
+    BpfMode.IMM   | BpfSize.B  | BpfClass.STX: OpInfo("STX_IMM_B",  None),
+    BpfMode.IMM   | BpfSize.DW | BpfClass.STX: OpInfo("STX_IMM_DW", None),
 
-    BpfCode.LOAD_STORE.ABS   | BpfSize.W  | BpfClass.STX: OpInfo("STX_ABS_W",  None),
-    BpfCode.LOAD_STORE.ABS   | BpfSize.H  | BpfClass.STX: OpInfo("STX_ABS_H",  None),
-    BpfCode.LOAD_STORE.ABS   | BpfSize.B  | BpfClass.STX: OpInfo("STX_ABS_B",  None),
-    BpfCode.LOAD_STORE.ABS   | BpfSize.DW | BpfClass.STX: OpInfo("STX_ABS_DW", None),
+    BpfMode.ABS   | BpfSize.W  | BpfClass.STX: OpInfo("STX_ABS_W",  None),
+    BpfMode.ABS   | BpfSize.H  | BpfClass.STX: OpInfo("STX_ABS_H",  None),
+    BpfMode.ABS   | BpfSize.B  | BpfClass.STX: OpInfo("STX_ABS_B",  None),
+    BpfMode.ABS   | BpfSize.DW | BpfClass.STX: OpInfo("STX_ABS_DW", None),
 
-    BpfCode.LOAD_STORE.IND   | BpfSize.W  | BpfClass.STX: OpInfo("STX_IND_W",  None),
-    BpfCode.LOAD_STORE.IND   | BpfSize.H  | BpfClass.STX: OpInfo("STX_IND_H",  None),
-    BpfCode.LOAD_STORE.IND   | BpfSize.B  | BpfClass.STX: OpInfo("STX_IND_B",  None),
-    BpfCode.LOAD_STORE.IND   | BpfSize.DW | BpfClass.STX: OpInfo("STX_IND_DW", None),
+    BpfMode.IND   | BpfSize.W  | BpfClass.STX: OpInfo("STX_IND_W",  None),
+    BpfMode.IND   | BpfSize.H  | BpfClass.STX: OpInfo("STX_IND_H",  None),
+    BpfMode.IND   | BpfSize.B  | BpfClass.STX: OpInfo("STX_IND_B",  None),
+    BpfMode.IND   | BpfSize.DW | BpfClass.STX: OpInfo("STX_IND_DW", None),
     
-    BpfCode.LOAD_STORE.MEM   | BpfSize.W  | BpfClass.STX: OpInfo("STX_W",  7),
-    BpfCode.LOAD_STORE.MEM   | BpfSize.H  | BpfClass.STX: OpInfo("STX_H",  7),
-    BpfCode.LOAD_STORE.MEM   | BpfSize.B  | BpfClass.STX: OpInfo("STX_B",  7),
-    BpfCode.LOAD_STORE.MEM   | BpfSize.DW | BpfClass.STX: OpInfo("STX_DW", 7),
+    BpfMode.MEM   | BpfSize.W  | BpfClass.STX: OpInfo("STX_W",  7),
+    BpfMode.MEM   | BpfSize.H  | BpfClass.STX: OpInfo("STX_H",  7),
+    BpfMode.MEM   | BpfSize.B  | BpfClass.STX: OpInfo("STX_B",  7),
+    BpfMode.MEM   | BpfSize.DW | BpfClass.STX: OpInfo("STX_DW", 7),
 
-    BpfCode.LOAD_STORE.MEMSX | BpfSize.W  | BpfClass.STX: OpInfo("STX_MEMSX_W",  7),
-    BpfCode.LOAD_STORE.MEMSX | BpfSize.H  | BpfClass.STX: OpInfo("STX_MEMSX_H",  7),
-    BpfCode.LOAD_STORE.MEMSX | BpfSize.B  | BpfClass.STX: OpInfo("STX_MEMSX_B",  7),
-    BpfCode.LOAD_STORE.MEMSX | BpfSize.DW | BpfClass.STX: OpInfo("STX_MEMSX_DW", 7),
+    BpfMode.MEMSX | BpfSize.W  | BpfClass.STX: OpInfo("STX_MEMSX_W",  7),
+    BpfMode.MEMSX | BpfSize.H  | BpfClass.STX: OpInfo("STX_MEMSX_H",  7),
+    BpfMode.MEMSX | BpfSize.B  | BpfClass.STX: OpInfo("STX_MEMSX_B",  7),
+    BpfMode.MEMSX | BpfSize.DW | BpfClass.STX: OpInfo("STX_MEMSX_DW", 7),
     
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_ADD) << 8): OpInfo("ATOMIC_ADD_W", 8),
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_ADD|BPF_FETCH) << 8): OpInfo("ATOMIC_ADD_FETCH_W", 8),
+    (BpfMode.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_ADD) << 8): OpInfo("ATOMIC_ADD_W", 8),
+    (BpfMode.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_ADD|BPF_FETCH) << 8): OpInfo("ATOMIC_ADD_FETCH_W", 8),
 
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_AND) << 8): OpInfo("ATOMIC_AND_W", 8),
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_AND|BPF_FETCH) << 8): OpInfo("ATOMIC_AND_FETCH_W", 8),
+    (BpfMode.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_AND) << 8): OpInfo("ATOMIC_AND_W", 8),
+    (BpfMode.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_AND|BPF_FETCH) << 8): OpInfo("ATOMIC_AND_FETCH_W", 8),
 
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_OR) << 8): OpInfo("ATOMIC_OR_W", 8),
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_OR |BPF_FETCH) << 8): OpInfo("ATOMIC_OR_FETCH_W", 8),
+    (BpfMode.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_OR) << 8): OpInfo("ATOMIC_OR_W", 8),
+    (BpfMode.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_OR |BPF_FETCH) << 8): OpInfo("ATOMIC_OR_FETCH_W", 8),
 
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_XOR) << 8): OpInfo("ATOMIC_XOR_W", 8),
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_XOR|BPF_FETCH) << 8): OpInfo("ATOMIC_XOR_FETCH_W", 8),
+    (BpfMode.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_XOR) << 8): OpInfo("ATOMIC_XOR_W", 8),
+    (BpfMode.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_XOR|BPF_FETCH) << 8): OpInfo("ATOMIC_XOR_FETCH_W", 8),
 
     # XCHG / CMPXCHG
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_XCHG) << 8): OpInfo("ATOMIC_XCHG_W", 8),
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_CMPXCHG) << 8): OpInfo("ATOMIC_CMPXCHG_W", 8),
+    (BpfMode.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_XCHG) << 8): OpInfo("ATOMIC_XCHG_W", 8),
+    (BpfMode.ATOMIC | BpfSize.W  | BpfClass.STX) | ((ATOMIC_CMPXCHG) << 8): OpInfo("ATOMIC_CMPXCHG_W", 8),
 
     # === STX | ATOMIC | DW（64-bit）===
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_ADD          ) << 8): OpInfo("ATOMIC_ADD_DW", 8),
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_ADD|BPF_FETCH) << 8): OpInfo("ATOMIC_ADD_FETCH_DW", 8),
+    (BpfMode.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_ADD          ) << 8): OpInfo("ATOMIC_ADD_DW", 8),
+    (BpfMode.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_ADD|BPF_FETCH) << 8): OpInfo("ATOMIC_ADD_FETCH_DW", 8),
 
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_AND          ) << 8): OpInfo("ATOMIC_AND_DW", 8),
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_AND|BPF_FETCH) << 8): OpInfo("ATOMIC_AND_FETCH_DW", 8),
+    (BpfMode.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_AND          ) << 8): OpInfo("ATOMIC_AND_DW", 8),
+    (BpfMode.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_AND|BPF_FETCH) << 8): OpInfo("ATOMIC_AND_FETCH_DW", 8),
 
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_OR           ) << 8): OpInfo("ATOMIC_OR_DW", 8),
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_OR |BPF_FETCH) << 8): OpInfo("ATOMIC_OR_FETCH_DW", 8),
+    (BpfMode.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_OR           ) << 8): OpInfo("ATOMIC_OR_DW", 8),
+    (BpfMode.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_OR |BPF_FETCH) << 8): OpInfo("ATOMIC_OR_FETCH_DW", 8),
 
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_XOR          ) << 8): OpInfo("ATOMIC_XOR_DW", 8),
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_XOR|BPF_FETCH) << 8): OpInfo("ATOMIC_XOR_FETCH_DW", 8),
+    (BpfMode.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_XOR          ) << 8): OpInfo("ATOMIC_XOR_DW", 8),
+    (BpfMode.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_XOR|BPF_FETCH) << 8): OpInfo("ATOMIC_XOR_FETCH_DW", 8),
 
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_XCHG         ) << 8): OpInfo("ATOMIC_XCHG_DW", 8),
-    (BpfCode.LOAD_STORE.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_CMPXCHG      ) << 8): OpInfo("ATOMIC_CMPXCHG_DW", 8),
+    (BpfMode.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_XCHG         ) << 8): OpInfo("ATOMIC_XCHG_DW", 8),
+    (BpfMode.ATOMIC | BpfSize.DW | BpfClass.STX) | ((ATOMIC_CMPXCHG      ) << 8): OpInfo("ATOMIC_CMPXCHG_DW", 8),
 }
 
 
@@ -299,7 +299,7 @@ def instr_to_runtime(instructions:list, start:int, end:int) -> int:
 
     return runtime
 
-def dfs_blocks(first_block: Block, instructions: list) -> int:
+def dfs_blocks(first_block: Block | None, instructions: list) -> int:
     """
     Perform a depth-first search over the Block graph. （No loops currently)
     Returns a integer value (CPU cycles) representing an estimated runtime upper bound
@@ -318,7 +318,7 @@ def dfs_blocks(first_block: Block, instructions: list) -> int:
     if first_block is None:
         return 0
 
-    onpath: Set[int] = set()      # nodes on the current recursion path
+    onpath: Set[Block] = set()      # nodes on the current recursion path
     path_runtime_ub = 0
     path_runtime = 0
 
