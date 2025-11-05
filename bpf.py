@@ -2,17 +2,6 @@ import struct
 from enum import IntEnum
 
 
-class BpfClass(IntEnum):
-    LD = 0x0
-    LDX = 0x1
-    ST = 0x2
-    STX = 0x3
-    ALU = 0x4
-    JMP = 0x5
-    JMP32 = 0x6
-    ALU64 = 0x7
-
-
 class Shift:
     IMM = 32
     OFFSET = 16
@@ -22,6 +11,10 @@ class Shift:
     S = SZ = 3
     CODE = 4
     MODE = 5
+
+    # for 16-byte instructions
+    RESERVED = 32
+    NEXT_IMM = 0
 
 
 class Mask:
@@ -40,10 +33,28 @@ class Mask:
     SZ = 0b11 << Shift.SZ
     MODE = 0b111 << Shift.MODE
 
+    # for 16-byte instructions
+    RESERVED = 0xFFFFFFFF << Shift.RESERVED
+    NEXT_IMM = 0xFFFFFFFF << Shift.NEXT_IMM
 
+
+class_in_opcode_shift = Shift.CLASS - Shift.OPCODE
 code_in_opcode_shift = Shift.CODE - Shift.OPCODE
 s_in_opcode_shift = Shift.S - Shift.OPCODE
 mode_in_opcode_shift = Shift.MODE - Shift.OPCODE
+
+
+class BpfClass(IntEnum):
+    # shift is zero, but let's keep it consistant
+    shift = class_in_opcode_shift
+    LD = 0x0 << shift
+    LDX = 0x1 << shift
+    ST = 0x2 << shift
+    STX = 0x3 << shift
+    ALU = 0x4 << shift
+    JMP = 0x5 << shift
+    JMP32 = 0x6 << shift
+    ALU64 = 0x7 << shift
 
 
 # for Arithmetic and Jump instructions
@@ -52,12 +63,14 @@ class BpfS:
     K = 0x0 << shift  # imm is source
     X = 0x1 << shift  # src is source
 
+
 # for Load and Store instructions
 class BpfSize:
-    W  = 0x00 << Shift.SZ   # 32
-    H  = 0x01 << Shift.SZ   # 16
-    B  = 0x02 << Shift.SZ   # 8
-    DW = 0x03 << Shift.SZ   # 64
+    W = 0x00 << Shift.SZ  # 32
+    H = 0x01 << Shift.SZ  # 16
+    B = 0x02 << Shift.SZ  # 8
+    DW = 0x03 << Shift.SZ  # 64
+
 
 # for Arithmetic and Jump instructions
 class BpfCode:
@@ -107,6 +120,12 @@ class BpfMode(IntEnum):
     MEMSX = 0x4 << shift
     ATOMIC = 0x6 << shift
 
+    @classmethod
+    def _missing_(cls, value):
+        if isinstance(value, int):
+            val = value >> Shift.MODE
+            raise ValueError(f"couldn't find BpfMode for 0b{val:03b} = {val}")
+
 
 class BpfInstruction:
     def __init__(self, instruction: bytes) -> None:
@@ -117,6 +136,11 @@ class BpfInstruction:
         self.src = self._get_src()
         self.dst = self._get_dst()
         self.opcode = self._get_opcode()
+
+        # for the occasional 16-byte instruction
+        self.next_instruction: bytes | None = None
+        self.reserved: int | None = None
+        self.next_imm: int | None = None
 
     def _to_int(self, instruction: bytes) -> int:
         (val,) = struct.unpack(
@@ -157,11 +181,61 @@ class BpfInstruction:
     def _get_opcode(self) -> int:
         return (self._to_int(self.instruction) & Mask.OPCODE) >> Shift.OPCODE
 
+    def _get_reserved(self) -> int:
+        if self.next_instruction is None:
+            raise Exception(f"tried getting reserved on 8-byte instruction")
+        return self._to_int(self.next_instruction) & Mask.RESERVED >> Shift.RESERVED
+
+    def _get_next_imm(self) -> int:
+        if self.next_instruction is None:
+            raise Exception(f"tried getting next_imm on 8-byte instruction")
+        return self._to_int(self.next_instruction) & Mask.NEXT_IMM >> Shift.NEXT_IMM
+
     def get_class(self) -> BpfClass:
-        return BpfClass(self.opcode & (Mask.CLASS >> Shift.CLASS))
+        return BpfClass(self.opcode & Mask.CLASS)
+
+    def get_mode(self) -> BpfMode:
+        return BpfMode(self.opcode & Mask.MODE)
 
     def __str__(self) -> str:
-        return " ".join([f"{b:02x}" for b in self.instruction])
+        def bytes_to_str(bb: bytes) -> str:
+            return " ".join([f"{b:02x}" for b in bb])
+
+        out = bytes_to_str(self.instruction)
+        if self.next_instruction is not None:
+            out += " " + bytes_to_str(self.next_instruction)
+
+        return out
 
     def __repr__(self) -> str:
         return str(self)
+
+    def class_is_ld_st(self) -> bool:
+        return self.get_class() in [
+            BpfClass.LD,
+            BpfClass.LDX,
+            BpfClass.ST,
+            BpfClass.STX,
+        ]
+
+    def class_is_alu_jmp(self) -> bool:
+        return self.get_class() in [
+            BpfClass.ALU,
+            BpfClass.JMP,
+            BpfClass.JMP32,
+            BpfClass.ALU64,
+        ]
+
+    def is_wide_instruction(self) -> bool:
+        """As defined in https://docs.kernel.org/bpf/standardization/instruction-set.html#wide-instruction-encoding"""
+
+        # https://docs.kernel.org/bpf/standardization/instruction-set.html#bit-immediate-instructions
+        if self.class_is_ld_st() and self.get_mode() == BpfMode.IMM:
+            return True
+
+        return False
+
+    def widen_instruction(self, more: bytes):
+        self.next_instruction = more
+        self.reserved = self._get_reserved()
+        self.next_imm = self._get_next_imm()

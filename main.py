@@ -18,7 +18,13 @@ def read_bpf_file(filename: str) -> list[BpfInstruction]:
             if ins == b"":
                 break
 
-            instructions.append(BpfInstruction(ins))
+            bpf_ins = BpfInstruction(ins)
+            if bpf_ins.is_wide_instruction():
+                more = file.read(inst_size)
+                assert more != b""
+                bpf_ins.widen_instruction(more)
+
+            instructions.append(bpf_ins)
 
     return instructions
 
