@@ -117,6 +117,7 @@ class BpfMode(IntEnum):
     ABS = 0x1 << shift
     IND = 0x2 << shift
     MEM = 0x3 << shift
+    FMEM = 0x5 << shift
     MEMSX = 0x4 << shift
     ATOMIC = 0x6 << shift
 
