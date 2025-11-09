@@ -1,9 +1,16 @@
 from __future__ import annotations
-import sys
+import argparse
 
 from bpf import BpfInstruction, BpfClass, BpfCode, BpfS
 from block import Block
 from dfs import dfs_blocks
+
+
+parser = argparse.ArgumentParser(
+    prog="bpf-runtime-verifier",
+    description="Estimates the runtime of BPF-Prime programs",
+)
+parser.add_argument("filename")
 
 
 def read_bpf_file(filename: str) -> list[BpfInstruction]:
@@ -46,7 +53,7 @@ def get_blocks_tree(
         seen = set()
 
     if start_idx in seen:
-        raise Exception(f"detected loop: block at idx={start_idx} loops" )
+        raise Exception(f"detected loop: block at idx={start_idx} loops")
 
     seen.add(start_idx)
 
@@ -58,7 +65,7 @@ def get_blocks_tree(
         # meaning they match structure (e.g. are you of type int?),
         # not values (e.g. are you 221?)
         # we go around this with our `x if x == (value)`
-        match (ins.opcode):
+        match ins.opcode:
             # unconditional jumps
             case x if x == BpfCode.JMP.EXIT | BpfS.K | BpfClass.JMP:
                 print(f"idx={idx}: EXIT")
@@ -85,7 +92,7 @@ def get_blocks_tree(
             case x if x == BpfCode.JMP.CALL | BpfS.K | BpfClass.JMP:
                 block = Block(start_idx, idx)
                 # start.add(idx + 1)
-                match (ins.src):
+                match ins.src:
                     case 0:
                         print("calling helper function by static id")
                         continue
@@ -165,12 +172,9 @@ def get_blocks_tree(
 
 
 def main():
-    args = sys.argv
-    if len(args) != 2:
-        raise Exception(f"usage: {args[0]} <filename>")
-    filename = args[1]
+    args = parser.parse_args()
 
-    instructions = read_bpf_file(filename)
+    instructions = read_bpf_file(args.filename)
     first_block = get_blocks_tree(instructions)
 
     print(f"blocks: {first_block}")
