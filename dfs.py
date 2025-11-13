@@ -421,10 +421,12 @@ def instr_to_runtime(instructions:list, start:int, end:int) -> int:
         else:
             op_info = BPF_INFO.get(instr.opcode)      # ALU/MEM ... + FLDX & FSTX
 
-        print(f"idx={idx}: name={op_info.name}, latency={op_info.latency}")
         if op_info:
+            print(f"idx={idx}: name={op_info.name}, latency={op_info.latency}")
             if op_info.latency:
                 runtime += op_info.latency
+        else:
+            print(f"idx={idx}: Cannot find corresponding instruction")
 
     return runtime
 

@@ -4,6 +4,7 @@ import argparse
 from bpf import BpfInstruction, BpfClass, BpfCode, BpfS
 from block import Block
 from dfs import dfs_blocks
+from mem_access import dfs_blocks_with_mem
 
 
 parser = argparse.ArgumentParser(
@@ -180,6 +181,7 @@ def main():
     print(f"blocks: {first_block}")
     runtime_ub: float = dfs_blocks(first_block, instructions)
     print(f"runtime_ub: {runtime_ub}")
+    runtime_ub_mem = dfs_blocks_with_mem(first_block, instructions)
 
 
 if __name__ == "__main__":
