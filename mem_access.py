@@ -150,7 +150,6 @@ def _branch_cond_z3(idx: int, instr, opinfo: OpInfo, z3_regs: Dict[int, ArithRef
         return None
 
     # Normalize comparator (strip trailing "32" for now; we’re using Int semantics)
-    # If you want precise 32/64-bit or signed/unsigned, switch to BitVec and UGT/UGE/ULT/ULE.
     cmp_core = cmp_tag.replace("32", "")
 
     # Integer
@@ -315,30 +314,10 @@ def _mem_access_from_instr(idx: int, instr, opinfo: OpInfo, st: RegisterState,
 
 # ---------- Z3-aware ALU constraints ----------
 def _apply_alu_update_z3(idx: int, instr, opinfo: OpInfo,
-                         z3_regs: Dict[int, ArithRef], solver: Solver, base_syms: Dict[str, ArithRef]):
+                         z3_regs: Dict[int, ArithRef], solver: Solver, base_syms: Dict[str, ArithRef]) -> None:
 
     """Emit Z3 constraints for one eBPF ALU/IMM instruction and advance the
      Z3 register mapping.
-
-    The function models the effect of a single instruction at program point
-    ``idx`` by:
-      1) creating a fresh Z3 variable for the destination register
-         (``dst_var = _z3_reg_var(dst, idx)``);
-      2) adding the appropriate equality constraint to ``solver`` for
-         supported ops; and
-      3) updating ``z3_regs[dst]`` to this new version so later instructions
-         read the latest value.
-
-    Supported behaviors:
-      * MOV_K / MOV64_K:      dst := imm
-      * MOV_X / MOV64_X:      dst := src
-      * ADD_K / SUB_K (32/64): dst := dst ± imm   (uses previous dst version)
-      * ADD_X / SUB_X (32/64): dst := dst ± src   (uses previous dst/src versions)
-      * LD*_IMM* / LDX*_IMM*:  dst := base symbol derived from ``imm``
-                               (via ``_z3_imm_addr_symbol``; memoized in
-                               ``base_syms`` to represent an address base)
-      * Any other op:          dst becomes a fresh, unconstrained variable
-                               (“havoc”); no constraint ties it to prior value.
 
     Notes:
       - This routine only handles ALU/IMM-style semantics; memory accesses are
@@ -355,47 +334,98 @@ def _apply_alu_update_z3(idx: int, instr, opinfo: OpInfo,
     Returns:
         None. Side-effects on ``solver`` and ``z3_regs``.
     """
-    if opinfo is None: return
-    name = opinfo.name
+    if opinfo is None:
+        return
+
+    raw = opinfo.name
     dst, src, imm = instr.dst, instr.src, instr.imm
     dst_var = _z3_reg_var(dst, idx)
 
-    if name in ("MOV_K","MOV64_K"):
+    # ---- Helpers ----
+    def _prev(reg: int) -> ArithRef:
+        return z3_regs.get(reg, _z3_reg_var(reg, idx - 1))
+
+    # Memory-like opcode families (keep original names; don't strip 'F')
+    def _is_mem_like(n: str) -> bool:
+        if _is_fpu_mem(n):
+            return True
+        if _is_load_mem(n) or _is_store_mem(n):
+            return True
+        return False
+
+    # ---- Normalize FPU ALU names ----
+    if raw.startswith('F') and not _is_mem_like(raw):
+        name = raw[1:]            # e.g., FADD64_K -> ADD64_K, FMOV_X -> MOV_X
+    else:
+        name = raw
+
+    # ================= Exact constraints we support =================
+    # MOV_K / MOV64_K / FMOV_K / FMOV64_K
+    if name in ("MOV_K", "MOV64_K"):
         solver.add(dst_var == IntVal(imm))
         z3_regs[dst] = dst_var
         return
-    if name in ("MOV_X","MOV64_X"):
-        rhs = z3_regs.get(src, _z3_reg_var(src, idx-1))
-        solver.add(dst_var == rhs)
+
+    # MOV_X / MOV64_X / FMOV_X / FMOV64_X
+    if name in ("MOV_X", "MOV64_X"):
+        solver.add(dst_var == _prev(src))
         z3_regs[dst] = dst_var
         return
 
-    if name in ("ADD_K","ADD64_K"):
-        base = z3_regs.get(dst, _z3_reg_var(dst, idx-1))
-        solver.add(dst_var == base + IntVal(imm))
-        z3_regs[dst] = dst_var
-        return
-    if name in ("SUB_K","SUB64_K"):
-        base = z3_regs.get(dst, _z3_reg_var(dst, idx-1))
-        solver.add(dst_var == base - IntVal(imm))
+    # ADD_K / ADD64_K / FADD*_K
+    if name in ("ADD_K", "ADD64_K"):
+        solver.add(dst_var == _prev(dst) + IntVal(imm))
         z3_regs[dst] = dst_var
         return
 
-    if name in ("ADD_X","ADD64_X","SUB_X","SUB64_X"):
-        lhs = z3_regs.get(dst, _z3_reg_var(dst, idx-1))
-        rhs = z3_regs.get(src, _z3_reg_var(src, idx-1))
-        if name.startswith("ADD"): solver.add(dst_var == lhs + rhs)
-        else:                      solver.add(dst_var == lhs - rhs)
+    # SUB_K / SUB64_K / FSUB*_K
+    if name in ("SUB_K", "SUB64_K"):
+        solver.add(dst_var == _prev(dst) - IntVal(imm))
         z3_regs[dst] = dst_var
         return
 
-    if name in ("LD_IMM_W","LD_IMM_H","LD_IMM_B","LDDW","LDX_IMM_W","LDX_IMM_H","LDX_IMM_B","LDX_IMM_DW"):
+    # ADD_X / ADD64_X / FADD*_X   and   SUB_X / SUB64_X / FSUB*_X
+    if name in ("ADD_X", "ADD64_X", "SUB_X", "SUB64_X"):
+        lhs = _prev(dst)
+        rhs = _prev(src)
+        if name.startswith("ADD"):
+            solver.add(dst_var == lhs + rhs)
+        else:
+            solver.add(dst_var == lhs - rhs)
+        z3_regs[dst] = dst_var
+        return
+
+    # NEG / NEG64 / FNEG
+    if name in ("NEG", "NEG64"):
+        solver.add(dst_var == -_prev(dst))
+        z3_regs[dst] = dst_var
+        return
+
+    # MUL_K / MUL64_K / FMUL*_K   (safe Int semantics)
+    if name in ("MUL_K", "MUL64_K"):
+        solver.add(dst_var == _prev(dst) * IntVal(imm))
+        z3_regs[dst] = dst_var
+        return
+
+    # MUL_X / MUL64_X / FMUL*_X   (safe Int semantics)
+    if name in ("MUL_X", "MUL64_X"):
+        solver.add(dst_var == _prev(dst) * _prev(src))
+        z3_regs[dst] = dst_var
+        return
+
+    # ================= Address/immediate loads we model =================
+    if name in ("LD_IMM_W", "LD_IMM_H", "LD_IMM_B", "LDDW",
+                "LDX_IMM_W", "LDX_IMM_H", "LDX_IMM_B", "LDX_IMM_DW"):
         sym = _z3_imm_addr_symbol(imm, base_syms)
         solver.add(dst_var == sym)
         z3_regs[dst] = dst_var
         return
 
-    z3_regs[dst] = dst_var
+    # ================= Everything else =================
+    # Bitwise (AND/OR/XOR), shifts (LSH/RSH/ARSH), DIV/MOD, etc. are
+    # left unconstrained under Int semantics to avoid incorrect models.
+    # If later needed, switch to BitVec and add precise rules.
+    z3_regs[dst] = dst_var  # havoc
 
 
 def _scan_block(
