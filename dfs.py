@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from block import Block
-from bpf import BpfClass, BpfCode, BpfS, BpfSize, BpfMode
+from bpf import BpfClass, BpfCode, BpfS, BpfSize, BpfMode, BpfInstruction, Mask, Shift
 
 from typing import Set, Optional, Dict
 
@@ -41,7 +41,8 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfCode.ALU.LSH  | BpfS.X | BpfClass.ALU:   OpInfo("LSH_X",   1),
     BpfCode.ALU.RSH  | BpfS.K | BpfClass.ALU:   OpInfo("RSH_K",   1),
     BpfCode.ALU.RSH  | BpfS.X | BpfClass.ALU:   OpInfo("RSH_X",   1),
-    BpfCode.ALU.NEG  | BpfS.K | BpfClass.ALU:   OpInfo("NEG",     0),
+    BpfCode.ALU.NEG  | BpfS.K | BpfClass.ALU:   OpInfo("NEG_K",   0),
+    BpfCode.ALU.NEG  | BpfS.X | BpfClass.ALU:   OpInfo("NEG_X",   0),
     BpfCode.ALU.XOR  | BpfS.K | BpfClass.ALU:   OpInfo("XOR_K",   5),
     BpfCode.ALU.XOR  | BpfS.X | BpfClass.ALU:   OpInfo("XOR_X",   1),
     BpfCode.ALU.MOV  | BpfS.K | BpfClass.ALU:   OpInfo("MOV_K",   4),
@@ -69,7 +70,8 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfCode.ALU.LSH  | BpfS.X | BpfClass.ALU64: OpInfo("LSH64_X", 1),
     BpfCode.ALU.RSH  | BpfS.K | BpfClass.ALU64: OpInfo("RSH64_K", 1),
     BpfCode.ALU.RSH  | BpfS.X | BpfClass.ALU64: OpInfo("RSH64_X", 1),
-    BpfCode.ALU.NEG  | BpfS.K | BpfClass.ALU64: OpInfo("NEG64",   0),
+    BpfCode.ALU.NEG  | BpfS.K | BpfClass.ALU64: OpInfo("NEG64_K", 0),
+    BpfCode.ALU.NEG  | BpfS.X | BpfClass.ALU64: OpInfo("NEG64_X", 0),
     BpfCode.ALU.XOR  | BpfS.K | BpfClass.ALU64: OpInfo("XOR64_K", 5),
     BpfCode.ALU.XOR  | BpfS.X | BpfClass.ALU64: OpInfo("XOR64_X", 1),
     BpfCode.ALU.MOV  | BpfS.K | BpfClass.ALU64: OpInfo("MOV64_K", 4),
@@ -103,6 +105,7 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfCode.JMP.JSLE | BpfS.K | BpfClass.JMP:   OpInfo("JSLE_K",  7),
     BpfCode.JMP.JSLE | BpfS.X | BpfClass.JMP:   OpInfo("JSLE_X",  3),
     BpfCode.JMP.CALL | BpfS.K | BpfClass.JMP:   OpInfo("CALL",    None),
+    BpfCode.JMP.CALL | BpfS.X | BpfClass.JMP:   OpInfo("CALL",    None),
     BpfCode.JMP.EXIT | BpfS.K | BpfClass.JMP:   OpInfo("EXIT",    2),
 
     # ===== JMP32 (32-bit compare) =====
@@ -129,6 +132,8 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfCode.JMP.JSLT | BpfS.X | BpfClass.JMP32: OpInfo("JSLT32_X", 3),
     BpfCode.JMP.JSLE | BpfS.K | BpfClass.JMP32: OpInfo("JSLE32_K", 7),
     BpfCode.JMP.JSLE | BpfS.X | BpfClass.JMP32: OpInfo("JSLE32_X", 3),
+    BpfCode.JMP.CALL | BpfS.K | BpfClass.JMP32: OpInfo("CALL",     None),
+    BpfCode.JMP.CALL | BpfS.X | BpfClass.JMP32: OpInfo("CALL",     None),
     
     # ===== LD =====
     BpfMode.IMM | BpfSize.W  | BpfClass.LD:  OpInfo("LD_IMM_W",  4 + 87),
@@ -150,6 +155,11 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfMode.MEM   | BpfSize.H  | BpfClass.LD: OpInfo("LD_MEM_H",  None),
     BpfMode.MEM   | BpfSize.B  | BpfClass.LD: OpInfo("LD_MEM_B",  None),
     BpfMode.MEM   | BpfSize.DW | BpfClass.LD: OpInfo("LD_MEM_DW", None),
+
+    BpfMode.FMEM  | BpfSize.W  | BpfClass.LD: OpInfo("FLD_W",  3 + 87),
+    BpfMode.FMEM  | BpfSize.H  | BpfClass.LD: OpInfo("FLD_H",  3 + 87),
+    BpfMode.FMEM  | BpfSize.B  | BpfClass.LD: OpInfo("FLD_B",  3 + 87),
+    BpfMode.FMEM  | BpfSize.DW | BpfClass.LD: OpInfo("FLD_DW",  3 + 87),
 
     BpfMode.MEMSX | BpfSize.W  | BpfClass.LD: OpInfo("LD_MEMSX_W",  None),
     BpfMode.MEMSX | BpfSize.H  | BpfClass.LD: OpInfo("LD_MEMSX_H",  None),
@@ -176,6 +186,11 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfMode.MEM   | BpfSize.H  | BpfClass.LDX: OpInfo("LDX_H",  11 + 87),
     BpfMode.MEM   | BpfSize.B  | BpfClass.LDX: OpInfo("LDX_B",  11 + 87),
     BpfMode.MEM   | BpfSize.DW | BpfClass.LDX: OpInfo("LDX_DW", 11 + 87),
+    
+    BpfMode.FMEM  | BpfSize.W  | BpfClass.LDX: OpInfo("FLDX_W",  3 + 87),
+    BpfMode.FMEM  | BpfSize.H  | BpfClass.LDX: OpInfo("FLDX_H",  3 + 87),
+    BpfMode.FMEM  | BpfSize.B  | BpfClass.LDX: OpInfo("FLDX_B",  3 + 87),
+    BpfMode.FMEM  | BpfSize.DW | BpfClass.LDX: OpInfo("FLDX_DW",  3 + 87),
 
     BpfMode.MEMSX | BpfSize.W  | BpfClass.LDX: OpInfo("LDX_MEMSX_W", 11 + 87),
     BpfMode.MEMSX | BpfSize.H  | BpfClass.LDX: OpInfo("LDX_MEMSX_H", 11 + 87),
@@ -202,6 +217,11 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfMode.MEM   | BpfSize.H  | BpfClass.ST:  OpInfo("ST_H",  11 + 87),
     BpfMode.MEM   | BpfSize.B  | BpfClass.ST:  OpInfo("ST_B",  11 + 87),
     BpfMode.MEM   | BpfSize.DW | BpfClass.ST:  OpInfo("ST_DW", 11 + 87),
+    
+    BpfMode.FMEM  | BpfSize.W  | BpfClass.ST: OpInfo("FST_W",  1 + 87),
+    BpfMode.FMEM  | BpfSize.H  | BpfClass.ST: OpInfo("FST_H",  1 + 87),
+    BpfMode.FMEM  | BpfSize.B  | BpfClass.ST: OpInfo("FST_B",  1 + 87),
+    BpfMode.FMEM  | BpfSize.DW | BpfClass.ST: OpInfo("FST_DW",  1 + 87),
 
     BpfMode.MEMSX | BpfSize.W  | BpfClass.ST:  OpInfo("ST_MEMSX_W",  11 + 87),
     BpfMode.MEMSX | BpfSize.H  | BpfClass.ST:  OpInfo("ST_MEMSX_H",  11 + 87),
@@ -228,6 +248,11 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfMode.MEM   | BpfSize.H  | BpfClass.STX: OpInfo("STX_H",  7 + 87),
     BpfMode.MEM   | BpfSize.B  | BpfClass.STX: OpInfo("STX_B",  7 + 87),
     BpfMode.MEM   | BpfSize.DW | BpfClass.STX: OpInfo("STX_DW", 7 + 87),
+    
+    BpfMode.FMEM  | BpfSize.W  | BpfClass.STX: OpInfo("FSTX_W",  1 + 87),
+    BpfMode.FMEM  | BpfSize.H  | BpfClass.STX: OpInfo("FSTX_H",  1 + 87),
+    BpfMode.FMEM  | BpfSize.B  | BpfClass.STX: OpInfo("FSTX_B",  1 + 87),
+    BpfMode.FMEM  | BpfSize.DW | BpfClass.STX: OpInfo("FSTX_DW",  1 + 87),
 
     BpfMode.MEMSX | BpfSize.W  | BpfClass.STX: OpInfo("STX_MEMSX_W",  7 + 87),
     BpfMode.MEMSX | BpfSize.H  | BpfClass.STX: OpInfo("STX_MEMSX_H",  7 + 87),
@@ -268,6 +293,106 @@ BPF_INFO: Dict[int, OpInfo] = {
 }
 
 
+BPF_INFO_FPU: Dict[int, OpInfo] = {
+    # ===== FPU32 (Single Precision) =====
+    BpfCode.ALU.ADD  | BpfS.K | BpfClass.ALU:   OpInfo("FADD_K",   12),
+    BpfCode.ALU.ADD  | BpfS.X | BpfClass.ALU:   OpInfo("FADD_X",   5),
+    BpfCode.ALU.SUB  | BpfS.K | BpfClass.ALU:   OpInfo("FSUB_K",   12),
+    BpfCode.ALU.SUB  | BpfS.X | BpfClass.ALU:   OpInfo("FSUB_X",   5),
+    BpfCode.ALU.MUL  | BpfS.K | BpfClass.ALU:   OpInfo("FMUL_K",   12),
+    BpfCode.ALU.MUL  | BpfS.X | BpfClass.ALU:   OpInfo("FMUL_X",   5),
+    BpfCode.ALU.DIV  | BpfS.K | BpfClass.ALU:   OpInfo("FDIV_K",   27),
+    BpfCode.ALU.DIV  | BpfS.X | BpfClass.ALU:   OpInfo("FDIV_X",   20),
+    BpfCode.ALU.NEG  | BpfS.K | BpfClass.ALU:   OpInfo("FNEG_K",   3),
+    BpfCode.ALU.NEG  | BpfS.X | BpfClass.ALU:   OpInfo("FNEG_X",   3),
+    BpfCode.ALU.MOV  | BpfS.K | BpfClass.ALU:   OpInfo("FMOV_K",   7),
+    BpfCode.ALU.MOV  | BpfS.X | BpfClass.ALU:   OpInfo("FMOV_X",   7),
+    
+    # ===== FPU64 (Double precision) =====
+    BpfCode.ALU.ADD  | BpfS.K | BpfClass.ALU64:   OpInfo("FADD64_K",   14),
+    BpfCode.ALU.ADD  | BpfS.X | BpfClass.ALU64:   OpInfo("FADD64_X",   7),
+    BpfCode.ALU.SUB  | BpfS.K | BpfClass.ALU64:   OpInfo("FSUB64_K",   14),
+    BpfCode.ALU.SUB  | BpfS.X | BpfClass.ALU64:   OpInfo("FSUB64_X",   7),
+    BpfCode.ALU.MUL  | BpfS.K | BpfClass.ALU64:   OpInfo("FMUL64_K",   14),
+    BpfCode.ALU.MUL  | BpfS.X | BpfClass.ALU64:   OpInfo("FMUL64_X",   7),
+    BpfCode.ALU.DIV  | BpfS.K | BpfClass.ALU64:   OpInfo("FDIV64_K",   27),
+    BpfCode.ALU.DIV  | BpfS.X | BpfClass.ALU64:   OpInfo("FDIV64_X",   20),
+    BpfCode.ALU.NEG  | BpfS.K | BpfClass.ALU64:   OpInfo("FNEG64_K",   3),
+    BpfCode.ALU.NEG  | BpfS.X | BpfClass.ALU64:   OpInfo("FNEG64_X",   3),
+    BpfCode.ALU.MOV  | BpfS.K | BpfClass.ALU64:   OpInfo("FMOV64_K",   7),
+    BpfCode.ALU.MOV  | BpfS.X | BpfClass.ALU64:   OpInfo("FMOV64_X",   7),
+    
+    ## Only register-register comparisons are supported!
+    # ===== FJMP (64-bit compare) =====
+    BpfCode.JMP.JEQ  | BpfS.K | BpfClass.JMP:   OpInfo("JFEQ_K",   10),
+    BpfCode.JMP.JEQ  | BpfS.X | BpfClass.JMP:   OpInfo("JFEQ_X",   3),
+    BpfCode.JMP.JGT  | BpfS.K | BpfClass.JMP:   OpInfo("JFOGT_K",   10),
+    BpfCode.JMP.JGT  | BpfS.X | BpfClass.JMP:   OpInfo("JFOGT_X",   3),
+    BpfCode.JMP.JGE  | BpfS.K | BpfClass.JMP:   OpInfo("JFOGE_K",   10),
+    BpfCode.JMP.JGE  | BpfS.X | BpfClass.JMP:   OpInfo("JFOGE_X",   3),
+    BpfCode.JMP.JNE  | BpfS.K | BpfClass.JMP:   OpInfo("JFNE_K",   10),
+    BpfCode.JMP.JNE  | BpfS.X | BpfClass.JMP:   OpInfo("JFNE_X",   3),
+    BpfCode.JMP.JSGT | BpfS.K | BpfClass.JMP:   OpInfo("JFUGT_K",  15),
+    BpfCode.JMP.JSGT | BpfS.X | BpfClass.JMP:   OpInfo("JFUGT_X",  8),
+    BpfCode.JMP.JSGE | BpfS.K | BpfClass.JMP:   OpInfo("JFUGE_K",  15),
+    BpfCode.JMP.JSGE | BpfS.X | BpfClass.JMP:   OpInfo("JFUGE_X",  8),
+    BpfCode.JMP.JLT  | BpfS.K | BpfClass.JMP:   OpInfo("JFOLT_K",   10),
+    BpfCode.JMP.JLT  | BpfS.X | BpfClass.JMP:   OpInfo("JFOLT_X",   3),
+    BpfCode.JMP.JLE  | BpfS.K | BpfClass.JMP:   OpInfo("JFOLE_K",   10),
+    BpfCode.JMP.JLE  | BpfS.X | BpfClass.JMP:   OpInfo("JFOLE_X",   3),
+    BpfCode.JMP.JSLT | BpfS.K | BpfClass.JMP:   OpInfo("JFULT_K",  15),
+    BpfCode.JMP.JSLT | BpfS.X | BpfClass.JMP:   OpInfo("JFULT_X",  8),
+    BpfCode.JMP.JSLE | BpfS.K | BpfClass.JMP:   OpInfo("JFULE_K",  15),
+    BpfCode.JMP.JSLE | BpfS.X | BpfClass.JMP:   OpInfo("JFULE_X",  8),
+
+    # ===== FJMP32 (32-bit compare) =====
+    BpfCode.JMP.JEQ  | BpfS.K | BpfClass.JMP32:   OpInfo("JFEQ32_K",   10),
+    BpfCode.JMP.JEQ  | BpfS.X | BpfClass.JMP32:   OpInfo("JFEQ32_X",   3),
+    BpfCode.JMP.JGT  | BpfS.K | BpfClass.JMP32:   OpInfo("JFOGT32_K",   10),
+    BpfCode.JMP.JGT  | BpfS.X | BpfClass.JMP32:   OpInfo("JFOGT32_X",   3),
+    BpfCode.JMP.JGE  | BpfS.K | BpfClass.JMP32:   OpInfo("JFOGE32_K",   10),
+    BpfCode.JMP.JGE  | BpfS.X | BpfClass.JMP32:   OpInfo("JFOGE32_X",   3),
+    BpfCode.JMP.JNE  | BpfS.K | BpfClass.JMP32:   OpInfo("JFNE32_K",   10),
+    BpfCode.JMP.JNE  | BpfS.X | BpfClass.JMP32:   OpInfo("JFNE32_X",   3),
+    BpfCode.JMP.JSGT | BpfS.K | BpfClass.JMP32:   OpInfo("JFUGT32_K",  15),
+    BpfCode.JMP.JSGT | BpfS.X | BpfClass.JMP32:   OpInfo("JFUGT32_X",  8),
+    BpfCode.JMP.JSGE | BpfS.K | BpfClass.JMP32:   OpInfo("JFUGE32_K",  15),
+    BpfCode.JMP.JSGE | BpfS.X | BpfClass.JMP32:   OpInfo("JFUGE32_X",  8),
+    BpfCode.JMP.JLT  | BpfS.K | BpfClass.JMP32:   OpInfo("JFOLT32_K",   10),
+    BpfCode.JMP.JLT  | BpfS.X | BpfClass.JMP32:   OpInfo("JFOLT32_X",   3),
+    BpfCode.JMP.JLE  | BpfS.K | BpfClass.JMP32:   OpInfo("JFOLE32_K",   10),
+    BpfCode.JMP.JLE  | BpfS.X | BpfClass.JMP32:   OpInfo("JFOLE32_X",   3),
+    BpfCode.JMP.JSLT | BpfS.K | BpfClass.JMP32:   OpInfo("JFULT32_K",  15),
+    BpfCode.JMP.JSLT | BpfS.X | BpfClass.JMP32:   OpInfo("JFULT32_X",  8),
+    BpfCode.JMP.JSLE | BpfS.K | BpfClass.JMP32:   OpInfo("JFULE32_K",  15),
+    BpfCode.JMP.JSLE | BpfS.X | BpfClass.JMP32:   OpInfo("JFULE_32X",  8)
+}
+
+
+def is_fpu_instr(instr: BpfInstruction) -> bool:
+    cls_ = instr.get_class()
+
+    raw = instr._to_int(instr.instruction)
+    offset_u = (raw & Mask.OFFSET) >> Shift.OFFSET
+    imm_u = (raw & Mask.IMM) >> Shift.IMM
+
+    # FPU Arithmetic: ALU / ALU64 + offset bit1=1
+    if cls_ in (BpfClass.ALU, BpfClass.ALU64):
+        f_flag = (offset_u >> 1) & 0x1
+        return f_flag == 1
+
+    # FPU Branch: JMP / JMP32 + Not CALL/EXIT + imm bit1=1
+    if cls_ in (BpfClass.JMP, BpfClass.JMP32):
+        code = instr.opcode & Mask.CODE
+
+        # Exclude CALL and EXIT
+        if code in (BpfCode.JMP.CALL, BpfCode.JMP.EXIT):
+            return False
+
+        imm_bit1 = (imm_u >> 1) & 0x1
+        return imm_bit1 == 1
+
+    return False
 
 
 def instr_to_runtime(instructions:list, start:int, end:int) -> int:
@@ -291,13 +416,19 @@ def instr_to_runtime(instructions:list, start:int, end:int) -> int:
     runtime = 0
     for idx in range(start, end+1):
         instr = instructions[idx]
-        op_info = BPF_INFO.get(instr.opcode)
-        print(f"idx={idx}: {op_info}")
+        if is_fpu_instr(instr):
+            op_info = BPF_INFO_FPU.get(instr.opcode)  # FADD / FNEG / JFEQ / JFOGT ...
+        else:
+            op_info = BPF_INFO.get(instr.opcode)      # ALU/MEM ... + FLDX & FSTX
+
+        if op_info:
+            print(f"idx={idx}: name={op_info.name}, latency={op_info.latency}")
         if op_info:
             if op_info.latency:
                 runtime += op_info.latency
 
     return runtime
+
 
 def dfs_blocks(first_block: Block | None, instructions: list) -> int:
     """
@@ -334,7 +465,7 @@ def dfs_blocks(first_block: Block | None, instructions: list) -> int:
         onpath.add(block)
 
         instr_count = block.end - block.start + 1
-        print(f"Visiting BB({block.start}, {block.end}), instructions={instr_count}")
+        print(f"\n======Visiting BB({block.start}, {block.end}), instructions={instr_count}======")
 
         instr_runtime = instr_to_runtime(instructions, block.start, block.end)
         path_runtime += instr_runtime
@@ -351,5 +482,3 @@ def dfs_blocks(first_block: Block | None, instructions: list) -> int:
 
     dfs(first_block)
     return path_runtime_ub
-
-    
