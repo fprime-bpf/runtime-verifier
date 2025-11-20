@@ -21,7 +21,7 @@ int main() {
     }
 
     // Do multiplication
-    /*for (ii = 0; ii < MAT_DIM; ii += IB) {
+    for (ii = 0; ii < MAT_DIM; ii += IB) {
         for (kk = 0; kk < MAT_DIM; kk += KB) {
             for (j = 0; j < MAT_DIM; j += 2) {
                 for (i = ii; i < ii + IB; i += 2) {
@@ -50,6 +50,6 @@ int main() {
     // Write back to map
     for (i = 0; i < MAT_SIZE; i++) {
         bpf_map_update_elem(mat_map_res, &i, &mat_res[i], 0);
-    }*/
+    }
     return 0;
 }
