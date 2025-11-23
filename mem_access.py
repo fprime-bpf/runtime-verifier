@@ -7,7 +7,7 @@ from dfs import is_fpu_instr, BPF_INFO, BPF_INFO_FPU
 from dataclasses import dataclass, field
 from copy import deepcopy
 from bpf import BpfInstruction, BpfClass
-from typing import List, Optional, Dict, cast
+from typing import List, Optional, Dict, cast, Tuple
 from enum import Enum, auto
 
 NUM_REGS = 11
@@ -22,7 +22,7 @@ def _init_fp() -> List[ArithRef]:
 class State:
     gp: List[BitVecRef] = field(default_factory=_init_gp)
     fp: List[ArithRef] = field(default_factory=_init_fp)
-    memory: Dict[int, ExprRef] = field(default_factory=dict)
+    memory: Dict[ExprRef, ExprRef] = field(default_factory=dict)
 
     def fork(self) -> "State":
         return State(
@@ -376,6 +376,138 @@ def _fresh_fp_var(reg_idx: int, step_idx: int) -> ArithRef:
     return Real(f"F{reg_idx}_I{step_idx}")
 
 
+PKT_BASE = BitVec("pkt_base", WORD)  # abstract packet base pointer
+def _mem_addr(decoded_instr: DecodedInstr, state: State) -> BitVecRef:
+    """
+    Compute an effective address for load/store-like instructions.
+    """
+    name = decoded_instr.name
+
+    # ---------- Packet ABS/IND forms ----------
+    if "_ABS_" in name:
+        # Absolute offset into packet: pkt_base + imm
+        off = BitVecVal(decoded_instr.imm, WORD)
+        return PKT_BASE + off
+
+    if "_IND_" in name:
+        # Indexed packet access: pkt_base + src_reg + imm
+        idx = state.get_gp(decoded_instr.src)      # BitVecRef
+        off = BitVecVal(decoded_instr.imm, WORD)
+        return PKT_BASE + idx + off
+
+    # ---------- Register-based memory (stack / map / etc.) ----------
+    # Loads: base in src
+    if (
+        name.startswith("LD_MEM_")
+        or name.startswith("LD_MEMSX_")
+        or name.startswith("FLD_")
+        or name.startswith("LDX_")
+        or name.startswith("FLDX_")
+    ):
+        base_idx = decoded_instr.src
+
+    # Stores: base in dst
+    elif (
+        name.startswith("ST_")
+        or name.startswith("ST_MEMSX_")
+        or name.startswith("FST_")
+        or name.startswith("STX_")
+        or name.startswith("STX_MEMSX_")
+        or name.startswith("FSTX_")
+    ):
+        base_idx = decoded_instr.dst
+
+    else:
+        raise ValueError(f"Unsupported load/store opcode for _mem_addr: {name}")
+
+    base: BitVecRef = state.get_gp(base_idx)
+    off = BitVecVal(decoded_instr.offset, WORD)
+    return base + off
+
+
+def _fresh_mem_val(is_float: bool, idx: int) -> ExprRef:
+    """
+    Create a fresh symbolic value for a memory cell.
+    Integer loads use a BitVec; FP loads use a Real.
+    """
+    if is_float:
+        return Real(f"mem_f_{idx}")        # Real for FP memory cell
+    else:
+        return BitVec(f"mem_{idx}", WORD)  # BitVec for integer memory cell
+
+
+# classify by opcode name
+_LOAD_PREFIXES  = ("LD_", "LDX_", "FLD_", "FLDX_")
+_STORE_PREFIXES = ("ST_", "STX_", "FST_", "FSTX_")
+
+def _exec_mem(decoded_instr: DecodedInstr, state: State) -> Optional[ExprRef]:
+    """
+    Execute a memory-related instruction symbolically.
+
+    Responsibilities:
+      - Handle LD_IMM_*/LDDW: update dst register, no memory, return None.
+      - Handle ST_IMM_*/STX_IMM_*: write imm into [dst + off], return addr.
+      - For real loads/stores (LD*/LDX*/ST*/STX*/FLD*/FST*):
+          * compute addr = _mem_addr(...)
+          * update state.memory[addr]
+          * for loads, also update dst register.
+
+    Returns:
+        addr (ExprRef) if this instruction touches memory,
+        or None if it only updates registers (e.g., LD_IMM/LDDW).
+    """
+    name = decoded_instr.name
+    dst  = decoded_instr.dst
+    src  = decoded_instr.src
+
+    # ----- 1) Immediate-only loads: LD_IMM_*, LDX_IMM_*, LDDW -----
+    if name.startswith("LD_IMM_") or name.startswith("LDX_IMM_") or name == "LDDW":
+        imm_val = BitVecVal(decoded_instr.imm, WORD)
+        state.set_gp(dst, imm_val)
+        return None
+
+    # ----- 2) Immediate stores: ST_IMM_* / STX_IMM_* -----
+    if name.startswith("ST_IMM_") or name.startswith("STX_IMM_"):
+        base = state.get_gp(dst)
+        off  = BitVecVal(decoded_instr.offset, WORD)
+        addr = base + off
+
+        imm_val = BitVecVal(decoded_instr.imm, WORD)
+        state.memory[addr] = imm_val
+        return addr
+
+    # ----- 3) All other real memory accesses go via _mem_addr -----
+    addr = _mem_addr(decoded_instr, state)
+
+    # 3a) Loads (LD_*, LDX_*, FLD_*, FLDX_*, and the LD_MEMSX_* variants)
+    if name.startswith(_LOAD_PREFIXES):
+        # lazily initialize memory cell if we haven't seen this address before
+        if addr not in state.memory:
+            fresh_idx = len(state.memory)
+            state.memory[addr] = _fresh_mem_val(decoded_instr.is_float, fresh_idx)
+
+        cell_val: ExprRef = state.memory[addr]
+
+        if decoded_instr.is_float:
+            state.set_fp(dst, cell_val)
+        else:
+            state.set_gp(dst, cell_val)
+
+        return addr
+
+    # 3b) Stores (ST_*, STX_*, FST_*, FSTX_* and MEMSX variants)
+    if name.startswith(_STORE_PREFIXES):
+        if decoded_instr.is_float:
+            val: ExprRef = state.get_fp(src)
+        else:
+            val = state.get_gp(src)
+
+        state.memory[addr] = val
+        return addr
+
+    raise ValueError(f"_exec_mem called on unsupported opcode: {name}")
+
+
 def _branch_condition(decoded_instr: DecodedInstr, state: State) -> BoolRef:
     """
     Compute the Z3 condition under which this jump is taken.
@@ -471,22 +603,30 @@ def _branch_condition(decoded_instr: DecodedInstr, state: State) -> BoolRef:
     raise ValueError(f"Unsupported integer branch opcode: {op_name}")
 
 
-def _process_instruction(instr: BpfInstruction, state: State, instr_idx: int) -> None:
+def _process_instruction(instr: BpfInstruction, state: State) -> Tuple[Optional[BoolRef], Optional[ExprRef]]:
+    """    
+    Symbolically evaluates a single eBPF instruction.
+
+    This function decodes the instruction, forwards it to the correct semantic
+    function (ALU/FPU, memory load/store, or branch), and returns
+    (branch_cond, addr)
+    """
     decoded_instr = _decode_instruction(instr)
-    dst_idx = decoded_instr.dst
+    
+    branch_cond: Optional[BoolRef] = None
+    addr: Optional[ExprRef] = None
+
     match decoded_instr.instr_class:
         case InstrClass.OP:  # ALU or FPU operations
             _update_state_op(decoded_instr, state)
-            rhs_expr: ArithRef = state.get_fp(dst_idx)
-            new_fp = _fresh_fp_var(dst_idx, instr_idx)
-            constraint: BoolRef = cast(BoolRef, (new_fp == rhs_expr))
-            state.set_fp(dst_idx, new_fp)
 
         case InstrClass.LOAD_STORE:
-            pass
+            addr = _exec_mem(decoded_instr, state)
 
         case InstrClass.BRANCH:
-            constraint = _branch_condition(decoded_instr, state)
+            branch_cond = _branch_condition(decoded_instr, state)
 
         case InstrClass.OTHER:
             pass
+        
+    return (branch_cond, addr)
