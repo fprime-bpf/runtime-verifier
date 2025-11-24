@@ -109,17 +109,15 @@ def get_middle(mat_dim: int, rolled: bool):
                 for j in range(0, mat_dim, 2):
                     middle += f"    j = {j};\n"
                     for i in range(ii, ii + IB_SIZE, 2):
-                        middle += f"""
-    i = {i};
-    if (kk == 0) {{
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }}
-    else {{
+                        middle += f"    {i};\n"
+                        if kk == 0:
+                            middle += "    acc00 = acc01 = acc10 = acc11 = 0;\n"
+                        else:
+                            middle += """
         acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
         acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
         acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
         acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }}
 """
                         for k in range(kk, kk + KB_SIZE):
                             middle += f"""
