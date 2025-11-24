@@ -1,9 +1,10 @@
 import sys
 
-def get_begin(arr_size: int, rolled: bool):
+
+def get_begin(mat_dim: int, rolled: bool):
     begin = f"""
 #include "bpf_shim.h"
-#define MAT_DIM {arr_size}
+#define MAT_DIM {mat_dim}
 #define MAT_SIZE (MAT_DIM * MAT_DIM)
 int main() {{
     void *mat_map_1 = MAP_BY_FD(0), *mat_map_2 = MAP_BY_FD(1), *mat_map_res = MAP_BY_FD(2), *result;
@@ -26,7 +27,7 @@ int main() {{
     }
 """
     else:
-        for i in range(arr_size * arr_size):
+        for i in range(mat_dim * mat_dim):
             begin += f"    i = {i};\n"
             begin += f"    result = bpf_map_lookup_elem(mat_map_1, &i);\n"
             begin += f"    mat_1[i] = *(int *)result;\n"
@@ -35,7 +36,7 @@ int main() {{
 
     return begin
 
-def get_end(arr_size: int, rolled: bool):
+def get_end(mat_dim: int, rolled: bool):
     end = ""
 
     if rolled:
@@ -47,7 +48,7 @@ def get_end(arr_size: int, rolled: bool):
 """
 
     else:
-        for i in range(arr_size):
+        for i in range(mat_dim):
             end += f"    i = {i};\n" 
             end += f"    bpf_map_update_elem(mat_map_res, &i, &mat_res[i], 0);\n"
 
@@ -57,7 +58,7 @@ def get_end(arr_size: int, rolled: bool):
     return end
 
 
-def get_middle(arr_size: int, rolled: bool):
+def get_middle(mat_dim: int, rolled: bool):
     middle = ''
             
     if rolled:
@@ -74,11 +75,11 @@ def get_middle(arr_size: int, rolled: bool):
 """
 
     else: 
-        for i in range(arr_size):
-            for j in range(arr_size):
+        for i in range(mat_dim):
+            for j in range(mat_dim):
                 middle += f"\n    i = {i}, j = {j};\n";
                 middle += f"    mat_res[i * MAT_DIM + j] = 0;\n";
-                for k in range(arr_size):
+                for k in range(mat_dim):
                     middle += f"    k = {k};\n";
                     middle += f"    mat_res[i * MAT_DIM + j] += mat_1[i * MAT_DIM + k] * mat_2[k * MAT_DIM + j];\n";
 
@@ -90,35 +91,32 @@ def main():
     assert len(sys.argv) == 2
     name = sys.argv[1]
     filename = f"{name}.bpf.c"
-    arr_size = 0
+    mat_dim = 0
     match name:
         case "small_matmul":
-            arr_size = 4
+            mat_dim = 4
         case "medium_matmul":
-            arr_size = 10
+            mat_dim = 10
         case "big_matmul":
-            arr_size = 16
+            mat_dim = 16
         case  "huge_matmul":
-            arr_size = 32
-        # case "insane_matmul":
-        #     arr_size = 2048
+            mat_dim = 32
         case _:
             raise Exception(f"bad argument")
 
-
     # unrolled 
-    begin = get_begin(arr_size, rolled=False)
-    middle = get_middle(arr_size, rolled=False)
-    end = get_end(arr_size, rolled=False)
+    begin = get_begin(mat_dim, rolled=False)
+    middle = get_middle(mat_dim, rolled=False)
+    end = get_end(mat_dim, rolled=False)
     contents = begin + middle + end
     with open(f"unrolled_{filename}", "w") as f:
         f.write(contents)
 
 
     # rolled
-    begin = get_begin(arr_size, rolled=True)
-    middle = get_middle(arr_size, rolled=True)
-    end = get_end(arr_size, rolled=True)
+    begin = get_begin(mat_dim, rolled=True)
+    middle = get_middle(mat_dim, rolled=True)
+    end = get_end(mat_dim, rolled=True)
     contents = begin + middle + end
     with open(f"rolled_{filename}", "w") as f:
         f.write(contents)
