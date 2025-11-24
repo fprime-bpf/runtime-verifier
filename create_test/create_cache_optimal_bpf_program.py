@@ -114,10 +114,10 @@ def get_middle(mat_dim: int, rolled: bool):
                             middle += "    acc00 = acc01 = acc10 = acc11 = 0;\n"
                         else:
                             middle += """
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 """
                         for k in range(kk, kk + KB_SIZE):
                             middle += f"""

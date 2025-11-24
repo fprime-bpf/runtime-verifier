@@ -2013,17 +2013,8 @@ int main() {
     ii = 0;
     kk = 0;
     j = 0;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2053,17 +2044,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2094,17 +2076,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2134,17 +2107,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2175,17 +2139,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2215,17 +2170,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2256,17 +2202,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2296,17 +2233,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2337,17 +2265,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2377,17 +2296,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2418,17 +2328,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2458,17 +2359,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2499,17 +2391,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2539,17 +2422,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2580,17 +2454,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2620,17 +2485,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2661,17 +2517,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2701,17 +2548,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2742,17 +2580,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2782,17 +2611,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2824,17 +2644,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 4;
     j = 0;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2864,17 +2679,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2905,17 +2715,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2945,17 +2750,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -2986,17 +2786,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3026,17 +2821,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3067,17 +2857,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3107,17 +2892,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3148,17 +2928,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3188,17 +2963,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3229,17 +2999,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3269,17 +3034,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3310,17 +3070,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3350,17 +3105,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3391,17 +3141,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3431,17 +3176,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3472,17 +3212,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3512,17 +3247,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3553,17 +3283,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3593,17 +3318,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3635,17 +3355,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 8;
     j = 0;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3675,17 +3390,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3716,17 +3426,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3756,17 +3461,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3797,17 +3497,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3837,17 +3532,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3878,17 +3568,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3918,17 +3603,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3959,17 +3639,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -3999,17 +3674,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4040,17 +3710,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4080,17 +3745,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4121,17 +3781,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4161,17 +3816,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4202,17 +3852,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4242,17 +3887,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4283,17 +3923,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4323,17 +3958,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4364,17 +3994,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4404,17 +4029,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4446,17 +4066,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 12;
     j = 0;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4486,17 +4101,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4527,17 +4137,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4567,17 +4172,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4608,17 +4208,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4648,17 +4243,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4689,17 +4279,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4729,17 +4314,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4770,17 +4350,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4810,17 +4385,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4851,17 +4421,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4891,17 +4456,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4932,17 +4492,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -4972,17 +4527,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5013,17 +4563,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5053,17 +4598,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5094,17 +4634,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5134,17 +4669,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5175,17 +4705,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5215,17 +4740,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5257,17 +4777,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 16;
     j = 0;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5297,17 +4812,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5338,17 +4848,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5378,17 +4883,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5419,17 +4919,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5459,17 +4954,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5500,17 +4990,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5540,17 +5025,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5581,17 +5061,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5621,17 +5096,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5662,17 +5132,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5702,17 +5167,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5743,17 +5203,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5783,17 +5238,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5824,17 +5274,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5864,17 +5309,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5905,17 +5345,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5945,17 +5380,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -5986,17 +5416,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 0;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6026,17 +5451,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 2;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6069,17 +5489,8 @@ int main() {
     ii = 4;
     kk = 0;
     j = 0;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6109,17 +5520,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6150,17 +5552,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6190,17 +5583,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6231,17 +5615,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6271,17 +5646,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6312,17 +5678,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6352,17 +5709,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6393,17 +5741,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6433,17 +5772,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6474,17 +5804,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6514,17 +5835,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6555,17 +5867,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6595,17 +5898,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6636,17 +5930,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6676,17 +5961,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6717,17 +5993,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6757,17 +6024,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6798,17 +6056,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6838,17 +6087,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6880,17 +6120,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 4;
     j = 0;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6920,17 +6155,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -6961,17 +6191,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7001,17 +6226,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7042,17 +6262,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7082,17 +6297,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7123,17 +6333,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7163,17 +6368,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7204,17 +6404,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7244,17 +6439,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7285,17 +6475,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7325,17 +6510,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7366,17 +6546,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7406,17 +6581,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7447,17 +6617,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7487,17 +6652,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7528,17 +6688,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7568,17 +6723,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7609,17 +6759,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7649,17 +6794,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7691,17 +6831,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 8;
     j = 0;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7731,17 +6866,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7772,17 +6902,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7812,17 +6937,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7853,17 +6973,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7893,17 +7008,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7934,17 +7044,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -7974,17 +7079,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8015,17 +7115,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8055,17 +7150,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8096,17 +7186,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8136,17 +7221,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8177,17 +7257,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8217,17 +7292,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8258,17 +7328,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8298,17 +7363,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8339,17 +7399,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8379,17 +7434,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8420,17 +7470,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8460,17 +7505,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8502,17 +7542,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 12;
     j = 0;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8542,17 +7577,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8583,17 +7613,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8623,17 +7648,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8664,17 +7684,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8704,17 +7719,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8745,17 +7755,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8785,17 +7790,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8826,17 +7826,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8866,17 +7861,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8907,17 +7897,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8947,17 +7932,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -8988,17 +7968,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9028,17 +8003,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9069,17 +8039,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9109,17 +8074,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9150,17 +8110,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9190,17 +8145,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9231,17 +8181,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9271,17 +8216,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9313,17 +8253,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 16;
     j = 0;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9353,17 +8288,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9394,17 +8324,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9434,17 +8359,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9475,17 +8395,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9515,17 +8430,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9556,17 +8466,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9596,17 +8501,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9637,17 +8537,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9677,17 +8572,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9718,17 +8608,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9758,17 +8643,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9799,17 +8679,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9839,17 +8714,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9880,17 +8750,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9920,17 +8785,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -9961,17 +8821,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10001,17 +8856,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10042,17 +8892,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 4;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10082,17 +8927,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 6;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10125,17 +8965,8 @@ int main() {
     ii = 8;
     kk = 0;
     j = 0;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10165,17 +8996,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10206,17 +9028,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10246,17 +9059,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10287,17 +9091,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10327,17 +9122,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10368,17 +9154,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10408,17 +9185,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10449,17 +9217,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10489,17 +9248,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10530,17 +9280,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10570,17 +9311,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10611,17 +9343,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10651,17 +9374,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10692,17 +9406,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10732,17 +9437,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10773,17 +9469,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10813,17 +9500,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10854,17 +9532,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10894,17 +9563,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10936,17 +9596,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 4;
     j = 0;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -10976,17 +9631,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11017,17 +9667,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11057,17 +9702,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11098,17 +9738,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11138,17 +9773,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11179,17 +9809,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11219,17 +9844,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11260,17 +9880,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11300,17 +9915,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11341,17 +9951,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11381,17 +9986,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11422,17 +10022,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11462,17 +10057,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11503,17 +10093,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11543,17 +10128,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11584,17 +10164,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11624,17 +10199,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11665,17 +10235,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11705,17 +10270,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11747,17 +10307,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 8;
     j = 0;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11787,17 +10342,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11828,17 +10378,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11868,17 +10413,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11909,17 +10449,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11949,17 +10484,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -11990,17 +10520,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12030,17 +10555,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12071,17 +10591,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12111,17 +10626,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12152,17 +10662,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12192,17 +10697,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12233,17 +10733,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12273,17 +10768,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12314,17 +10804,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12354,17 +10839,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12395,17 +10875,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12435,17 +10910,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12476,17 +10946,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12516,17 +10981,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12558,17 +11018,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 12;
     j = 0;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12598,17 +11053,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12639,17 +11089,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12679,17 +11124,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12720,17 +11160,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12760,17 +11195,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12801,17 +11231,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12841,17 +11266,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12882,17 +11302,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12922,17 +11337,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -12963,17 +11373,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13003,17 +11408,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13044,17 +11444,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13084,17 +11479,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13125,17 +11515,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13165,17 +11550,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13206,17 +11586,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13246,17 +11621,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13287,17 +11657,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13327,17 +11692,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13369,17 +11729,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 16;
     j = 0;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13409,17 +11764,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13450,17 +11800,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13490,17 +11835,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13531,17 +11871,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13571,17 +11906,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13612,17 +11942,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13652,17 +11977,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13693,17 +12013,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13733,17 +12048,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13774,17 +12084,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13814,17 +12119,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13855,17 +12155,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13895,17 +12190,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13936,17 +12226,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -13976,17 +12261,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14017,17 +12297,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14057,17 +12332,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14098,17 +12368,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 8;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14138,17 +12403,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 10;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14181,17 +12441,8 @@ int main() {
     ii = 12;
     kk = 0;
     j = 0;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14221,17 +12472,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14262,17 +12504,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14302,17 +12535,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14343,17 +12567,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14383,17 +12598,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14424,17 +12630,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14464,17 +12661,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14505,17 +12693,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14545,17 +12724,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14586,17 +12756,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14626,17 +12787,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14667,17 +12819,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14707,17 +12850,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14748,17 +12882,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14788,17 +12913,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14829,17 +12945,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14869,17 +12976,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14910,17 +13008,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14950,17 +13039,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -14992,17 +13072,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 4;
     j = 0;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15032,17 +13107,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15073,17 +13143,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15113,17 +13178,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15154,17 +13214,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15194,17 +13249,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15235,17 +13285,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15275,17 +13320,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15316,17 +13356,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15356,17 +13391,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15397,17 +13427,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15437,17 +13462,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15478,17 +13498,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15518,17 +13533,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15559,17 +13569,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15599,17 +13604,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15640,17 +13640,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15680,17 +13675,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15721,17 +13711,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15761,17 +13746,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15803,17 +13783,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 8;
     j = 0;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15843,17 +13818,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15884,17 +13854,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15924,17 +13889,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -15965,17 +13925,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16005,17 +13960,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16046,17 +13996,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16086,17 +14031,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16127,17 +14067,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16167,17 +14102,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16208,17 +14138,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16248,17 +14173,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16289,17 +14209,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16329,17 +14244,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16370,17 +14280,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16410,17 +14315,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16451,17 +14351,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16491,17 +14386,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16532,17 +14422,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16572,17 +14457,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16614,17 +14494,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 12;
     j = 0;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16654,17 +14529,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16695,17 +14565,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16735,17 +14600,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16776,17 +14636,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16816,17 +14671,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16857,17 +14707,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16897,17 +14742,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16938,17 +14778,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -16978,17 +14813,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17019,17 +14849,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17059,17 +14884,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17100,17 +14920,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17140,17 +14955,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17181,17 +14991,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17221,17 +15026,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17262,17 +15062,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17302,17 +15097,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17343,17 +15133,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17383,17 +15168,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17425,17 +15205,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 16;
     j = 0;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17465,17 +15240,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17506,17 +15276,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17546,17 +15311,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17587,17 +15347,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17627,17 +15382,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17668,17 +15418,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17708,17 +15453,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17749,17 +15489,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17789,17 +15524,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17830,17 +15560,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17870,17 +15595,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17911,17 +15631,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17951,17 +15666,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -17992,17 +15702,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18032,17 +15737,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18073,17 +15773,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18113,17 +15808,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18154,17 +15844,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 12;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18194,17 +15879,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 14;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18237,17 +15917,8 @@ int main() {
     ii = 16;
     kk = 0;
     j = 0;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18277,17 +15948,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18318,17 +15980,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18358,17 +16011,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18399,17 +16043,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18439,17 +16074,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18480,17 +16106,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18520,17 +16137,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18561,17 +16169,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18601,17 +16200,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18642,17 +16232,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18682,17 +16263,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18723,17 +16295,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18763,17 +16326,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18804,17 +16358,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18844,17 +16389,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18885,17 +16421,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18925,17 +16452,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -18966,17 +16484,8 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19006,17 +16515,8 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+    acc00 = acc01 = acc10 = acc11 = 0;
 
     k = 0;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19048,17 +16548,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 4;
     j = 0;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19088,17 +16583,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19129,17 +16619,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19169,17 +16654,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19210,17 +16690,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19250,17 +16725,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19291,17 +16761,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19331,17 +16796,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19372,17 +16832,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19412,17 +16867,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19453,17 +16903,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19493,17 +16938,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19534,17 +16974,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19574,17 +17009,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19615,17 +17045,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19655,17 +17080,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19696,17 +17116,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19736,17 +17151,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19777,17 +17187,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19817,17 +17222,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 4;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19859,17 +17259,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 8;
     j = 0;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19899,17 +17294,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19940,17 +17330,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -19980,17 +17365,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20021,17 +17401,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20061,17 +17436,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20102,17 +17472,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20142,17 +17507,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20183,17 +17543,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20223,17 +17578,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20264,17 +17614,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20304,17 +17649,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20345,17 +17685,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20385,17 +17720,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20426,17 +17756,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20466,17 +17791,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20507,17 +17827,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20547,17 +17862,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20588,17 +17898,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20628,17 +17933,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 8;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20670,17 +17970,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 12;
     j = 0;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20710,17 +18005,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20751,17 +18041,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20791,17 +18076,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20832,17 +18112,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20872,17 +18147,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20913,17 +18183,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20953,17 +18218,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -20994,17 +18254,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21034,17 +18289,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21075,17 +18325,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21115,17 +18360,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21156,17 +18396,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21196,17 +18431,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21237,17 +18467,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21277,17 +18502,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21318,17 +18538,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21358,17 +18573,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21399,17 +18609,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21439,17 +18644,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 12;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21481,17 +18681,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     kk = 16;
     j = 0;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21521,17 +18716,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21562,17 +18752,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 2;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21602,17 +18787,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21643,17 +18823,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 4;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21683,17 +18858,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21724,17 +18894,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 6;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21764,17 +18929,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21805,17 +18965,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 8;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21845,17 +19000,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21886,17 +19036,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 10;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21926,17 +19071,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -21967,17 +19107,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 12;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -22007,17 +19142,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -22048,17 +19178,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 14;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -22088,17 +19213,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -22129,17 +19249,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 16;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -22169,17 +19284,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -22210,17 +19320,12 @@ int main() {
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
     j = 18;
-
     i = 16;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
@@ -22250,17 +19355,12 @@ int main() {
     mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
     mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
     mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
-
     i = 18;
-    if (kk == 0) {
-        acc00 = acc01 = acc10 = acc11 = 0;
-    }
-    else {
-        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-    }
+
+    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
+    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
+    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
+    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
 
     k = 16;
     acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
