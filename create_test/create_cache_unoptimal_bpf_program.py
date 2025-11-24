@@ -14,7 +14,6 @@ int main() {{
 
 """
 
-
     if rolled:
         begin += """
     // Read in 2 matrices
@@ -36,6 +35,7 @@ int main() {{
 
     return begin
 
+
 def get_end(mat_dim: int, rolled: bool):
     end = ""
 
@@ -49,7 +49,7 @@ def get_end(mat_dim: int, rolled: bool):
 
     else:
         for i in range(mat_dim):
-            end += f"    i = {i};\n" 
+            end += f"    i = {i};\n"
             end += f"    bpf_map_update_elem(mat_map_res, &i, &mat_res[i], 0);\n"
 
     end += "    return 0;\n"
@@ -59,8 +59,8 @@ def get_end(mat_dim: int, rolled: bool):
 
 
 def get_middle(mat_dim: int, rolled: bool):
-    middle = ''
-            
+    middle = ""
+
     if rolled:
         middle += """
     // Do multiplication
@@ -74,17 +74,16 @@ def get_middle(mat_dim: int, rolled: bool):
     }
 """
 
-    else: 
+    else:
         for i in range(mat_dim):
             for j in range(mat_dim):
-                middle += f"\n    i = {i}, j = {j};\n";
-                middle += f"    mat_res[i * MAT_DIM + j] = 0;\n";
+                middle += f"\n    i = {i}, j = {j};\n"
+                middle += f"    mat_res[i * MAT_DIM + j] = 0;\n"
                 for k in range(mat_dim):
-                    middle += f"    k = {k};\n";
-                    middle += f"    mat_res[i * MAT_DIM + j] += mat_1[i * MAT_DIM + k] * mat_2[k * MAT_DIM + j];\n";
+                    middle += f"    k = {k};\n"
+                    middle += f"    mat_res[i * MAT_DIM + j] += mat_1[i * MAT_DIM + k] * mat_2[k * MAT_DIM + j];\n"
 
     return middle
-
 
 
 def main():
@@ -99,26 +98,25 @@ def main():
             mat_dim = 10
         case "big_matmul":
             mat_dim = 16
-        case  "huge_matmul":
+        case "huge_matmul":
             mat_dim = 32
         case _:
             raise Exception(f"bad argument")
 
-    # unrolled 
+    # unrolled
     begin = get_begin(mat_dim, rolled=False)
     middle = get_middle(mat_dim, rolled=False)
     end = get_end(mat_dim, rolled=False)
     contents = begin + middle + end
-    with open(f"unrolled_{filename}", "w") as f:
+    with open(f"unrolled__cache_unoptimal{filename}", "w") as f:
         f.write(contents)
-
 
     # rolled
     begin = get_begin(mat_dim, rolled=True)
     middle = get_middle(mat_dim, rolled=True)
     end = get_end(mat_dim, rolled=True)
     contents = begin + middle + end
-    with open(f"rolled_{filename}", "w") as f:
+    with open(f"rolled_cache_unoptimal{filename}", "w") as f:
         f.write(contents)
 
 
