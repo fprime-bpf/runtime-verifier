@@ -111,7 +111,7 @@ def get_middle(mat_dim: int, rolled: bool):
                     for i in range(ii, ii + IB_SIZE, 2):
                         middle += f"""
     i = {i};
-    if (kk = 0) {{
+    if (kk == 0) {{
         acc00 = acc01 = acc10 = acc11 = 0;
     }}
     else {{
@@ -143,17 +143,16 @@ def get_middle(mat_dim: int, rolled: bool):
 def main():
     assert len(sys.argv) == 2
     name = sys.argv[1]
-    filename = f"{name}.bpf.c"
     mat_dim = 0
     match name:
         case "small_matmul":
-            mat_dim = 4
+            mat_dim = 8
         case "medium_matmul":
-            mat_dim = 10
+            mat_dim = 12
         case "big_matmul":
             mat_dim = 16
         case "huge_matmul":
-            mat_dim = 32
+            mat_dim = 20
         case _:
             raise Exception(f"bad argument")
 
@@ -167,7 +166,7 @@ def main():
     middle = get_middle(mat_dim, rolled=False)
     end = get_end(mat_dim, rolled=False)
     contents = begin + middle + end
-    with open(f"unrolled_cache_optimal_{filename}", "w") as f:
+    with open(f"unrolled_{name}_cache_optimal.bpf.c", "w") as f:
         f.write(contents)
 
     # rolled
@@ -175,7 +174,7 @@ def main():
     middle = get_middle(mat_dim, rolled=True)
     end = get_end(mat_dim, rolled=True)
     contents = begin + middle + end
-    with open(f"rolled_cache_optimal_{filename}", "w") as f:
+    with open(f"rolled_{name}_cache_optimal.bpf.c", "w") as f:
         f.write(contents)
 
 
