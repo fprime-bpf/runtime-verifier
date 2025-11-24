@@ -17,9 +17,9 @@ def get_begin(mat_dim: int, rolled: bool):
 #define KB {KB_SIZE}
 int main() {{
     void *mat_map_1 = MAP_BY_FD(0), *mat_map_2 = MAP_BY_FD(1), *mat_map_res = MAP_BY_FD(2), *result;
-    int mat_1[MAT_SIZE], mat_2[MAT_SIZE], mat_res[MAT_SIZE];
-    int i, j, k, ii, kk;
-    int acc00, acc01, acc10, acc11;
+    float mat_1[MAT_SIZE], mat_2[MAT_SIZE], mat_res[MAT_SIZE];
+    long i, j, k, ii, kk;
+    float acc00, acc01, acc10, acc11;
 
 """
 
@@ -28,10 +28,10 @@ int main() {{
     // Read in 2 matrices
     for (i = 0; i < MAT_SIZE; i++) {
         result = bpf_map_lookup_elem(mat_map_1, &i);
-        mat_1[i] = *(int *)result;
+        mat_1[i] = *(float *)result;
 
         result = bpf_map_lookup_elem(mat_map_2, &i);
-        mat_2[i] = *(int *)result;
+        mat_2[i] = *(float *)result;
     }
 """
     else:
