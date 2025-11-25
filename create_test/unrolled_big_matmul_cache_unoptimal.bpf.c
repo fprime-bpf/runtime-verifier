@@ -4,8 +4,8 @@
 #define MAT_SIZE (MAT_DIM * MAT_DIM)
 int main() {
     void *mat_map_1 = MAP_BY_FD(0), *mat_map_2 = MAP_BY_FD(1), *mat_map_res = MAP_BY_FD(2), *result;
-    int mat_1[MAT_SIZE], mat_2[MAT_SIZE], mat_res[MAT_SIZE];
-    int i, j, k;
+    float mat_1[MAT_SIZE], mat_2[MAT_SIZE], mat_res[MAT_SIZE];
+    long i, j, k;
 
 
     i = 0;
