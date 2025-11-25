@@ -14,7 +14,6 @@ def get_begin(mat_dim: int, rolled: bool):
 #define MAT_DIM {mat_dim}
 #define MAT_SIZE (MAT_DIM * MAT_DIM)
 #define IB {IB_SIZE}
-#define KB {KB_SIZE}
 int main() {{
     void *mat_map_1 = MAP_BY_FD(0), *mat_map_2 = MAP_BY_FD(1), *mat_map_res = MAP_BY_FD(2), *result;
     float mat_1[MAT_SIZE], mat_2[MAT_SIZE], mat_res[MAT_SIZE];
@@ -74,28 +73,19 @@ def get_middle(mat_dim: int, rolled: bool):
         middle += """
     // Do multiplication
     for (ii = 0; i < MAT_DIM; ii += IB) {
-        for (kk = 0; kk < MAT_DIM; kk += KB) {
-            for (j = 0; j < MAT_DIM; j += 2) {
-                for (i = ii; i < ii + IB; i += 2) {
-                    if (kk == 0) 
-                        acc00 = acc01 = acc10 = acc11 = 0;
-                    else {
-                        acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-                        acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-                        acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-                        acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-                    }
-                    for (k = kk; k < kk + KB; k++) {
-                        acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
-                        acc01 += mat_2[k * MAT_DIM + j + 1] * mat_1[(i + 0) * MAT_DIM + k];
-                        acc10 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 1) * MAT_DIM + k];
-                        acc11 += mat_2[k * MAT_DIM + j + 1] * mat_1[(i + 1) * MAT_DIM + k];
-                    }
-                    mat_res[(i + 0) * MAT_DIM + j + 0] = acc00;
-                    mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
-                    mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
-                    mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
+        for (j = 0; j < MAT_DIM; j += 2) {
+            for (i = ii; i < ii + IB; i += 2) {
+                acc00 = acc01 = acc10 = acc11 = 0;
+                for (k = 0; k < MAT_DIM; k++) {
+                    acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
+                    acc01 += mat_2[k * MAT_DIM + j + 1] * mat_1[(i + 0) * MAT_DIM + k];
+                    acc10 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 1) * MAT_DIM + k];
+                    acc11 += mat_2[k * MAT_DIM + j + 1] * mat_1[(i + 1) * MAT_DIM + k];
                 }
+                mat_res[(i + 0) * MAT_DIM + j + 0] = acc00;
+                mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
+                mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
+                mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
             }
         }
     }
@@ -104,35 +94,25 @@ def get_middle(mat_dim: int, rolled: bool):
     else:
         for ii in range(0, mat_dim, IB_SIZE):
             middle += f"    ii = {ii};\n"
-            for kk in range(0, mat_dim, KB_SIZE):
-                middle += f"    kk = {kk};\n"
-                for j in range(0, mat_dim, 2):
-                    middle += f"    j = {j};\n"
-                    for i in range(ii, ii + IB_SIZE, 2):
-                        middle += f"    i = {i};\n"
-                        if kk == 0:
-                            middle += "    acc00 = acc01 = acc10 = acc11 = 0;\n"
-                        else:
-                            middle += """
-    acc00 = mat_res[(i+0) * MAT_DIM + j + 0];
-    acc01 = mat_res[(i+0) * MAT_DIM + j + 1];
-    acc10 = mat_res[(i+1) * MAT_DIM + j + 0];
-    acc11 = mat_res[(i+1) * MAT_DIM + j + 1];
-"""
-                        for k in range(kk, kk + KB_SIZE):
-                            middle += f"""
-    k = {k};
-    acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
-    acc01 += mat_2[k * MAT_DIM + j + 1] * mat_1[(i + 0) * MAT_DIM + k];
-    acc10 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 1) * MAT_DIM + k];
-    acc11 += mat_2[k * MAT_DIM + j + 1] * mat_1[(i + 1) * MAT_DIM + k];
+            for j in range(0, mat_dim, 2):
+                middle += f"    j = {j};\n"
+                for i in range(ii, ii + IB_SIZE, 2):
+                    middle += f"    i = {i};\n"
+                    middle += "    acc00 = acc01 = acc10 = acc11 = 0;\n"
+                    for k in range(0, mat_dim):
+                        middle += f"""
+k = {k};
+acc00 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 0) * MAT_DIM + k];
+acc01 += mat_2[k * MAT_DIM + j + 1] * mat_1[(i + 0) * MAT_DIM + k];
+acc10 += mat_2[k * MAT_DIM + j + 0] * mat_1[(i + 1) * MAT_DIM + k];
+acc11 += mat_2[k * MAT_DIM + j + 1] * mat_1[(i + 1) * MAT_DIM + k];
 """
 
-                        middle += """
-    mat_res[(i + 0) * MAT_DIM + j + 0] = acc00;
-    mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
-    mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
-    mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
+                    middle += """
+mat_res[(i + 0) * MAT_DIM + j + 0] = acc00;
+mat_res[(i + 0) * MAT_DIM + j + 1] = acc01;
+mat_res[(i + 1) * MAT_DIM + j + 0] = acc10;
+mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
 """
 
     return middle
