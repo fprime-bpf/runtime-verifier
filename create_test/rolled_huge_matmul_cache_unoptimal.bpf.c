@@ -4,7 +4,7 @@
 #define MAT_SIZE (MAT_DIM * MAT_DIM)
 int main() {
     void *mat_map_1 = MAP_BY_FD(0), *mat_map_2 = MAP_BY_FD(1), *mat_map_res = MAP_BY_FD(2), *result;
-    float mat_1[MAT_SIZE], mat_2[MAT_SIZE], mat_res[MAT_SIZE];
+    int mat_1[MAT_SIZE], mat_2[MAT_SIZE], mat_res[MAT_SIZE];
     long i, j, k;
 
 
@@ -12,10 +12,10 @@ int main() {
     // Read in 2 matrices
     for (i = 0; i < MAT_SIZE; i++) {
         result = bpf_map_lookup_elem(mat_map_1, &i);
-        mat_1[i] = *(float *)result;
+        mat_1[i] = *(int *)result;
 
         result = bpf_map_lookup_elem(mat_map_2, &i);
-        mat_2[i] = *(float *)result;
+        mat_2[i] = *(int *)result;
     }
 
     // Do multiplication
