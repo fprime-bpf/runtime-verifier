@@ -7,6 +7,12 @@ IB_SIZE = 4
 KB_SIZE = 4
 # both must be divisors of mat dim
 
+class Type:
+    FLOAT = "float"
+    INT = "int"
+
+mat_type = Type.FLOAT
+
 
 def get_begin(mat_dim: int, rolled: bool):
     begin = f"""
@@ -16,30 +22,30 @@ def get_begin(mat_dim: int, rolled: bool):
 #define IB {IB_SIZE}
 int main() {{
     void *mat_map_1 = MAP_BY_FD(0), *mat_map_2 = MAP_BY_FD(1), *mat_map_res = MAP_BY_FD(2), *result;
-    float mat_1[MAT_SIZE], mat_2[MAT_SIZE], mat_res[MAT_SIZE];
+    {mat_type} mat_1[MAT_SIZE], mat_2[MAT_SIZE], mat_res[MAT_SIZE];
     long i, j, k, ii, kk;
-    float acc00, acc01, acc10, acc11;
+    {mat_type} acc00, acc01, acc10, acc11;
 
 """
 
     if rolled:
-        begin += """
+        begin += f"""
     // Read in 2 matrices
-    for (i = 0; i < MAT_SIZE; i++) {
+    for (i = 0; i < MAT_SIZE; i++) {{
         result = bpf_map_lookup_elem(mat_map_1, &i);
-        mat_1[i] = *(float *)result;
+        mat_1[i] = *({mat_type} *)result;
 
         result = bpf_map_lookup_elem(mat_map_2, &i);
-        mat_2[i] = *(float *)result;
-    }
+        mat_2[i] = *({mat_type} *)result;
+    }}
 """
     else:
         for i in range(mat_dim * mat_dim):
             begin += f"    i = {i};\n"
             begin += f"    result = bpf_map_lookup_elem(mat_map_1, &i);\n"
-            begin += f"    mat_1[i] = *(int *)result;\n"
+            begin += f"    mat_1[i] = *({mat_type} *)result;\n"
             begin += f"    result = bpf_map_lookup_elem(mat_map_2, &i);\n"
-            begin += f"    mat_2[i] = *(int *)result;\n"
+            begin += f"    mat_2[i] = *({mat_type} *)result;\n"
 
     return begin
 
