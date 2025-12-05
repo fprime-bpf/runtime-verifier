@@ -94,26 +94,14 @@ def get_middle(mat_dim: int, rolled: bool):
 
 def main():
     assert len(sys.argv) == 2
-    name = sys.argv[1]
-    mat_dim = 0
-    match name:
-        case "small_matmul":
-            mat_dim = 8
-        case "medium_matmul":
-            mat_dim = 12
-        case "big_matmul":
-            mat_dim = 16
-        case "huge_matmul":
-            mat_dim = 20
-        case _:
-            raise Exception(f"bad argument")
+    mat_dim = int(sys.argv[1])
 
     # unrolled
     begin = get_begin(mat_dim, rolled=False)
     middle = get_middle(mat_dim, rolled=False)
     end = get_end(mat_dim, rolled=False)
     contents = begin + middle + end
-    with open(f"unrolled_{name}_cache_unoptimal.bpf.c", "w") as f:
+    with open(f"unrolled_{mat_dim}x{mat_dim}_unopt.bpf.c", "w") as f:
         f.write(contents)
 
     # rolled
@@ -121,7 +109,7 @@ def main():
     middle = get_middle(mat_dim, rolled=True)
     end = get_end(mat_dim, rolled=True)
     contents = begin + middle + end
-    with open(f"rolled_{name}_cache_unoptimal.bpf.c", "w") as f:
+    with open(f"rolled_{mat_dim}x{mat_dim}_unopt.bpf.c", "w") as f:
         f.write(contents)
 
 

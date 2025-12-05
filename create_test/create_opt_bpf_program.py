@@ -126,19 +126,7 @@ mat_res[(i + 1) * MAT_DIM + j + 1] = acc11;
 
 def main():
     assert len(sys.argv) == 2
-    name = sys.argv[1]
-    mat_dim = 0
-    match name:
-        case "small_matmul":
-            mat_dim = 8
-        case "medium_matmul":
-            mat_dim = 12
-        case "big_matmul":
-            mat_dim = 16
-        case "huge_matmul":
-            mat_dim = 20
-        case _:
-            raise Exception(f"bad argument")
+    mat_dim = int(sys.argv[1])
 
     if mat_dim % IB_SIZE or mat_dim % KB_SIZE:
         raise Exception(
@@ -150,7 +138,7 @@ def main():
     middle = get_middle(mat_dim, rolled=False)
     end = get_end(mat_dim, rolled=False)
     contents = begin + middle + end
-    with open(f"unrolled_{name}_cache_optimal.bpf.c", "w") as f:
+    with open(f"unrolled_{mat_dim}x{mat_dim}_opt.bpf.c", "w") as f:
         f.write(contents)
 
     # rolled
@@ -158,7 +146,7 @@ def main():
     middle = get_middle(mat_dim, rolled=True)
     end = get_end(mat_dim, rolled=True)
     contents = begin + middle + end
-    with open(f"rolled_{name}_cache_optimal.bpf.c", "w") as f:
+    with open(f"rolled_{mat_dim}x{mat_dim}_opt.bpf.c", "w") as f:
         f.write(contents)
 
 
