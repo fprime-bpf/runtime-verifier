@@ -4,7 +4,7 @@ class Type:
     FLOAT = "float"
     INT = "int"
 
-mat_type = Type.INT
+mat_type = Type.FLOAT
 
 
 def get_begin(mat_dim: int, rolled: bool):
