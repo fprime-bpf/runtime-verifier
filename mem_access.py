@@ -1,12 +1,11 @@
-from z3 import (Solver, Int, IntVal, Abs, Not, sat, simplify, ArithRef, BoolRef, ExprRef, If, BitVecVal,
-    Extract, ZeroExt, SignExt, UDiv, URem, SRem, LShR, If, And, Real, BitVecRef, BitVec, RealVal, BV2Int,
-    UGT, UGE, ULT, ULE, BoolVal)
+from z3 import (ArithRef, BoolRef, ExprRef, If, BitVecVal,Extract, ZeroExt, SignExt, UDiv, 
+                URem, SRem, LShR, If, And, Real, BitVecRef, BitVec, RealVal, BV2Int,
+                UGT, UGE, ULT, ULE, BoolVal)
 
 from block import Block
-from dfs import is_fpu_instr, BPF_INFO, BPF_INFO_FPU
 from dataclasses import dataclass, field
 from copy import deepcopy
-from bpf import BpfInstruction, BpfClass
+from bpf import BpfClass, BpfCode, BpfInstruction, Mask, Shift, BPF_INFO, BPF_INFO_FPU
 from typing import List, Optional, Dict, cast, Tuple
 from enum import Enum, auto
 
@@ -61,9 +60,35 @@ class DecodedInstr:
     offset: int
 
 
+def _is_fpu_instr(instr: BpfInstruction) -> bool:
+    cls_ = instr.get_class()
+
+    raw = instr._to_int(instr.instruction)
+    offset_u = (raw & Mask.OFFSET) >> Shift.OFFSET
+    imm_u = (raw & Mask.IMM) >> Shift.IMM
+
+    # FPU Arithmetic: ALU / ALU64 + offset bit1=1
+    if cls_ in (BpfClass.ALU, BpfClass.ALU64):
+        f_flag = (offset_u >> 1) & 0x1
+        return f_flag == 1
+
+    # FPU Branch: JMP / JMP32 + Not CALL/EXIT + imm bit1=1
+    if cls_ in (BpfClass.JMP, BpfClass.JMP32):
+        code = instr.opcode & Mask.CODE
+
+        # Exclude CALL and EXIT
+        if code in (BpfCode.JMP.CALL, BpfCode.JMP.EXIT):
+            return False
+
+        imm_bit1 = (imm_u >> 1) & 0x1
+        return imm_bit1 == 1
+
+    return False
+
+
 def _decode_instruction(instr: BpfInstruction) -> DecodedInstr:
     
-    if is_fpu_instr(instr):
+    if _is_fpu_instr(instr):
         op_info = BPF_INFO_FPU.get(instr.opcode)  # FADD / FNEG / JFEQ / JFOGT ...
     else:
         op_info = BPF_INFO.get(instr.opcode)      # ALU/MEM ... + FLDX & FSTX
@@ -85,7 +110,7 @@ def _decode_instruction(instr: BpfInstruction) -> DecodedInstr:
 
     return DecodedInstr(
         name=op_info.name,
-        is_float=is_fpu_instr(instr),
+        is_float=_is_fpu_instr(instr),
         instr_class=instr_class,
         dst=instr.dst,
         src=instr.src,
@@ -440,7 +465,7 @@ def _fresh_mem_val(is_float: bool, idx: int) -> ExprRef:
 _LOAD_PREFIXES  = ("LD_", "LDX_", "FLD_", "FLDX_")
 _STORE_PREFIXES = ("ST_", "STX_", "FST_", "FSTX_")
 
-def _exec_mem(decoded_instr: DecodedInstr, state: State) -> Optional[ExprRef]:
+def _exec_mem(decoded_instr: DecodedInstr, state: State) -> Optional[BitVecRef]:
     """
     Execute a memory-related instruction symbolically.
 
@@ -453,7 +478,7 @@ def _exec_mem(decoded_instr: DecodedInstr, state: State) -> Optional[ExprRef]:
           * for loads, also update dst register.
 
     Returns:
-        addr (ExprRef) if this instruction touches memory,
+        addr (BitVecRef) if this instruction touches memory,
         or None if it only updates registers (e.g., LD_IMM/LDDW).
     """
     name = decoded_instr.name
@@ -603,28 +628,38 @@ def _branch_condition(decoded_instr: DecodedInstr, state: State) -> BoolRef:
     raise ValueError(f"Unsupported integer branch opcode: {op_name}")
 
 
-def _process_instruction(instr: BpfInstruction, state: State) -> Tuple[Optional[BoolRef], Optional[ExprRef]]:
+def process_instruction(instr: BpfInstruction, state: State, instr_idx: int) -> Tuple[Optional[BoolRef], Optional[BitVecRef]]:
     """    
     Symbolically evaluates a single eBPF instruction.
-
-    This function decodes the instruction, forwards it to the correct semantic
-    function (ALU/FPU, memory load/store, or branch), and returns
-    (branch_cond, addr)
+    Added 'instr_idx' to support deterministic naming of symbolic variables.
     """
     decoded_instr = _decode_instruction(instr)
     
     branch_cond: Optional[BoolRef] = None
-    addr: Optional[ExprRef] = None
+    addr: Optional[BitVecRef] = None
 
     match decoded_instr.instr_class:
-        case InstrClass.OP:  # ALU or FPU operations
+        case InstrClass.OP:
             _update_state_op(decoded_instr, state)
 
         case InstrClass.LOAD_STORE:
             addr = _exec_mem(decoded_instr, state)
 
         case InstrClass.BRANCH:
-            branch_cond = _branch_condition(decoded_instr, state)
+            if decoded_instr.name == "EXIT":
+                branch_cond = None
+                addr = None
+
+            elif decoded_instr.name == "CALL":
+                func_id = decoded_instr.imm
+                
+                if func_id == 1:
+                    new_r0 = BitVec(f"R0_I{instr_idx}", 64)
+                    state.set_gp(0, new_r0)
+                # Both addr and branch_cond are None
+ 
+            else:
+                branch_cond = _branch_condition(decoded_instr, state)
 
         case InstrClass.OTHER:
             pass
