@@ -343,8 +343,8 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfCode.JMP.JSLT | BpfS.X | BpfClass.JMP:   OpInfo("JSLT_X",  3),
     BpfCode.JMP.JSLE | BpfS.K | BpfClass.JMP:   OpInfo("JSLE_K",  7),
     BpfCode.JMP.JSLE | BpfS.X | BpfClass.JMP:   OpInfo("JSLE_X",  3),
-    BpfCode.JMP.CALL | BpfS.K | BpfClass.JMP:   OpInfo("CALL",    None),
-    BpfCode.JMP.CALL | BpfS.X | BpfClass.JMP:   OpInfo("CALL",    None),
+    BpfCode.JMP.CALL | BpfS.K | BpfClass.JMP:   OpInfo("CALL",    11 + 87),
+    BpfCode.JMP.CALL | BpfS.X | BpfClass.JMP:   OpInfo("CALL",    11 + 87),
     BpfCode.JMP.EXIT | BpfS.K | BpfClass.JMP:   OpInfo("EXIT",    2),
 
     # ===== JMP32 (32-bit compare) =====
@@ -371,8 +371,8 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfCode.JMP.JSLT | BpfS.X | BpfClass.JMP32: OpInfo("JSLT32_X", 3),
     BpfCode.JMP.JSLE | BpfS.K | BpfClass.JMP32: OpInfo("JSLE32_K", 7),
     BpfCode.JMP.JSLE | BpfS.X | BpfClass.JMP32: OpInfo("JSLE32_X", 3),
-    BpfCode.JMP.CALL | BpfS.K | BpfClass.JMP32: OpInfo("CALL",     None),
-    BpfCode.JMP.CALL | BpfS.X | BpfClass.JMP32: OpInfo("CALL",     None),
+    BpfCode.JMP.CALL | BpfS.K | BpfClass.JMP32: OpInfo("CALL",     11 + 87),
+    BpfCode.JMP.CALL | BpfS.X | BpfClass.JMP32: OpInfo("CALL",     11 + 87),
     
     # ===== LD =====
     BpfMode.IMM | BpfSize.W  | BpfClass.LD:  OpInfo("LD_IMM_W",  4 + 87),
