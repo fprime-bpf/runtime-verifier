@@ -78,7 +78,7 @@ def get_middle(mat_dim: int, rolled: bool):
     if rolled:
         middle += """
     // Do multiplication
-    for (ii = 0; i < MAT_DIM; ii += IB) {
+    for (ii = 0; ii < MAT_DIM; ii += IB) {
         for (j = 0; j < MAT_DIM; j += 2) {
             for (i = ii; i < ii + IB; i += 2) {
                 acc00 = acc01 = acc10 = acc11 = 0;
