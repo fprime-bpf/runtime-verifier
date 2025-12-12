@@ -155,7 +155,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
             if hasattr(instruction, 'opcode') and instruction.opcode == 0x85:
                 if hasattr(instruction, 'imm') and instruction.imm in [1, 2, 3]:
                     # print(f"  [Helper Call] ID {instruction.imm} at I{current_idx}: +87 cycles")
-                    path_runtime += 87
+                    path_runtime += 11 + 87
             
 
             if branch_cond is not None:
