@@ -1,9 +1,9 @@
 from block import Block
-from bpf import BpfClass, BpfCode, BpfS, BpfSize, BpfMode, BpfInstruction, Mask, Shift, BPF_INFO, BPF_INFO_FPU
+from bpf import BpfClass, BpfCode, BpfInstruction, Mask, Shift, BPF_INFO, BPF_INFO_FPU
 from mem_access import process_instruction, State
-from typing import Set, Optional, Dict, List, Tuple
-from z3 import ExprRef, Solver, If, ULT, ULE, sat, BitVecRef, BoolRef, Not, unknown, UGT, unsat
-
+from typing import Set, Optional
+from z3 import Solver, If, ULT, ULE, sat, BitVecRef, BoolRef, Not, unknown
+from collections import deque
 
 CACHE_LINE_DIFF = 4
 COST_MEM_L1_HIT = 0
@@ -74,9 +74,9 @@ def instr_to_runtime(instructions:list, start:int, end:int) -> int:
 
 
 def check_cache_hit(curr_addr, cache_list, solver) -> int:
-    for i in range(len(cache_list)):
+    for i in reversed(range(len(cache_list))):
         if curr_addr.eq(cache_list[i]):
-            return True
+            return i
             
         solver.push()
         
@@ -84,14 +84,14 @@ def check_cache_hit(curr_addr, cache_list, solver) -> int:
                   cache_list[i] - curr_addr, 
                   curr_addr - cache_list[i])
         
-        solver.add(UGT(diff, CACHE_LINE_DIFF)) 
+        solver.add(ULE(diff, CACHE_LINE_DIFF)) 
         
         result = solver.check()
         solver.pop()
 
         if result == unknown:
             print(f"Warning: Z3 returned unknown at addr {curr_addr}")
-        if result == unsat:
+        if result == sat:
             return i
             
     return -1
@@ -111,7 +111,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
     path_runtime_ub = 0
     path_runtime = 0  # Tracks cumulative runtime for the current path
 
-    def dfs(block: 'Block', state: 'State', cache_state: List[BitVecRef], solver: Solver):
+    def dfs(block: 'Block', state: 'State', cache_state: deque[BitVecRef], solver: Solver):
         nonlocal path_runtime_ub, path_runtime
 
         # 1. Cycle detection (Back-edge)
@@ -137,8 +137,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
         path_runtime += base_block_cost
 
         # Prepare local cache state (copy from parent)
-        # List of (AddressExpr, TTL)
-        curr_cache = [ addr for addr in cache_state ]
+        curr_cache = deque(list(cache_state), maxlen=16)
 
         last_branch_cond: Optional[BoolRef] = None
 
@@ -169,22 +168,21 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
 
                 if op_info:
                     if "LD" in op_info.name:
-                        dist = check_cache_hit(mem_addr, curr_cache, solver)
+                        dist = check_cache_hit(mem_addr, list(curr_cache), solver)
+
+                        # Check the distance from the most recent MEM/FMEM instruction
                         if dist == -1:
                             print(f"  [Cache MISS] Addr: {mem_addr} (+{COST_MEM_MISS} cycles)")
                             path_runtime += COST_MEM_MISS
-                        elif dist < 8:
+                        elif len(list(curr_cache)) - dist < 8:
                             print(f"  [Cache HIT L1] Addr: {mem_addr} (+{COST_MEM_L1_HIT} cycles)")
                             path_runtime += COST_MEM_L1_HIT
-                        elif dist < 16:
+                        elif len(list(curr_cache)) - dist < 16:
                             print(f"  [Cache HIT L2] Addr: {mem_addr} (+{COST_MEM_L2_HIT} cycles)")
                             path_runtime += COST_MEM_L2_HIT
 
                 # Update cache with new access
                 curr_cache.append(mem_addr)
-                # Trim to max 16 elements
-                if len(curr_cache) > 16:
-                    curr_cache.pop(0)
 
         if not block.next:
             print(f"Reaching an exit point {block.end}, total path runtime is {path_runtime}")
@@ -199,10 +197,10 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
                 if last_branch_cond is not None:
                     solver.push()
                     solver.add(last_branch_cond)
-                    dfs(nxt, state.fork(), list(curr_cache), solver)
+                    dfs(nxt, state.fork(), curr_cache, solver)
                     solver.pop()
                 else:
-                    dfs(nxt, state.fork(), list(curr_cache), solver)
+                    dfs(nxt, state.fork(), curr_cache, solver)
 
             # Case B: Two Successors (Conditional Branch)
             # successors[0] is the Taken target, successors[1] is the Not-Taken target
@@ -210,7 +208,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
                 if last_branch_cond is None:
                     print("Warning: Branch with 2 successors but no condition found! Exploring both blindly.")
                     for nxt in successors:
-                        dfs(nxt, state.fork(), list(curr_cache), solver)
+                        dfs(nxt, state.fork(), deque(list(curr_cache), maxlen=16), solver)
                 else:
                     # --- Condition is True (Taken) ---
                     nxt_true = successors[0]
@@ -219,7 +217,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
                     
                     # Pruning: Only recurse if the path is satisfiable
                     if solver.check() == sat:
-                        dfs(nxt_true, state.fork(), list(curr_cache), solver)
+                        dfs(nxt_true, state.fork(), deque(list(curr_cache), maxlen=16), solver)
                     else:
                         print(f"  [Pruned] Path to BB {nxt_true.start} is unreachable (UNSAT).")
 
@@ -231,7 +229,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
                     solver.add(Not(last_branch_cond))
                     
                     if solver.check() == sat:
-                        dfs(nxt_false, state.fork(), list(curr_cache), solver)
+                        dfs(nxt_false, state.fork(), deque(list(curr_cache), maxlen=16), solver)
                     else:
                         print(f"  [Pruned] Path to BB {nxt_false.start} is unreachable (UNSAT).")
                     
@@ -243,12 +241,12 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
 
     # Initialize state
     initial_state = State()
-    initial_cache: List[BitVecRef] = []
-    
+    initial_cache: deque[BitVecRef] = deque([], maxlen=16)
+
     # Initialize Solver for path constraints and cache checks
     solver = Solver()
-    
+
     # Start DFS
     dfs(first_block, initial_state, initial_cache, solver)
-    
+
     return path_runtime_ub
