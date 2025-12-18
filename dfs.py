@@ -6,7 +6,8 @@ from z3 import ExprRef, Solver, If, ULT, ULE, sat, BitVecRef, BoolRef, Not, unkn
 
 
 CACHE_LINE_DIFF = 4
-COST_MEM_HIT = 0
+COST_MEM_L1_HIT = 2
+COST_MEM_L2_HIT = 12
 COST_MEM_MISS = 87
 CACHE_TTL_N = 8  # Set to 8/16 for test
 
@@ -72,16 +73,16 @@ def instr_to_runtime(instructions:list, start:int, end:int) -> int:
     return runtime
 
 
-def check_cache_hit(curr_addr, cache_list, solver) -> bool:
-    for cached_addr, _ in cache_list:
-        if curr_addr.eq(cached_addr):
+def check_cache_hit(curr_addr, cache_list, solver) -> int:
+    for i in range(len(cache_list)):
+        if curr_addr.eq(cache_list[i]):
             return True
             
         solver.push()
         
-        diff = If(ULT(curr_addr, cached_addr), 
-                  cached_addr - curr_addr, 
-                  curr_addr - cached_addr)
+        diff = If(ULT(curr_addr, cache_list[i]), 
+                  cache_list[i] - curr_addr, 
+                  curr_addr - cache_list[i])
         
         solver.add(UGT(diff, CACHE_LINE_DIFF)) 
         
@@ -91,9 +92,9 @@ def check_cache_hit(curr_addr, cache_list, solver) -> bool:
         if result == unknown:
             print(f"Warning: Z3 returned unknown at addr {curr_addr}")
         if result == unsat:
-            return True
+            return i
             
-    return False
+    return -1
     
     
 def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
@@ -110,7 +111,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
     path_runtime_ub = 0
     path_runtime = 0  # Tracks cumulative runtime for the current path
 
-    def dfs(block: 'Block', state: 'State', cache_state: List[Tuple[BitVecRef, int]], solver: Solver):
+    def dfs(block: 'Block', state: 'State', cache_state: List[BitVecRef], solver: Solver):
         nonlocal path_runtime_ub, path_runtime
 
         # 1. Cycle detection (Back-edge)
@@ -129,50 +130,61 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
 
         # For backtracking
         runtime_at_entry = path_runtime
-        
+
         # --- Cost Calculation Part 1: Base Static Cost ---
         # Calculate the base execution time for this block (ALU, static costs)
         base_block_cost = instr_to_runtime(instructions, block.start, block.end)
         path_runtime += base_block_cost
-        
+
         # Prepare local cache state (copy from parent)
         # List of (AddressExpr, TTL)
-        curr_cache = [ (addr, ttl) for addr, ttl in cache_state ]
-        
+        curr_cache = [ addr for addr in cache_state ]
+
         last_branch_cond: Optional[BoolRef] = None
-        
+
         # --- Cost Calculation Part 2: Memory Penalties ---
         for i, instruction in enumerate(block_instrs):
             current_idx = block.start + i
-            
-            # 1. Update Cache TTL
-            curr_cache = [ (addr, t - 1) for addr, t in curr_cache if t > 1 ]
-
+ 
             # 2. Symbolic Execution
             branch_cond, mem_addr = process_instruction(instruction, state, current_idx)
-            
-            # 3. Helper Call Cost Logic (+87 cycles)
+
+            # 3. Helper Call Cost Logic
             if hasattr(instruction, 'opcode') and instruction.opcode == 0x85:
                 if hasattr(instruction, 'imm') and instruction.imm in [1, 2, 3]:
-                    # print(f"  [Helper Call] ID {instruction.imm} at I{current_idx}: +87 cycles")
-                    path_runtime += 11 + 87
-            
+                    print(f"  [Helper Call] ID {instruction.imm} at I{current_idx}: +{COST_MEM_MISS} cycles")
+                    path_runtime += COST_MEM_MISS
+                else:
+                    print(f"  [Helper Call] ID {instruction.imm} at I{current_idx}: +100 cycles")
+                    path_runtime += 100
 
             if branch_cond is not None:
                 last_branch_cond = branch_cond
 
-
             if mem_addr is not None:
-                
-                if check_cache_hit(mem_addr, curr_cache, solver):
-                    print(f"  [Cache HIT] Addr: {mem_addr} (+{COST_MEM_HIT} cycles)")
-                    path_runtime += COST_MEM_HIT
+                if is_fpu_instr(instruction):
+                    op_info = BPF_INFO_FPU.get(instruction.opcode)  # FADD / FNEG / JFEQ / JFOGT ...
                 else:
-                    print(f"  [Cache MISS] Addr: {mem_addr} (+{COST_MEM_MISS} cycles)")
-                    path_runtime += COST_MEM_MISS
-                    
-                    # Update cache on miss
-                    curr_cache.append((mem_addr, CACHE_TTL_N))
+                    op_info = BPF_INFO.get(instruction.opcode)      # ALU/MEM ... + FLDX & FSTX
+
+                if op_info:
+                    if "LD" in op_info.name:
+                        dist = check_cache_hit(mem_addr, curr_cache, solver)
+                        if dist == -1:
+                            print(f"  [Cache MISS] Addr: {mem_addr} (+{COST_MEM_MISS} cycles)")
+                            path_runtime += COST_MEM_MISS
+                        elif dist < 8:
+                            print(f"  [Cache HIT L1] Addr: {mem_addr} (+{COST_MEM_L1_HIT} cycles)")
+                            path_runtime += COST_MEM_L1_HIT
+                        elif dist < 16:
+                            print(f"  [Cache HIT L2] Addr: {mem_addr} (+{COST_MEM_L2_HIT} cycles)")
+                            path_runtime += COST_MEM_L2_HIT
+
+                # Update cache with new access
+                curr_cache.append(mem_addr)
+                # Trim to max 16 elements
+                if len(curr_cache) > 16:
+                    curr_cache.pop(0)
 
         if not block.next:
             print(f"Reaching an exit point {block.end}, total path runtime is {path_runtime}")
@@ -180,7 +192,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
         else:
             # Branching
             successors = block.next
-            
+
             # Case A: Single Successor (Unconditional Jump or Fall-through)
             if len(successors) == 1:
                 nxt = successors[0]
@@ -210,7 +222,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
                         dfs(nxt_true, state.fork(), list(curr_cache), solver)
                     else:
                         print(f"  [Pruned] Path to BB {nxt_true.start} is unreachable (UNSAT).")
-                    
+
                     solver.pop()
 
                     # --- Condition is False (Not Taken) ---
@@ -231,7 +243,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
 
     # Initialize state
     initial_state = State()
-    initial_cache: List[Tuple[BitVecRef, int]] = []
+    initial_cache: List[BitVecRef] = []
     
     # Initialize Solver for path constraints and cache checks
     solver = Solver()
