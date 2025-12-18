@@ -6,7 +6,7 @@ from z3 import ExprRef, Solver, If, ULT, ULE, sat, BitVecRef, BoolRef, Not, unkn
 
 
 CACHE_LINE_DIFF = 4
-COST_MEM_L1_HIT = 2
+COST_MEM_L1_HIT = 0
 COST_MEM_L2_HIT = 12
 COST_MEM_MISS = 87
 CACHE_TTL_N = 8  # Set to 8/16 for test
