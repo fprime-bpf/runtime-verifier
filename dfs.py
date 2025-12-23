@@ -174,10 +174,10 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
                         if dist == -1:
                             print(f"  [Cache MISS] Addr: {mem_addr} (+{COST_MEM_MISS} cycles)")
                             path_runtime += COST_MEM_MISS
-                        elif len(list(curr_cache)) - dist < 7:
+                        elif len(list(curr_cache)) - dist < 8:
                             print(f"  [Cache HIT L1] Addr: {mem_addr} (+{COST_MEM_L1_HIT} cycles)")
                             path_runtime += COST_MEM_L1_HIT
-                        elif len(list(curr_cache)) - dist < 15:
+                        elif len(list(curr_cache)) - dist < 16:
                             print(f"  [Cache HIT L2] Addr: {mem_addr} (+{COST_MEM_L2_HIT} cycles)")
                             path_runtime += COST_MEM_L2_HIT
 
