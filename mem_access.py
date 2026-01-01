@@ -392,11 +392,11 @@ def _update_state_op(decoded_instr: DecodedInstr, state: State) -> None:
         state.set_gp(dst_idx, new_val)
 
 
-def _fresh_gp_var(reg_idx: int, step_idx: int) -> BitVecRef:
+def fresh_gp_var(reg_idx: int, step_idx: int) -> BitVecRef:
     """Create a fresh 64-bit GP register variable R{reg}_I{step}."""
     return BitVec(f"R{reg_idx}_I{step_idx}", WORD)
 
-def _fresh_fp_var(reg_idx: int, step_idx: int) -> ArithRef:
+def fresh_fp_var(reg_idx: int, step_idx: int) -> ArithRef:
     """Create a fresh FP register variable F{reg}_I{step} (modeled as Real)."""
     return Real(f"F{reg_idx}_I{step_idx}")
 
@@ -654,7 +654,7 @@ def process_instruction(instr: BpfInstruction, state: State, instr_idx: int) -> 
                 func_id = decoded_instr.imm
                 
                 if func_id == 1:
-                    new_r0 = BitVec(f"R0_I{instr_idx}", 64)
+                    new_r0 = fresh_gp_var(0, instr_idx)
                     state.set_gp(0, new_r0)
                 # Both addr and branch_cond are None
  
