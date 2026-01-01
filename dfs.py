@@ -1,6 +1,6 @@
 from block import Block
 from bpf import BpfClass, BpfCode, BpfInstruction, Mask, Shift, BPF_INFO, BPF_INFO_FPU
-from mem_access import process_instruction, State
+from mem_access import process_instruction, State, fresh_gp_var, fresh_fp_var
 from typing import Set, Optional
 from z3 import Solver, If, ULT, ULE, sat, BitVecRef, BoolRef, Not, unknown
 from collections import deque
@@ -150,6 +150,13 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
 
             # 3. Helper Call Cost Logic
             if hasattr(instruction, 'opcode') and instruction.opcode == 0x85:
+                
+                # Set R1-R5 to new values
+                for reg_idx in range(1,6):
+                    reg_val = fresh_gp_var(reg_idx, current_idx)
+                    state.set_gp(reg_idx, reg_val)
+                    # print(f"  [Helper Call] at I{current_idx}: R{reg_idx} value is set to {state.get_gp(reg_idx)}")
+                
                 if hasattr(instruction, 'imm') and instruction.imm in [1, 2, 3]:
                     print(f"  [Helper Call] ID {instruction.imm} at I{current_idx}: +{COST_MEM_MISS} cycles")
                     path_runtime += COST_MEM_MISS
