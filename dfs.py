@@ -8,7 +8,7 @@ from collections import deque
 CACHE_LINE_DIFF = 4
 COST_MEM_L1_HIT = 0
 COST_MEM_L2_HIT = 12
-COST_MEM_MISS = 87 + 87
+COST_MEM_MISS = 87
 CACHE_TTL_N = 8  # Set to 8/16 for test
 
 
