@@ -10,14 +10,16 @@ class Block:
         self.next: list[Block] = []
 
     def add(self, block: Block):
-        self.next.append(block)
+        if block not in self.next:
+            self.next.append(block)
 
-    def __str__(self) -> str:
-        curr = f"BB({self.start}, {self.end})"
+    # This is dlasbled to avoid recursive calls on a cyclic graph
+    # def __str__(self) -> str:
+    #     curr = f"BB({self.start}, {self.end})"
 
-        if len(self.next) == 1:
-            return f"{curr} -> {str(self.next[0])}"
-        if len(self.next) > 1:
-            return f"{curr} -> [{'; '.join([f'{str(n)}' for n in self.next])}]"
+    #     if len(self.next) == 1:
+    #         return f"{curr} -> {str(self.next[0])}"
+    #     if len(self.next) > 1:
+    #         return f"{curr} -> [{'; '.join([f'{str(n)}' for n in self.next])}]"
 
-        return curr
+    #     return curr
