@@ -37,19 +37,21 @@ def read_bpf_file(filename: str) -> list[BpfInstruction]:
 
 
 def get_blocks_tree(
-    instructions: list[BpfInstruction], start_idx=0, all_blocks: dict[int, Block] | None = None
+    instructions: list[BpfInstruction], start_idx=0, all_blocks: dict[int, Block] | None = None, leaders = None
 ) -> Block:
-    """Processes instruction set into a CFG using Leader-based partitioning."""
+    """Processes instruction set into a CFG using Leader-based partitioning.""" 
 
     # Pre-scan phase: Identify entry points (Leaders) to avoid block overlaps
     if all_blocks is None:
         all_blocks = {}
         leaders = {0}
         for i, ins in enumerate(instructions):
+            print(f"idx={i}: instruction={str(ins)}")
             if ins.get_class() in [BpfClass.JMP, BpfClass.JMP32]:
                 # Target of a jump is a leader
+                # BPF CALL
                 if ins.opcode == (BpfCode.JMP.CALL | BpfS.K | BpfClass.JMP):
-                    if ins.src == 1: 
+                    if ins.src == 1:   # Calling normal function
                         leaders.add(i + ins.imm + 1)
                 elif ins.opcode != (BpfCode.JMP.EXIT | BpfS.K | BpfClass.JMP):
                     target = i + ins.off + 1 if hasattr(ins, 'off') else i + ins.imm + 1
@@ -59,15 +61,16 @@ def get_blocks_tree(
                 if i + 1 < len(instructions):
                     leaders.add(i + 1)
         
-        all_blocks['_leaders'] = sorted([l for l in leaders if l < len(instructions)])
-
+        leaders = sorted([l for l in leaders if l < len(instructions)])
+        
+    # Cycle detection: reuse existing block and terminate recursion.
     if start_idx in all_blocks:
         return all_blocks[start_idx]
 
     # Determine current block boundary based on the next leader
-    leaders = all_blocks['_leaders']
     next_leader = next((l for l in leaders if l > start_idx), len(instructions))
     
+    # Find the basic block
     curr_block_end = start_idx
     for idx in range(start_idx, next_leader):
         curr_block_end = idx
@@ -87,7 +90,7 @@ def get_blocks_tree(
     if last_ins.get_class() not in [BpfClass.JMP, BpfClass.JMP32] or \
        (last_ins.opcode == BpfCode.JMP.CALL | BpfClass.JMP and last_ins.src in [0, 2]):
         if curr_block_end + 1 < len(instructions):
-            next_b = get_blocks_tree(instructions, curr_block_end + 1, all_blocks)
+            next_b = get_blocks_tree(instructions, curr_block_end + 1, all_blocks, leaders)
             block.add(next_b)
         return block
 
@@ -98,21 +101,21 @@ def get_blocks_tree(
 
         case x if x == BpfCode.JMP.JA | BpfS.K | BpfClass.JMP:
             jump_to = idx + last_ins.off + 1
-            block.add(get_blocks_tree(instructions, jump_to, all_blocks))
+            block.add(get_blocks_tree(instructions, jump_to, all_blocks, leaders))
             return block
 
         case x if x == BpfCode.JMP.JA | BpfS.K | BpfClass.JMP32:
             jump_to = idx + last_ins.imm + 1
-            block.add(get_blocks_tree(instructions, jump_to, all_blocks))
+            block.add(get_blocks_tree(instructions, jump_to, all_blocks, leaders))
             return block
 
         case x if x == BpfCode.JMP.CALL | BpfS.K | BpfClass.JMP:
             if last_ins.src == 1:
                 jump_to = idx + last_ins.imm + 1
-                block.add(get_blocks_tree(instructions, jump_to, all_blocks))
+                block.add(get_blocks_tree(instructions, jump_to, all_blocks, leaders))
             else:
                 # Fall-through for helper calls
-                block.add(get_blocks_tree(instructions, idx + 1, all_blocks))
+                block.add(get_blocks_tree(instructions, idx + 1, all_blocks, leaders))
             return block
 
             # conditional jumps, these jump to two blocks
@@ -164,8 +167,8 @@ def get_blocks_tree(
         ]:
             jump_if = idx + last_ins.off + 1
             jump_else = idx + 1
-            block.add(get_blocks_tree(instructions, jump_if, all_blocks))
-            block.add(get_blocks_tree(instructions, jump_else, all_blocks))
+            block.add(get_blocks_tree(instructions, jump_if, all_blocks, leaders))
+            block.add(get_blocks_tree(instructions, jump_else, all_blocks, leaders))
             return block
 
         case _:
@@ -219,6 +222,34 @@ def print_cfg_from_root(root: Block):
         print(f"Block [{block.start:3} - {block.end:3}]")
         print(f"  └── Successors: {successors_str}")
         
+    print("="*60 + "\n")
+    
+    print("\n" + "="*60)
+    print(f"{'MERMAID GRAPH CODE':^60}")
+    print("="*60)
+    print("```mermaid")
+    print("graph TD")
+    
+    print("    classDef exitNode fill:#f96,stroke:#333,stroke-width:2px;")
+    
+    for start_idx in sorted(all_blocks.keys()):
+        block = all_blocks[start_idx]
+        node_id = f"B{block.start}"
+        node_label = f"\"Block [{block.start} - {block.end}]\""
+        
+        if not block.next:
+            print(f"    {node_id}(({node_label})):::exitNode")
+        else:
+            print(f"    {node_id}[{node_label}]")
+
+        for n in block.next:
+            target_id = f"B{n.start}"
+            if n.start <= block.start:
+                print(f"    {node_id} --> {target_id}")
+            else:
+                print(f"    {node_id} --> {target_id}")
+                
+    print("```")
     print("="*60 + "\n")
 
 
