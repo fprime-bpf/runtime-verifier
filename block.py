@@ -8,18 +8,13 @@ class Block:
         self.start = start_idx
         self.end = end_idx
         self.next: list[Block] = []
+        self.prev: list[Block] = []
 
     def add(self, block: Block):
         if block not in self.next:
             self.next.append(block)
+        if self not in block.prev:
+            block.prev.append(self)
 
-    # This is dlasbled to avoid recursive calls on a cyclic graph
-    # def __str__(self) -> str:
-    #     curr = f"BB({self.start}, {self.end})"
-
-    #     if len(self.next) == 1:
-    #         return f"{curr} -> {str(self.next[0])}"
-    #     if len(self.next) > 1:
-    #         return f"{curr} -> [{'; '.join([f'{str(n)}' for n in self.next])}]"
-
-    #     return curr
+    def __repr__(self) -> str:
+        return f"Block[{self.start:3} - {self.end:3}]"

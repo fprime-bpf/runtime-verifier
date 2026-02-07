@@ -3,7 +3,7 @@ import argparse
 
 from bpf import BpfInstruction, BpfClass, BpfCode, BpfS
 from block import Block
-from dfs import dfs_blocks
+from dfs import dfs_blocks, Loop, find_loops
 
 
 parser = argparse.ArgumentParser(
@@ -260,6 +260,10 @@ def main():
     first_block = get_blocks_tree(instructions)
 
     print_cfg_from_root(first_block)
+    loop_list = find_loops(first_block)
+    for loop in loop_list:
+        print(f"Loop: {loop}\n Header: {loop.header}\n Tail: {loop.tail}\n Members: {loop.members}\n\n")
+    
     runtime_cycle_ub: float = dfs_blocks(first_block, instructions)
     print(f"runtime_cycle_ub: {runtime_cycle_ub}")
     runtime_ub = runtime_cycle_ub / (6.67e8) * 1000

@@ -1,7 +1,6 @@
 from block import Block
 from bpf import BpfClass, BpfCode, BpfInstruction, Mask, Shift, BPF_INFO, BPF_INFO_FPU
 from mem_access import process_instruction, State, fresh_gp_var, fresh_fp_var
-from typing import Set, Optional
 from z3 import Solver, If, ULT, ULE, sat, BitVecRef, BoolRef, Not, unknown
 from collections import deque
 
@@ -257,3 +256,90 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
     dfs(first_block, initial_state, initial_cache, solver)
 
     return path_runtime_ub
+
+
+class Loop:
+    """
+    Metadata for a natural loop in the CFG.
+    """
+    def __init__(self, header: Block, tail: Block, members: set[Block]):
+        self.header = header
+        self.tail = tail
+        self.members = members
+        # (Source, Target)
+        self.entry_edges: set[tuple[Block, Block]] = set()
+        self.exit_edges: set[tuple[Block, Block]] = set()
+
+    def find_boundaries(self):
+        """
+        Populate entry and exit edges based on membership.
+        """
+        for member in self.members:
+            # Exit: source is inside, target is outside
+            for succ in member.next:
+                if succ not in self.members:
+                    self.exit_edges.add((member, succ))
+            # Entry: source is outside, target is inside
+            for pred in member.prev:
+                if pred not in self.members:
+                    self.entry_edges.add((pred, member))
+
+
+def find_loops(root_block: Block) -> list[Loop]:
+    """
+    Identifies loops using Three-Color DFS and collects members via reverse traversal.
+    """
+    # DFS to find header and tail of loops
+    visited = set()
+    visiting = set()
+    
+    loop_list = []
+    back_edges = []    # (tail, header) pairs
+
+    def dfs(current_block: Block):
+        visiting.add(current_block)
+        
+        for next_block in current_block.next:
+            if next_block in visiting:  # Loop detected
+                back_edges.append((current_block, next_block))
+            elif next_block not in visited:
+                dfs(next_block)
+        
+        visiting.remove(current_block)
+        visited.add(current_block)
+    dfs(root_block)
+
+    # Create loop_list: list[loop]
+    for tail, header in back_edges:
+        members = {header, tail}
+        stack = [tail]
+        
+        while stack:
+            curr = stack.pop()
+            for pred in curr.prev:
+                if pred not in members:
+                    members.add(pred)
+                    stack.append(pred)
+        
+        new_loop = Loop(header, tail, members)
+        new_loop.find_boundaries()
+        loop_list.append(new_loop)
+        
+        
+    # If nested loops found, error out
+    for l1 in loop_list:
+        for l2 in loop_list:
+            if l1 == l2:
+                continue
+            
+            # Check if any entry-edge source is in l2 AND any exit-edge target is in l2
+            entry_from_l2 = any(src in l2.members for src, _ in l1.entry_edges)
+            exit_to_l2 = any(target in l2.members for _, target in l1.exit_edges)
+            
+            if entry_from_l2 and exit_to_l2:
+                raise Exception(
+                    f"Nested Loop Error: Loop (Header {l1.header.start}) is nested "
+                    f"inside Loop (Header {l2.header.start})."
+                )
+
+    return loop_list
