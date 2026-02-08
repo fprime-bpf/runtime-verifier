@@ -38,14 +38,14 @@ def is_fpu_instr(instr: BpfInstruction) -> bool:
     return False
 
 
-def instr_to_runtime(instructions:list, start:int, end:int) -> int:
+def instr_to_runtime(instructions:dict[int, BpfInstruction], start:int, end:int) -> int:
     """
     Calculate runtime of the given instructions from `start` to `end` (inclusive).
 
     Parameters
     ----------
-    instructions : list
-        A list of decoded eBPF instructions.
+    instructions : dict[int, BpfInstruction]
+        A dictionary mapping program counter to decoded eBPF instructions.
     start : int
         Start index (inclusive).
     end : int
@@ -57,7 +57,7 @@ def instr_to_runtime(instructions:list, start:int, end:int) -> int:
         CPU cycles. Returns 0 if the input is invalid.
     """
     runtime = 0
-    for idx in range(start, end+1):
+    for idx in (pc for pc in sorted(instructions.keys()) if start <= pc <= end):
         instr = instructions[idx]
         if is_fpu_instr(instr):
             op_info = BPF_INFO_FPU.get(instr.opcode)  # FADD / FNEG / JFEQ / JFOGT ...
@@ -97,7 +97,7 @@ def check_cache_hit(curr_addr, cache_list, solver) -> int:
     return -1
     
     
-def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
+def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstruction]) -> int:
     """
     Perform a depth-first search over the Block graph with Path Constraints & Cache Simulation.
     Returns an integer value (CPU cycles) representing an estimated runtime upper bound.
@@ -124,7 +124,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: list) -> int:
 
         # Basic block information
         instr_count = block.end - block.start + 1
-        block_instrs = instructions[block.start : block.end + 1]
+        block_instrs = [instructions[pc] for pc in sorted(instructions.keys()) if block.start <= pc <= block.end]
         
         print(f"\n======Visiting BB({block.start}, {block.end}), instructions={instr_count}======")
 
