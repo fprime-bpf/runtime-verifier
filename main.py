@@ -13,11 +13,12 @@ parser = argparse.ArgumentParser(
 parser.add_argument("filename")
 
 
-def read_bpf_file(filename: str) -> list[BpfInstruction]:
+def read_bpf_file(filename: str) -> dict[int, BpfInstruction]:
     # TODO: this is not always the case,
     # some instructions are 16 bytes, and they're not that rare
     inst_size = 8
-    instructions = []
+    instructions = {}
+    current_pc = 0
     with open(filename, "rb") as file:
         while True:
             ins = file.read(inst_size)
@@ -30,14 +31,17 @@ def read_bpf_file(filename: str) -> list[BpfInstruction]:
                 more = file.read(inst_size)
                 assert more != b""
                 bpf_ins.widen_instruction(more)
-
-            instructions.append(bpf_ins)
+                instructions[current_pc] = bpf_ins
+                current_pc += 2
+            else:
+                instructions[current_pc] = bpf_ins
+                current_pc += 1
 
     return instructions
 
 
 def get_blocks_tree(
-    instructions: list[BpfInstruction], start_idx=0, seen: set | None = None
+    instructions: dict[int, BpfInstruction], start_idx=0, seen: set | None = None
 ) -> Block:
     """Processes instruction set into a Control Flow Graph (CFG).
 
@@ -57,7 +61,7 @@ def get_blocks_tree(
 
     seen.add(start_idx)
 
-    for idx in range(start_idx, len(instructions)):
+    for idx in (pc for pc in sorted(instructions.keys()) if pc >= start_idx):
         ins = instructions[idx]
         print(f"idx={idx}: instruction={str(ins)}")
 
@@ -174,7 +178,7 @@ def get_blocks_tree(
 def main():
     args = parser.parse_args()
 
-    instructions = read_bpf_file(args.filename)
+    instructions = read_bpf_file(args.filename)  # dict[int, BpfInstruction]
     first_block = get_blocks_tree(instructions)
 
     print(f"blocks: {first_block}")
