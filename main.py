@@ -49,39 +49,44 @@ def get_blocks_tree(
     if all_blocks is None:
         all_blocks = {}
         leaders = {0}
-        for i, ins in enumerate(instructions):
-            print(f"idx={i}: instruction={str(ins)}")
+        for idx in sorted(instructions.keys()):
+            ins = instructions[idx]
+            print(f"idx={idx}: instruction={str(ins)}")
             if ins.get_class() in [BpfClass.JMP, BpfClass.JMP32]:
                 # Target of a jump is a leader
                 # BPF CALL
                 if ins.opcode == (BpfCode.JMP.CALL | BpfS.K | BpfClass.JMP):
                     if ins.src == 1:   # Calling normal function
-                        leaders.add(i + ins.imm + 1)
+                        leaders.add(idx + ins.imm + 1)
+                        # print(f"Jumping to {idx + ins.imm + 1}")
                 elif ins.opcode != (BpfCode.JMP.EXIT | BpfS.K | BpfClass.JMP):
-                    target = i + ins.off + 1 if hasattr(ins, 'off') else i + ins.imm + 1
+                    target = idx + ins.off + 1 if hasattr(ins, 'off') else idx + ins.imm + 1
                     leaders.add(target)
+                    # print(f"Jumping to {target}")
                 
                 # Instruction following a jump is a leader
-                if i + 1 < len(instructions):
-                    leaders.add(i + 1)
+                if idx + 1 < max(instructions.keys()):
+                    leaders.add(idx + 1)
         
-        leaders = sorted([l for l in leaders if l < len(instructions)])
+        leaders = sorted([l for l in leaders if l < max(instructions.keys())])
+        # print(f"\nLeaders: {leaders}\n")
         
     # Cycle detection: reuse existing block and terminate recursion.
     if start_idx in all_blocks:
         return all_blocks[start_idx]
 
     # Determine current block boundary based on the next leader
-    next_leader = next((l for l in leaders if l > start_idx), len(instructions))
+    next_leader = next((l for l in leaders if l > start_idx), max(instructions.keys()))
     
     # Find the basic block
     curr_block_end = start_idx
-    for idx in range(start_idx, next_leader):
+    for idx in (pc for pc in sorted(instructions.keys()) if start_idx <= pc < next_leader):
         curr_block_end = idx
         ins = instructions[idx]
         if ins.get_class() in [BpfClass.JMP, BpfClass.JMP32]:
             # Helper calls don't end a block; other jumps do
             if not (ins.opcode == BpfCode.JMP.CALL | BpfS.K | BpfClass.JMP and ins.src in [0, 2]):
+                # print(f"Block end: {idx}, instruction {ins}")
                 break
             
     block = Block(start_idx, curr_block_end)
@@ -93,8 +98,10 @@ def get_blocks_tree(
     # Handle Fall-through: if block ends without a terminating jump
     if last_ins.get_class() not in [BpfClass.JMP, BpfClass.JMP32] or \
        (last_ins.opcode == BpfCode.JMP.CALL | BpfClass.JMP and last_ins.src in [0, 2]):
-        if curr_block_end + 1 < len(instructions):
-            next_b = get_blocks_tree(instructions, curr_block_end + 1, all_blocks, leaders)
+        next_step = 2 if last_ins.is_wide_instruction() else 1
+        if curr_block_end + next_step < max(instructions.keys()):
+            next_sequential_pc = curr_block_end + next_step
+            next_b = get_blocks_tree(instructions, next_sequential_pc, all_blocks, leaders)
             block.add(next_b)
         return block
 

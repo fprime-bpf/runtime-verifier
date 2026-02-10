@@ -325,7 +325,6 @@ def find_loops(root_block: Block) -> list[Loop]:
         new_loop.find_boundaries()
         loop_list.append(new_loop)
         
-        
     # If nested loops found, error out
     for l1 in loop_list:
         for l2 in loop_list:
