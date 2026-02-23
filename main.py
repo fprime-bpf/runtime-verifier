@@ -271,9 +271,10 @@ def main():
     first_block = get_blocks_tree(instructions)
 
     print_cfg_from_root(first_block)
-    loop_list = find_loops(first_block)
+    loop_list = find_loops(first_block, instructions)
     for loop in loop_list:
-        print(f"Loop: {loop}\n Header: {loop.header}\n Tail: {loop.tail}\n Members: {loop.members}\n\n")
+        print(f"Loop: {loop}\n Header: {loop.header}\n Tail: {loop.tail}\n Iteration count: {loop.max_iterations}\n "
+              f"Call0x5_pc: {loop.call_5_pc}\n w2_pc: {loop.w2_pc}\n w3_pc: {loop.w3_pc}\n Members: {loop.members}\n\n")
     
     runtime_cycle_ub: float = dfs_blocks(first_block, instructions)
     print(f"runtime_cycle_ub: {runtime_cycle_ub}")

@@ -374,6 +374,12 @@ class Loop:
         # (Source, Target)
         self.entry_edges: set[tuple[Block, Block]] = set()
         self.exit_edges: set[tuple[Block, Block]] = set()
+        # Loop iteration metadata
+        self.max_iterations: int | None = None
+        # Track the exact instruction PCs for loop initialization
+        self.call_5_pc: int | None = None
+        self.w2_pc: int | None = None
+        self.w3_pc: int | None = None
 
     def find_boundaries(self):
         """
@@ -388,9 +394,91 @@ class Loop:
             for pred in member.prev:
                 if pred not in self.members:
                     self.entry_edges.add((pred, member))
+                    
+    def analyze_max_iterations(self, instructions: dict[int, 'BpfInstruction']):
+        """
+        Use a standard Breadth-First Search (BFS) with a queue to scan backwards 
+        through the CFG. Looks for `bpf_iter_num_new` (call 0x5) and the 
+        initialization of its boundary arguments (w2 and w3).
+        """
+        for pred_block, _ in self.entry_edges:
+            
+            # Initialize the BFS queue.
+            # Queue element structure: 
+            # (current_block, found_call_5, val_w2, val_w3, pc_call, pc_w2, pc_w3)
+            bfs_queue = deque()
+            bfs_queue.append((pred_block, False, None, None, None, None, None))
+            
+            # Keep track of visited blocks to prevent infinite loops in cyclic CFGs
+            visited = set()
+            
+            # Start BFS traversal
+            while len(bfs_queue) > 0:
+                # Pop a node from the front of the queue
+                (curr_block, found_call_5, val_w2, val_w3, 
+                 pc_call, pc_w2, pc_w3) = bfs_queue.popleft()
+                
+                # Skip if we have already evaluated this block in the current path
+                if curr_block in visited:
+                    continue
+                visited.add(curr_block)
+                
+                # Extract the instruction PCs for the current block and sort them 
+                # in descending order (bottom-up scan because we are moving backwards)
+                pcs = sorted([pc for pc in instructions.keys() 
+                              if curr_block.start <= pc <= curr_block.end], reverse=True)
+                
+                for pc in pcs:
+                    instr = instructions[pc]
+                    
+                    # Step 1: Look for the iterator initialization (call 0x5)
+                    # Opcode 0x85 is CALL, immediate value 5 is bpf_iter_num_new
+                    if getattr(instr, 'opcode', -1) == 0x85 and getattr(instr, 'imm', -1) == 5:
+                        found_call_5 = True
+                        pc_call = pc
+                        continue
+                    
+                    # Step 2: Once call 0x5 is found, look upwards for w2 and w3 assignments
+                    if found_call_5:
+                        # Opcode 0xb4 is ALU32 | MOV | K (Assign immediate value to 32-bit register)
+                        if getattr(instr, 'opcode', -1) == 0xb4:
+                            if getattr(instr, 'dst', -1) == 2 and val_w2 is None:
+                                val_w2 = instr.imm
+                                pc_w2 = pc
+                            elif getattr(instr, 'dst', -1) == 3 and val_w3 is None:
+                                val_w3 = instr.imm
+                                pc_w3 = pc
+                        
+                        # Step 3: If both w2 and w3 are successfully found, calculate and save
+                        if val_w2 is not None and val_w3 is not None:
+                            self.max_iterations = val_w3 - val_w2
+                            
+                            self.call_5_pc = pc_call
+                            self.w2_pc = pc_w2
+                            self.w3_pc = pc_w3
+                            
+                            print(
+                                f"Loop Header {self.header.start}: Identified {self.max_iterations} max iterations.\n"
+                                f"  -> w2={val_w2} at PC {self.w2_pc}, "
+                                f"w3={val_w3} at PC {self.w3_pc}, call 0x5 at PC {self.call_5_pc}"
+                            )
+                            # Target found, exit the analysis for this entry edge
+                            return 
 
+                # Step 4: If values are not fully resolved in this block, 
+                # enqueue all unvisited predecessor blocks to continue the BFS
+                if curr_block.prev:
+                    print(f"Traversing previous blocks")
+                else:
+                    print(f"Error, no prev found!")
+                for prev_block in curr_block.prev:
+                    if prev_block not in visited:
+                        bfs_queue.append((
+                            prev_block, found_call_5, val_w2, val_w3, 
+                            pc_call, pc_w2, pc_w3
+                        ))
 
-def find_loops(root_block: Block) -> list[Loop]:
+def find_loops(root_block: Block, instructions: dict[int, BpfInstruction]) -> list[Loop]:
     """
     Identifies loops using Three-Color DFS and collects members via reverse traversal.
     """
@@ -428,6 +516,7 @@ def find_loops(root_block: Block) -> list[Loop]:
         
         new_loop = Loop(header, tail, members)
         new_loop.find_boundaries()
+        new_loop.analyze_max_iterations(instructions)
         loop_list.append(new_loop)
         
     # If nested loops found, error out
