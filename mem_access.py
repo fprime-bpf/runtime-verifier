@@ -1,6 +1,7 @@
 from z3 import (ArithRef, BoolRef, ExprRef, If, BitVecVal,Extract, ZeroExt, SignExt, UDiv, 
                 URem, SRem, LShR, If, And, Real, BitVecRef, BitVec, RealVal, BV2Int,
-                UGT, UGE, ULT, ULE, BoolVal)
+                UGT, UGE, ULT, ULE, BoolVal, is_bv, is_arith, is_bool, Int2BV, ToInt, ToReal, BV2Int,
+                is_true, is_false, simplify, is_bv_value, is_app)
 
 from block import Block
 from dataclasses import dataclass, field
@@ -10,18 +11,72 @@ from typing import List, Optional, Dict, cast, Tuple
 from enum import Enum, auto
 
 NUM_REGS = 11
+WORD = 64
 
-def _init_gp() -> List[BitVecRef]:
-    return [BitVec(f"R{i}_0", WORD) for i in range(NUM_REGS)]
+def to_bv64(expr):
+    """
+    Safely coerces any Z3 expression into a 64-bit BitVector.
+    """
+    if is_bv(expr):
+        return expr
+    if is_arith(expr):
+        # Convert Arithmetic/Real expressions to Integer then to 64-bit BitVec
+        return Int2BV(ToInt(expr), WORD)
+    if is_bool(expr):
+        # Map boolean results to 1 or 0
+        return If(expr, BitVecVal(1, WORD), BitVecVal(0, WORD))
+    if isinstance(expr, int):
+        return BitVecVal(expr, WORD)
+    return expr
 
-def _init_fp() -> List[ArithRef]:
-    return [Real(F"f{i}_0") for i in range(NUM_REGS)]
+def to_arith(expr):
+    """
+    Safely coerces any Z3 expression into an Arithmetic/Real expression.
+    """
+    if is_arith(expr):
+        return expr
+    if is_bv(expr):
+        # Interpret the BitVector as an integer and convert to Real
+        return ToReal(BV2Int(expr))
+    if isinstance(expr, (int, float)):
+        return RealVal(expr)
+    return expr
+
+
+def normalize_huge_bv(expr):
+    if expr is None:
+        return None
+    
+    if is_bv_value(expr):
+        val = expr.as_long()
+        if val >= (1 << 63):
+            signed_val = val - (1 << 64)
+            return BitVecVal(signed_val, 64)
+        return expr
+
+    if is_app(expr):
+        children = [normalize_huge_bv(c) for c in expr.children()]
+        return expr.decl()(*children)
+        
+    return expr
+
 
 @dataclass
 class State:
-    gp: List[BitVecRef] = field(default_factory=_init_gp)
-    fp: List[ArithRef] = field(default_factory=_init_fp)
+    gp: List[BitVecRef] = field(default_factory=lambda: [None] * NUM_REGS)
+    fp: List[ArithRef] = field(default_factory=lambda: [None] * NUM_REGS)
     memory: Dict[ExprRef, ExprRef] = field(default_factory=dict)
+    
+    def __post_init__(self):
+        
+        for i in range(NUM_REGS):
+            self.gp[i] = BitVecVal(0, WORD)
+            
+        for i in range(NUM_REGS):
+            self.fp[i] = RealVal(0)
+            
+        self.set_gp(10, BitVec("R10_FP", WORD))
+        self.set_gp(1, BitVec("R1_CTX", WORD))
 
     def fork(self) -> "State":
         return State(
@@ -31,10 +86,14 @@ class State:
         )
 
     def get_gp(self, i): return self.gp[i]
-    def set_gp(self, i, e): self.gp[i] = e
+    def set_gp(self, i, e):
+        val = to_bv64(e)
+        self.gp[i] = simplify(val, som=True)
 
     def get_fp(self, i): return self.fp[i]
-    def set_fp(self, i, e): self.fp[i] = e
+    def set_fp(self, i, e):
+        val = to_arith(e)
+        self.fp[i] = simplify(val, som=True)
 
 
 class InstrClass(Enum):
@@ -61,6 +120,16 @@ class DecodedInstr:
 
 
 def _is_fpu_instr(instr: BpfInstruction) -> bool:
+    """
+    Determines if an instruction belongs to the BPF_INFO_FPU lookup table.
+    
+    Returns:
+        True: For FP arithmetic (ALU) or FP branch (JMP) instructions.
+        False: For FP memory access (stored in BPF_INFO/FMEM) or any integer instructions.
+    
+    Note: Due to design specificities, FMEM instructions (e.g., FLDX, FSTX) are 
+    handled as non-FPU class in this context.
+    """
     cls_ = instr.get_class()
 
     raw = instr._to_int(instr.instruction)
@@ -110,7 +179,7 @@ def _decode_instruction(instr: BpfInstruction) -> DecodedInstr:
 
     return DecodedInstr(
         name=op_info.name,
-        is_float=_is_fpu_instr(instr),
+        is_float=op_info.name.startswith('F') or op_info.name.startswith('JF') ,
         instr_class=instr_class,
         dst=instr.dst,
         src=instr.src,
@@ -118,7 +187,6 @@ def _decode_instruction(instr: BpfInstruction) -> DecodedInstr:
         offset=instr.off
     )
 
-WORD = 64
 
 def _zext32(x: ExprRef) -> ExprRef:
     return ZeroExt(WORD - 32, Extract(31, 0, x))
@@ -126,6 +194,55 @@ def _zext32(x: ExprRef) -> ExprRef:
 def _is_alu32(decoded_instr: DecodedInstr) -> bool:
     return decoded_instr.instr_class == BpfClass.ALU    # 32-bit
     # ALU64: decoded_instr.instr_class == BpfClass.ALU64
+
+def _is_concrete(v):
+    return hasattr(v, 'as_long') and v.as_long() is not None
+
+def _safe_div(dst, src, size, signed=False):
+    if _is_concrete(dst) and _is_concrete(src):
+        d, s = dst.as_long(), src.as_long()
+        if signed:
+            mask = 1 << (size - 1)
+            d = d if d < mask else d - (1 << size)
+            s = s if s < mask else s - (1 << size)
+            
+        if s == 0: return BitVecVal(0, size)
+        
+        if signed and s == -1 and d == -(1 << (size - 1)):
+            return BitVecVal(d, size)
+            
+        res = int(d / s) if signed else (d // s)
+        return BitVecVal(res, size)
+
+    if not signed:
+        return If(src == 0, BitVecVal(0, size), UDiv(dst, src))
+    else:
+        min_val = 1 << (size - 1)
+        return If(src == 0, BitVecVal(0, size),
+                  If(And(src == -1, dst == min_val), BitVecVal(min_val, size), dst / src))
+
+def _safe_mod(dst, src, size, signed=False):
+    if _is_concrete(dst) and _is_concrete(src):
+        d, s = dst.as_long(), src.as_long()
+        if signed:
+            mask = 1 << (size - 1)
+            d = d if d < mask else d - (1 << size)
+            s = s if s < mask else s - (1 << size)
+
+        if s == 0: return BitVecVal(d if not signed else d, size)
+        
+        if signed and s == -1 and d == -(1 << (size - 1)):
+            return BitVecVal(0, size)
+            
+        res = d % s
+        return BitVecVal(res, size)
+
+    if not signed:
+        return If(src == 0, dst, URem(dst, src))
+    else:
+        min_val = 1 << (size - 1)
+        return If(src == 0, dst,
+                  If(And(src == -1, dst == min_val), BitVecVal(0, size), SRem(dst, src)))
 
 def _update_state_op(decoded_instr: DecodedInstr, state: State) -> None:
     op_name = decoded_instr.name
@@ -178,9 +295,10 @@ def _update_state_op(decoded_instr: DecodedInstr, state: State) -> None:
             src_val = BitVecVal(decoded_instr.imm, WORD)
 
         is_32 = _is_alu32(decoded_instr)
-
-        dst32 = cast(BitVecRef, Extract(31, 0, dst_val))
-        src32 = cast(BitVecRef, Extract(31, 0, src_val))
+        if dst_val is not None:
+            dst32 = cast(BitVecRef, Extract(31, 0, dst_val))
+        if src_val is not None:
+            src32 = cast(BitVecRef, Extract(31, 0, src_val))
 
         if op_name.startswith("ADD"):
             if is_32:
@@ -205,41 +323,15 @@ def _update_state_op(decoded_instr: DecodedInstr, state: State) -> None:
 
         elif op_name.startswith("DIV"):
             if is_32:
-                res32 = If(src32 == BitVecVal(0, 32),
-                        BitVecVal(0, 32),
-                        UDiv(dst32, src32))
-                new_val = _zext32(cast(BitVecRef, res32))
+                new_val = _zext32(cast(BitVecRef, _safe_div(dst32, src32, 32, signed=False)))
             else:
-                res = If(src_val == BitVecVal(0, WORD),
-                        BitVecVal(0, WORD),
-                        UDiv(dst_val, src_val))
-                new_val = res
+                new_val = _safe_div(dst_val, src_val, WORD, signed=False)
 
         elif op_name.startswith("SDIV"):
             if is_32:
-                INT_MIN32 = BitVecVal(1, 32) << 31
-                res32 = If(
-                    src32 == BitVecVal(0, 32),
-                    BitVecVal(0, 32),
-                    If(
-                        And(src32 == BitVecVal(-1, 32), dst32 == INT_MIN32),
-                        INT_MIN32,
-                        dst32 / src32,
-                    ),
-                )
-                new_val = _zext32(cast(BitVecRef, res32))
+                new_val = _zext32(cast(BitVecRef, _safe_div(dst32, src32, 32, signed=True)))
             else:
-                LLONG_MIN = BitVecVal(1, WORD) << (WORD - 1)
-                res = If(
-                    src_val == BitVecVal(0, WORD),
-                    BitVecVal(0, WORD),
-                    If(
-                        And(src_val == BitVecVal(-1, WORD), dst_val == LLONG_MIN),
-                        LLONG_MIN,
-                        dst_val / src_val,
-                    ),
-                )
-                new_val = res
+                new_val = _safe_div(dst_val, src_val, WORD, signed=True)
 
         elif op_name.startswith("OR"):
             if is_32:
@@ -298,41 +390,15 @@ def _update_state_op(decoded_instr: DecodedInstr, state: State) -> None:
 
         elif op_name.startswith("MOD"):
             if is_32:
-                res32 = If(src32 == BitVecVal(0, 32),
-                        dst32,
-                        URem(dst32, src32))
-                new_val = _zext32(cast(BitVecRef, res32))
+                new_val = _zext32(cast(BitVecRef, _safe_mod(dst32, src32, 32, signed=False)))
             else:
-                res = If(src_val == BitVecVal(0, WORD),
-                        dst_val,
-                        URem(dst_val, src_val))
-                new_val = res
+                new_val = _safe_mod(dst_val, src_val, WORD, signed=False)
 
         elif op_name.startswith("SMOD"):
             if is_32:
-                INT_MIN32 = BitVecVal(1, 32) << 31
-                res32 = If(
-                    src32 == BitVecVal(0, 32),
-                    dst32,
-                    If(
-                        And(src32 == BitVecVal(-1, 32), dst32 == INT_MIN32),
-                        BitVecVal(0, 32),
-                        SRem(dst32, src32),
-                    ),
-                )
-                new_val = _zext32(cast(BitVecRef, res32))
+                new_val = _zext32(cast(BitVecRef, _safe_mod(dst32, src32, 32, signed=True)))
             else:
-                LLONG_MIN = BitVecVal(1, WORD) << (WORD - 1)
-                res = If(
-                    src_val == BitVecVal(0, WORD),
-                    dst_val,
-                    If(
-                        And(src_val == BitVecVal(-1, WORD), dst_val == LLONG_MIN),
-                        BitVecVal(0, WORD),
-                        SRem(dst_val, src_val),
-                    ),
-                )
-                new_val = res
+                new_val = _safe_mod(dst_val, src_val, WORD, signed=True)
 
         elif op_name.startswith("MOVSX"):
             width = decoded_instr.imm   # 8 / 16 / 32
@@ -450,15 +516,15 @@ def _mem_addr(decoded_instr: DecodedInstr, state: State) -> BitVecRef:
     return base + off
 
 
-def _fresh_mem_val(is_float: bool, idx: int) -> ExprRef:
+def _fresh_mem_val(is_float: bool, reg: int, idx: int) -> ExprRef:
     """
     Create a fresh symbolic value for a memory cell.
     Integer loads use a BitVec; FP loads use a Real.
     """
     if is_float:
-        return Real(f"mem_f_{idx}")        # Real for FP memory cell
+        return Real(f"mem_f{reg}_{idx}")        # Real for FP memory cell
     else:
-        return BitVec(f"mem_{idx}", WORD)  # BitVec for integer memory cell
+        return BitVec(f"mem_g{reg}_{idx}", WORD)  # BitVec for integer memory cell
 
 
 # classify by opcode name
@@ -509,7 +575,7 @@ def _exec_mem(decoded_instr: DecodedInstr, state: State) -> Optional[BitVecRef]:
         # lazily initialize memory cell if we haven't seen this address before
         if addr not in state.memory:
             fresh_idx = len(state.memory)
-            state.memory[addr] = _fresh_mem_val(decoded_instr.is_float, fresh_idx)
+            state.memory[addr] = _fresh_mem_val(decoded_instr.is_float, dst, fresh_idx)
 
         cell_val: ExprRef = state.memory[addr]
 
@@ -665,3 +731,53 @@ def process_instruction(instr: BpfInstruction, state: State, instr_idx: int) -> 
             pass
         
     return (branch_cond, addr)
+
+
+def get_vars_from_expr(expr: ExprRef) -> set:
+    if not hasattr(expr, 'children'):
+        return set()
+    
+    variables = set()
+    if expr.num_args() == 0:
+        if not _is_concrete(expr): 
+            variables.add(str(expr))
+    else:
+        for child in expr.children():
+            variables.update(get_vars_from_expr(child))
+    return variables
+
+
+def get_all_var_names(data) -> set:
+    """
+    - Single Z3 exprs (BoolRef, BitVecRef, ArithRef)
+    - Sequences (list, tuple)
+    - Mappings (dict)
+    """
+    names = set()
+    
+    if isinstance(data, (list, tuple)):
+        for item in data:
+            names.update(get_all_var_names(item))
+            
+    elif isinstance(data, dict):
+        for k, v in data.items():
+            names.update(get_all_var_names(k))
+            names.update(get_all_var_names(v))
+            
+    # z3 expression
+    elif hasattr(data, 'children'):
+        names.update(collect_vars(data))
+        
+    return names
+
+
+def collect_vars(e) -> set:
+    if e.num_args() == 0:
+        if not _is_concrete(e) and not is_true(e) and not is_false(e):
+            return {str(e)}
+        return set()
+    
+    res = set()
+    for child in e.children():
+        res.update(collect_vars(child))
+    return res
