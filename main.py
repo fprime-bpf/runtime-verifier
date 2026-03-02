@@ -3,7 +3,7 @@ import argparse
 
 from bpf import BpfInstruction, BpfClass, BpfCode, BpfS
 from block import Block
-from dfs import dfs_blocks, Loop, find_loops
+from dfs import dfs_blocks, Loop, find_loops, unroll_loops_in_cfg
 
 
 parser = argparse.ArgumentParser(
@@ -191,74 +191,93 @@ def get_blocks_tree(
 
 def print_cfg_from_root(root: Block):
     """
-    Traverses the CFG from root and prints blocks with their 
-    successors formatted as 'Block [start - end]'.
+    Traverses the CFG from the root block using Breadth-First Search (BFS) 
+    and prints the blocks with their successors.
+    
+    It supports unrolled loops by differentiating blocks with suffixes,
+    and outputs both a text-based list and a Mermaid graph.
     """
-    all_blocks = {}
+    # Blocks with the same start/end but different suffixes are treated as 
+    # distinct objects thanks to the custom __hash__ and __eq__ methods.
+    visited_blocks = set()
     queue = [root]
     
     while queue:
         curr = queue.pop(0)
-        if curr.start in all_blocks:
+        if curr in visited_blocks:
             continue
         
-        all_blocks[curr.start] = curr
+        visited_blocks.add(curr)
         for n in curr.next:
-            if n.start not in all_blocks:
+            if n not in visited_blocks:
                 queue.append(n)
+
+    # Sort blocks: Primary key is the start index, secondary key is the suffix.
+    # This ensures that unrolled iterations (e.g., .1, .2) are printed sequentially.
+    sorted_blocks = sorted(list(visited_blocks), key=lambda b: (b.start, b.suffix))
 
     print("\n" + "="*60)
     print(f"{'BASIC BLOCK CFG LIST':^60}")
     print("="*60)
 
-    for start_idx in sorted(all_blocks.keys()):
-        block = all_blocks[start_idx]
-        
+    for block in sorted_blocks:
         if not block.next:
             successors_str = "TERMINATE (EXIT)"
         else:
             formatted_succs = []
             for n in block.next:
-                # Format each successor as Block [start - end]
-                s_str = f"Block [{n.start:3} - {n.end:3}]"
+                # Format each successor with its iteration suffix
+                s_str = f"Block [{n.start:3} - {n.end:3}]{n.suffix}"
                 
-                # Mark back-edges (loops) for easier debugging
-                if n.start <= block.start:
+                # Mark true back-edges. 
+                # In an unrolled CFG, a jump to a lower PC is only a back-edge 
+                # if it remains within the exact same iteration level (same suffix).
+                if n.start <= block.start and n.suffix == block.suffix:
                     s_str += " (LOOP BACK)"
                 
                 formatted_succs.append(s_str)
             
             successors_str = ", ".join(formatted_succs)
 
-        print(f"Block [{block.start:3} - {block.end:3}]")
+        print(f"Block [{block.start:3} - {block.end:3}]{block.suffix}")
         print(f"  └── Successors: {successors_str}")
         
     print("="*60 + "\n")
+    
     
     print("\n" + "="*60)
     print(f"{'MERMAID GRAPH CODE':^60}")
     print("="*60)
     print("```mermaid")
     print("graph TD")
-    
     print("    classDef exitNode fill:#f96,stroke:#333,stroke-width:2px;")
     
-    for start_idx in sorted(all_blocks.keys()):
-        block = all_blocks[start_idx]
-        node_id = f"B{block.start}"
-        node_label = f"\"Block [{block.start} - {block.end}]\""
+    def get_safe_id(b: Block) -> str:
+        """
+        Helper function to generate syntactically safe Mermaid Node IDs.
+        Replaces periods or spaces in the suffix with underscores.
+        e.g., Block 10 suffix '.1' -> 'B10_1'
+        """
+        safe_suffix = b.suffix.replace(".", "_").replace("@", "_").replace(" ", "_")
+        return f"B{b.start}{safe_suffix}"
+
+    for block in sorted_blocks:
+        node_id = get_safe_id(block)
         
+        # Include the suffix in the label and wrap it in quotes 
+        # to prevent Mermaid from throwing parsing errors.
+        node_label = f"\"Block [{block.start} - {block.end}]{block.suffix}\""
+        
+        # Declare node shapes: standard box for normal blocks, circle for exit nodes
         if not block.next:
             print(f"    {node_id}(({node_label})):::exitNode")
         else:
             print(f"    {node_id}[{node_label}]")
 
+        # Declare directed edges between nodes
         for n in block.next:
-            target_id = f"B{n.start}"
-            if n.start <= block.start:
-                print(f"    {node_id} --> {target_id}")
-            else:
-                print(f"    {node_id} --> {target_id}")
+            target_id = get_safe_id(n)
+            print(f"    {node_id} --> {target_id}")
                 
     print("```")
     print("="*60 + "\n")
@@ -275,8 +294,12 @@ def main():
     for loop in loop_list:
         print(f"Loop: {loop}\n Header: {loop.header}\n Tail: {loop.tail}\n Iteration count: {loop.max_iterations}\n "
               f"Call0x5_pc: {loop.call_5_pc}\n w2_pc: {loop.w2_pc}\n w3_pc: {loop.w3_pc}\n Members: {loop.members}\n\n")
+        
+    # Duplicate loop contents in cycle
+    unrolled_block = unroll_loops_in_cfg(first_block, loop_list)
+    print_cfg_from_root(unrolled_block)
     
-    runtime_cycle_ub: float = dfs_blocks(first_block, instructions)
+    runtime_cycle_ub: float = dfs_blocks(unrolled_block, instructions)
     print(f"runtime_cycle_ub: {runtime_cycle_ub}")
     runtime_ub = runtime_cycle_ub / (6.67e8) * 1000
     print(f"runtime_ub: {runtime_ub} ms")

@@ -207,7 +207,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
         instr_count = block.end - block.start + 1
         block_instrs = [instructions[pc] for pc in sorted(instructions.keys()) if block.start <= pc <= block.end]
         
-        print(f"\n======Visiting BB({block.start}, {block.end}), instructions={instr_count}======")
+        print(f"\n======Visiting BB({block.start}, {block.end}){block.suffix}, instructions={instr_count}======")
 
         # For backtracking
         runtime_at_entry = path_runtime
@@ -536,3 +536,62 @@ def find_loops(root_block: Block, instructions: dict[int, BpfInstruction]) -> li
                 )
 
     return loop_list
+
+
+def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
+    """
+    Unrolls loops in the CFG based on the identified max_iterations.
+    """
+    sorted_loops = sorted(loop_list, key=lambda l: l.header.start, reverse=True)
+
+    for loop in sorted_loops:
+        if loop.max_iterations is None or loop.max_iterations <= 0:
+            print(f"Warning: Loop at {loop.header.start} has no bound. Skipping unroll.")
+            continue
+
+        print(f"Unrolling loop at header {loop.header.start} for {loop.max_iterations} iterations.")
+
+        # 1. Identify exit targets (blocks outside the loop)
+        exit_targets = [exit_target for _, exit_target in loop.exit_edges]
+        entry_sources = [entry_source for entry_source, _ in loop.entry_edges]
+        
+        # 2. Perform the unrolling
+        prev_tails = None
+        
+        # We need to clone the loop body (members) N times
+        for i in range(loop.max_iterations):
+            block_map: dict[Block, Block] = {}
+            
+            # 1. Create clones with new suffix
+            for member in loop.members:
+                block_map[member] = member.copy_with_suffix(f".{i}")
+
+            # 2. Re-establish connections within this iteration slice
+            # , and exit edges
+            for member in loop.members:
+                new_member = block_map[member]
+                for succ in member.next:
+                    if succ in loop.members:
+                        if succ == loop.header:
+                            continue
+                        # Internal link to new blocks, disconnect back edges
+                        new_member.add(block_map[succ])
+                        
+                    # Exit link to blocks outside the loop
+                    elif succ not in loop.members:
+                        # if succ in exit_targets and i != loop.max_iterations - 1:
+                        #     continue
+                        new_member.add(succ)
+
+            # Link the previous iteration's tail to this iteration's header
+            if i == 0:
+                for entry_source in entry_sources:
+                    entry_source.next.remove(loop.header)
+                    entry_source.add(block_map[loop.header])
+                    prev_header = block_map[loop.tail]
+                    
+            elif i < loop.max_iterations:
+                prev_header.add(block_map[loop.header])
+                prev_header = block_map[loop.tail]
+
+    return root_block
