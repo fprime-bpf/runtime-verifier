@@ -8,14 +8,14 @@ class Block:
         self.start = start_idx
         self.end = end_idx
         self.suffix = suffix
-        self.next: set[Block] = set()
-        self.prev: set[Block] = set()
+        self.next: list[Block] = []
+        self.prev: list[Block] = []
 
     def add(self, block: Block):
         if block not in self.next:
-            self.next.add(block)
+            self.next.append(block)
         if self not in block.prev:
-            block.prev.add(self)
+            block.prev.append(self)
             
     def copy_with_suffix(self, new_suffix: str) -> Block:
         """

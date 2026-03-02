@@ -1,7 +1,7 @@
 from z3 import (ArithRef, BoolRef, ExprRef, If, BitVecVal,Extract, ZeroExt, SignExt, UDiv, 
                 URem, SRem, LShR, If, And, Real, BitVecRef, BitVec, RealVal, BV2Int,
                 UGT, UGE, ULT, ULE, BoolVal, is_bv, is_arith, is_bool, Int2BV, ToInt, ToReal, BV2Int,
-                is_true, is_false, simplify, is_bv_value, is_app)
+                is_true, is_false, simplify, is_bv_value, is_app, Z3_OP_UNINTERPRETED)
 
 from block import Block
 from dataclasses import dataclass, field
@@ -195,8 +195,15 @@ def _is_alu32(decoded_instr: DecodedInstr) -> bool:
     return decoded_instr.instr_class == BpfClass.ALU    # 32-bit
     # ALU64: decoded_instr.instr_class == BpfClass.ALU64
 
-def _is_concrete(v):
-    return hasattr(v, 'as_long') and v.as_long() is not None
+def _is_concrete(e) -> bool:
+    """
+    Safely checks if a Z3 expression is a concrete value (numeral/constant) 
+    rather than a symbolic variable. Supports BitVec, Int, Real, and Bool.
+    """
+    if not hasattr(e, 'decl'):
+        return isinstance(e, (int, float, bool))
+        
+    return e.decl().kind() != Z3_OP_UNINTERPRETED
 
 def _safe_div(dst, src, size, signed=False):
     if _is_concrete(dst) and _is_concrete(src):

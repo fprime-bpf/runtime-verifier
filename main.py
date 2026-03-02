@@ -296,10 +296,10 @@ def main():
               f"Call0x5_pc: {loop.call_5_pc}\n w2_pc: {loop.w2_pc}\n w3_pc: {loop.w3_pc}\n Members: {loop.members}\n\n")
         
     # Duplicate loop contents in cycle
-    unrolled_root = unroll_loops_in_cfg(first_block, loop_list)
-    print_cfg_from_root(unrolled_root)
+    unrolled_block = unroll_loops_in_cfg(first_block, loop_list)
+    print_cfg_from_root(unrolled_block)
     
-    runtime_cycle_ub: float = dfs_blocks(first_block, instructions)
+    runtime_cycle_ub: float = dfs_blocks(unrolled_block, instructions)
     print(f"runtime_cycle_ub: {runtime_cycle_ub}")
     runtime_ub = runtime_cycle_ub / (6.67e8) * 1000
     print(f"runtime_ub: {runtime_ub} ms")

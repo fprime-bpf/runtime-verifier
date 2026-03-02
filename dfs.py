@@ -207,7 +207,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
         instr_count = block.end - block.start + 1
         block_instrs = [instructions[pc] for pc in sorted(instructions.keys()) if block.start <= pc <= block.end]
         
-        print(f"\n======Visiting BB({block.start}, {block.end}), instructions={instr_count}======")
+        print(f"\n======Visiting BB({block.start}, {block.end}){block.suffix}, instructions={instr_count}======")
 
         # For backtracking
         runtime_at_entry = path_runtime
