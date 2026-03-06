@@ -779,12 +779,18 @@ def get_all_var_names(data) -> set:
 
 
 def collect_vars(e) -> set:
-    if e.num_args() == 0:
-        if not _is_concrete(e) and not is_true(e) and not is_false(e):
-            return {str(e)}
-        return set()
-    
     res = set()
-    for child in e.children():
-        res.update(collect_vars(child))
+    stack = [e]
+    visited = set()
+    while stack:
+        node = stack.pop()
+        node_id = node.get_id()
+        if node_id in visited:
+            continue
+        visited.add(node_id)
+        if node.num_args() == 0:
+            if not _is_concrete(node) and not is_true(node) and not is_false(node):
+                res.add(str(node))
+        else:
+            stack.extend(node.children())
     return res
