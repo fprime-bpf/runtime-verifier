@@ -6,9 +6,9 @@ from z3 import Solver, If, ULT, ULE, sat, BitVecRef, BoolRef, Not, unknown, Z3Ex
 from collections import deque
 
 CACHE_LINE_DIFF = 4
-COST_MEM_L1_HIT = 0
-COST_MEM_L2_HIT = 12
-COST_MEM_MISS = 87 + 87
+COST_MEM_L1_HIT = 8
+COST_MEM_L2_HIT = COST_MEM_L1_HIT + 12
+COST_MEM_MISS = COST_MEM_L1_HIT + COST_MEM_L2_HIT + 87 + 87
 CACHE_TTL_N = 8  # Set to 8/16 for test
 
 
