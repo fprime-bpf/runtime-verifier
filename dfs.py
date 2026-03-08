@@ -73,49 +73,6 @@ def instr_to_runtime(instructions:dict[int, BpfInstruction], start:int, end:int)
     return runtime
 
 
-# def check_cache_hit(curr_addr, cache_list, path_constraints: list, state: State) -> int:    
-#     solver = Solver()
-#     solver.set("smt.relevancy", 2)
-#     for i in reversed(range(len(cache_list))):
-#         if curr_addr.eq(cache_list[i]):
-#             return i
-        
-#     if hasattr(curr_addr, 'as_long') and curr_addr.as_long() is not None:
-#         curr_val = curr_addr.as_long()
-#         for i in reversed(range(len(cache_list))):
-#             if hasattr(cache_list[i], 'as_long') and cache_list[i].as_long() is not None:
-#                 if abs(curr_val - cache_list[i].as_long()) <= CACHE_LINE_DIFF: 
-#                     return i
-#         return -1
-
-#     for i in reversed(range(len(cache_list))):
-#         solver.push()
-#         solver.set("timeout", 1000) 
-#         solver.set("smt.arith.nl", True)
-        
-#         diff = If(ULT(curr_addr, cache_list[i]), 
-#                   cache_list[i] - curr_addr, 
-#                   curr_addr - cache_list[i])
-        
-#         solver.add(ULE(diff, CACHE_LINE_DIFF))
-        
-#         try:
-#             result = solver.check()
-#         except Z3Exception:
-#             result = unknown
-#         finally:
-#             solver.pop()
-
-#         if result == unknown:
-#             print(f"Warning: Z3 returned unknown at addr {curr_addr}")
-#             print(f"Unknown reason: {solver.reason_unknown()}")
-#             print(f"Statistics: {solver.statistics()}")
-#         if result == sat:
-#             return i
-            
-#     return -1
-    
-    
 def check_cache_hit(curr_addr: BitVecRef, cache_list: list[BitVecRef], solver: Solver, state: State) -> int:
     """
     Checks if the current memory address hits the simulated cache using a pre-configured solver.
