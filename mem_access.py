@@ -3,9 +3,7 @@ from z3 import (ArithRef, BoolRef, ExprRef, If, BitVecVal,Extract, ZeroExt, Sign
                 UGT, UGE, ULT, ULE, BoolVal, is_bv, is_arith, is_bool, Int2BV, ToInt, ToReal, BV2Int,
                 is_true, is_false, simplify, is_bv_value, is_app, Z3_OP_UNINTERPRETED)
 
-from block import Block
 from dataclasses import dataclass, field
-from copy import deepcopy
 from bpf import BpfClass, BpfCode, BpfInstruction, Mask, Shift, BPF_INFO, BPF_INFO_FPU
 from typing import List, Optional, Dict, cast, Tuple
 from enum import Enum, auto
@@ -63,12 +61,17 @@ def normalize_huge_bv(expr):
 
 @dataclass
 class State:
-    gp: List[BitVecRef] = field(default_factory=lambda: [None] * NUM_REGS)
-    fp: List[ArithRef] = field(default_factory=lambda: [None] * NUM_REGS)
+    gp: List[BitVecRef] = field(default_factory=list)
+    fp: List[ArithRef] = field(default_factory=list)
     memory: Dict[ExprRef, ExprRef] = field(default_factory=dict)
+    _is_initial: bool = field(default=True, repr=False)
     
     def __post_init__(self):
+        if not self._is_initial:
+            return
         
+        self.gp = [None] * NUM_REGS
+        self.fp = [None] * NUM_REGS
         for i in range(NUM_REGS):
             self.gp[i] = BitVecVal(0, WORD)
             
@@ -77,12 +80,14 @@ class State:
             
         self.set_gp(10, BitVec("R10_FP", WORD))
         self.set_gp(1, BitVec("R1_CTX", WORD))
+        self.set_gp(0, BitVec("R0_RET", WORD))
 
     def fork(self) -> "State":
         return State(
-            gp=deepcopy(self.gp),
-            fp=deepcopy(self.fp),
-            memory=deepcopy(self.memory),
+            gp=self.gp[:],
+            fp=self.fp[:],
+            memory=self.memory.copy(),
+            _is_initial=False,
         )
 
     def get_gp(self, i): return self.gp[i]
@@ -117,6 +122,8 @@ class DecodedInstr:
     src: int
     imm: int
     offset: int
+
+    bpf_class: BpfClass
 
 
 def _is_fpu_instr(instr: BpfInstruction) -> bool:
@@ -184,7 +191,8 @@ def _decode_instruction(instr: BpfInstruction) -> DecodedInstr:
         dst=instr.dst,
         src=instr.src,
         imm=instr.imm,
-        offset=instr.off
+        offset=instr.off,
+        bpf_class=cls_
     )
 
 
@@ -192,8 +200,7 @@ def _zext32(x: ExprRef) -> ExprRef:
     return ZeroExt(WORD - 32, Extract(31, 0, x))
 
 def _is_alu32(decoded_instr: DecodedInstr) -> bool:
-    return decoded_instr.instr_class == BpfClass.ALU    # 32-bit
-    # ALU64: decoded_instr.instr_class == BpfClass.ALU64
+    return decoded_instr.bpf_class == BpfClass.ALU
 
 def _is_concrete(e) -> bool:
     """
@@ -465,13 +472,15 @@ def _update_state_op(decoded_instr: DecodedInstr, state: State) -> None:
         state.set_gp(dst_idx, new_val)
 
 
-def fresh_gp_var(reg_idx: int, step_idx: int) -> BitVecRef:
-    """Create a fresh 64-bit GP register variable R{reg}_I{step}."""
-    return BitVec(f"R{reg_idx}_I{step_idx}", WORD)
+def fresh_gp_var(reg_idx: int, unique_id: str) -> BitVecRef:
+    """Create a fresh 64-bit GP register variable R{reg}_{unique_id}."""
+    safe_id = unique_id.replace('.', '_').replace('@', '_')
+    return BitVec(f"R{reg_idx}_{safe_id}", WORD)
 
-def fresh_fp_var(reg_idx: int, step_idx: int) -> ArithRef:
-    """Create a fresh FP register variable F{reg}_I{step} (modeled as Real)."""
-    return Real(f"F{reg_idx}_I{step_idx}")
+def fresh_fp_var(reg_idx: int, unique_id: str) -> ArithRef:
+    """Create a fresh FP register variable F{reg}_{unique_id} (modeled as Real)."""
+    safe_id = unique_id.replace('.', '_').replace('@', '_')
+    return Real(f"F{reg_idx}_{safe_id}")
 
 
 PKT_BASE = BitVec("pkt_base", WORD)  # abstract packet base pointer
@@ -523,22 +532,24 @@ def _mem_addr(decoded_instr: DecodedInstr, state: State) -> BitVecRef:
     return base + off
 
 
-def _fresh_mem_val(is_float: bool, reg: int, idx: int) -> ExprRef:
+def _fresh_mem_val(is_float: bool, reg: int, unique_id: str) -> ExprRef:
     """
     Create a fresh symbolic value for a memory cell.
     Integer loads use a BitVec; FP loads use a Real.
+    The unique_id ensures variable names are distinct across unrolled loop iterations.
     """
+    safe_id = unique_id.replace('.', '_').replace('@', '_')
     if is_float:
-        return Real(f"mem_f{reg}_{idx}")        # Real for FP memory cell
+        return Real(f"mem_f{reg}_{safe_id}")        # Real for FP memory cell
     else:
-        return BitVec(f"mem_g{reg}_{idx}", WORD)  # BitVec for integer memory cell
+        return BitVec(f"mem_g{reg}_{safe_id}", WORD)  # BitVec for integer memory cell
 
 
 # classify by opcode name
 _LOAD_PREFIXES  = ("LD_", "LDX_", "FLD_", "FLDX_")
 _STORE_PREFIXES = ("ST_", "STX_", "FST_", "FSTX_")
 
-def _exec_mem(decoded_instr: DecodedInstr, state: State) -> Optional[BitVecRef]:
+def _exec_mem(decoded_instr: DecodedInstr, state: State, unique_instr_id: str) -> Optional[BitVecRef]:
     """
     Execute a memory-related instruction symbolically.
 
@@ -581,8 +592,7 @@ def _exec_mem(decoded_instr: DecodedInstr, state: State) -> Optional[BitVecRef]:
     if name.startswith(_LOAD_PREFIXES):
         # lazily initialize memory cell if we haven't seen this address before
         if addr not in state.memory:
-            fresh_idx = len(state.memory)
-            state.memory[addr] = _fresh_mem_val(decoded_instr.is_float, dst, fresh_idx)
+            state.memory[addr] = _fresh_mem_val(decoded_instr.is_float, dst, unique_instr_id)
 
         cell_val: ExprRef = state.memory[addr]
 
@@ -701,10 +711,10 @@ def _branch_condition(decoded_instr: DecodedInstr, state: State) -> BoolRef:
     raise ValueError(f"Unsupported integer branch opcode: {op_name}")
 
 
-def process_instruction(instr: BpfInstruction, state: State, instr_idx: int) -> Tuple[Optional[BoolRef], Optional[BitVecRef]]:
+def process_instruction(instr: BpfInstruction, state: State, unique_instr_id: str) -> Tuple[Optional[BoolRef], Optional[BitVecRef]]:
     """    
     Symbolically evaluates a single eBPF instruction.
-    Added 'instr_idx' to support deterministic naming of symbolic variables.
+    'unique_instr_id' is used for deterministic naming of symbolic variables.
     """
     decoded_instr = _decode_instruction(instr)
     
@@ -716,7 +726,7 @@ def process_instruction(instr: BpfInstruction, state: State, instr_idx: int) -> 
             _update_state_op(decoded_instr, state)
 
         case InstrClass.LOAD_STORE:
-            addr = _exec_mem(decoded_instr, state)
+            addr = _exec_mem(decoded_instr, state, unique_instr_id)
 
         case InstrClass.BRANCH:
             if decoded_instr.name == "EXIT":
@@ -724,11 +734,12 @@ def process_instruction(instr: BpfInstruction, state: State, instr_idx: int) -> 
                 addr = None
 
             elif decoded_instr.name == "CALL":
-                func_id = decoded_instr.imm
-                
-                if func_id == 1:
-                    new_r0 = fresh_gp_var(0, instr_idx)
-                    state.set_gp(0, new_r0)
+                # Per the eBPF calling convention, helper calls can modify
+                # registers R0-R5. We model this by creating new, unconstrained
+                # symbolic variables for each of them. R0 holds the return value.
+                for reg_idx in range(6): # Clobber R0 through R5
+                    new_reg_val = fresh_gp_var(reg_idx, unique_instr_id)
+                    state.set_gp(reg_idx, new_reg_val)
                 # Both addr and branch_cond are None
  
             else:

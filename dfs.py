@@ -2,14 +2,14 @@ from block import Block
 from bpf import BpfClass, BpfCode, BpfInstruction, Mask, Shift, BPF_INFO, BPF_INFO_FPU
 from mem_access import process_instruction, State, fresh_gp_var, fresh_fp_var, get_all_var_names, get_vars_from_expr, \
     normalize_huge_bv
-from z3 import Solver, If, ULT, ULE, sat, BitVecRef, BoolRef, Not, unknown, Z3Exception, Then
+from z3 import Solver, If, ULT, ULE, sat, unsat, BitVecRef, BoolRef, Not, unknown, Z3Exception, Then
 from collections import deque
 
 CACHE_LINE_DIFF = 4
 COST_MEM_L1_HIT = 8
 COST_MEM_L2_HIT = COST_MEM_L1_HIT + 12
 COST_MEM_MISS = COST_MEM_L1_HIT + COST_MEM_L2_HIT + 87 + 87
-CACHE_TTL_N = 8  # Set to 8/16 for test
+CACHE_SIZE = 1
 
 
 def is_fpu_instr(instr: BpfInstruction) -> bool:
@@ -73,72 +73,17 @@ def instr_to_runtime(instructions:dict[int, BpfInstruction], start:int, end:int)
     return runtime
 
 
-# def check_cache_hit(curr_addr, cache_list, path_constraints: list, state: State) -> int:    
-#     solver = Solver()
-#     solver.set("smt.relevancy", 2)
-#     for i in reversed(range(len(cache_list))):
-#         if curr_addr.eq(cache_list[i]):
-#             return i
-        
-#     if hasattr(curr_addr, 'as_long') and curr_addr.as_long() is not None:
-#         curr_val = curr_addr.as_long()
-#         for i in reversed(range(len(cache_list))):
-#             if hasattr(cache_list[i], 'as_long') and cache_list[i].as_long() is not None:
-#                 if abs(curr_val - cache_list[i].as_long()) <= CACHE_LINE_DIFF: 
-#                     return i
-#         return -1
-
-#     for i in reversed(range(len(cache_list))):
-#         solver.push()
-#         solver.set("timeout", 1000) 
-#         solver.set("smt.arith.nl", True)
-        
-#         diff = If(ULT(curr_addr, cache_list[i]), 
-#                   cache_list[i] - curr_addr, 
-#                   curr_addr - cache_list[i])
-        
-#         solver.add(ULE(diff, CACHE_LINE_DIFF))
-        
-#         try:
-#             result = solver.check()
-#         except Z3Exception:
-#             result = unknown
-#         finally:
-#             solver.pop()
-
-#         if result == unknown:
-#             print(f"Warning: Z3 returned unknown at addr {curr_addr}")
-#             print(f"Unknown reason: {solver.reason_unknown()}")
-#             print(f"Statistics: {solver.statistics()}")
-#         if result == sat:
-#             return i
-            
-#     return -1
-    
-    
-def check_cache_hit(curr_addr: BitVecRef, cache_list: list[BitVecRef], path_constraints: list, state: State) -> int:    
+def check_cache_hit(curr_addr: BitVecRef, cache_list: list[BitVecRef], solver: Solver, state: State) -> int:
     """
-    Checks if the current memory address hits the simulated cache.
-    Uses symbolic minimization to filter irrelevant constraints for better performance.
+    Checks if the current memory address hits the simulated cache using a pre-configured solver.
+    The solver is expected to be passed in with all current path constraints already asserted.
     """
-    solver = Solver()
-    solver.set("timeout", 1000) 
-    solver.set("smt.relevancy", 2)
-    solver.set("smt.arith.nl", True)
-
-    # Constraint Slicing (Minimization)
-    active_vars = get_all_var_names(state.gp) | \
-                  get_all_var_names(state.fp) | \
-                  get_all_var_names(state.memory)
-    
-    for cond_expr, cond_vars in path_constraints:
-        if cond_vars.issubset(active_vars):
-            solver.add(cond_expr)
+    # The solver is now passed in, already containing path constraints.
 
     for i in reversed(range(len(cache_list))):
         if curr_addr.eq(cache_list[i]):
             return i
-        
+
     # Concrete Value Check
     if hasattr(curr_addr, 'as_long') and curr_addr.as_long() is not None:
         curr_val = curr_addr.as_long()
@@ -146,34 +91,33 @@ def check_cache_hit(curr_addr: BitVecRef, cache_list: list[BitVecRef], path_cons
             target = cache_list[i]
             if hasattr(target, 'as_long') and target.as_long() is not None:
                 # Check if the difference is within the Cache Line size
-                if abs(curr_val - target.as_long()) <= CACHE_LINE_DIFF: 
+                if abs(curr_val - target.as_long()) <= CACHE_LINE_DIFF:
                     return i
         return -1
 
     # Symbolic Range Check
     for i in reversed(range(len(cache_list))):
         solver.push()
-        
-        diff = If(ULT(curr_addr, cache_list[i]), 
-                  cache_list[i] - curr_addr, 
+
+        diff = If(ULT(curr_addr, cache_list[i]),
+                  cache_list[i] - curr_addr,
                   curr_addr - cache_list[i])
-        
-        solver.add(ULE(diff, CACHE_LINE_DIFF)) 
-        
+
+        solver.add(ULE(diff, CACHE_LINE_DIFF))
+
         try:
             result = solver.check()
         except Z3Exception:
             result = unknown
-        
+
+        solver.pop()  # Unconditionally pop to match the push()
+
         if result == sat:
-            solver.pop()
             return i
-            
+
         if result == unknown:
             print(f"Warning: Cache check returned unknown for {curr_addr}")
             pass
-            
-        solver.pop()
 
     return -1
     
@@ -192,7 +136,14 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
     path_runtime_ub = 0
     path_runtime = 0  # Tracks cumulative runtime for the current path
 
-    def dfs(block: 'Block', state: 'State', cache_state: deque[BitVecRef], path_constraints: list[tuple[BoolRef, set[str]]]):
+    # The solver is created once and passed down through the recursion.
+    # Its internal stack will manage the path constraints.
+    solver = Solver()
+    solver.set("timeout", 1000)
+    solver.set("smt.relevancy", 2)
+    solver.set("smt.arith.nl", True)
+
+    def dfs(block: 'Block', state: 'State', cache_state: deque[BitVecRef], solver: Solver):
         nonlocal path_runtime_ub, path_runtime
 
         # 1. Cycle detection (Back-edge)
@@ -217,34 +168,27 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
         base_block_cost = instr_to_runtime(instructions, block.start, block.end)
         path_runtime += base_block_cost
 
-        # Prepare local cache state (copy from parent)
-        curr_cache = deque(list(cache_state), maxlen=16)
-
         last_branch_cond: Optional[BoolRef] = None
-
-        # --- Cost Calculation Part 2: Memory Penalties ---
+        curr_cache = deque(list(cache_state), maxlen=CACHE_SIZE)
         sorted_pcs = sorted([pc for pc in instructions.keys() if block.start <= pc <= block.end])
         for i in sorted_pcs:
             current_idx = i
             instruction = instructions[current_idx]
+            unique_instr_id = f"{current_idx}{block.suffix}"
  
             # 2. Symbolic Execution
-            branch_cond, mem_addr = process_instruction(instruction, state, current_idx)
+            branch_cond, mem_addr = process_instruction(instruction, state, unique_instr_id)
 
             # 3. Helper Call Cost Logic
             if hasattr(instruction, 'opcode') and instruction.opcode == 0x85:
-                
-                # Set R1-R5 to new values
-                for reg_idx in range(1,6):
-                    reg_val = fresh_gp_var(reg_idx, current_idx)
-                    state.set_gp(reg_idx, reg_val)
-                    # print(f"  [Helper Call] at I{current_idx}: R{reg_idx} value is set to {state.get_gp(reg_idx)}")
+                # The symbolic state change (clobbering R0-R5) is now handled
+                # inside process_instruction. This block only adds the runtime cost.
                 
                 if hasattr(instruction, 'imm') and instruction.imm in [1, 2, 3]:
-                    print(f"  [Helper Call] ID {instruction.imm} at I{current_idx}: +{COST_MEM_MISS} cycles")
+                    print(f"  [Helper Call] ID {instruction.imm} at I{unique_instr_id}: +{COST_MEM_MISS} cycles")
                     path_runtime += COST_MEM_MISS
                 else:
-                    print(f"  [Helper Call] ID {instruction.imm} at I{current_idx}: +100 cycles")
+                    print(f"  [Helper Call] ID {instruction.imm} at I{unique_instr_id}: +100 cycles")
                     path_runtime += 100
 
             if branch_cond is not None:
@@ -258,7 +202,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
 
                 if op_info:
                     if "LD" in op_info.name:
-                        dist = check_cache_hit(mem_addr, list(curr_cache), path_constraints, state)
+                        dist = check_cache_hit(mem_addr, list(curr_cache), solver, state)
 
                         # Check the distance from the most recent MEM/FMEM instruction
                         if dist == -1:
@@ -284,70 +228,53 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
             # Case A: Single Successor (Unconditional Jump or Fall-through)
             if len(successors) == 1:
                 nxt = successors[0]
-                if last_branch_cond is not None:
-                    new_path_constraints = list(path_constraints)
-                    vars_true = get_all_var_names(last_branch_cond)
-                    new_path_constraints.append((last_branch_cond, vars_true))
-                    dfs(nxt, state.fork(), curr_cache, new_path_constraints)
-                else:
-                    dfs(nxt, state.fork(), curr_cache, path_constraints)
+                solver.push()
+                if last_branch_cond is not None: # For JA, which is always true
+                    solver.add(last_branch_cond)
+                dfs(nxt, state.fork(), curr_cache, solver)
+                solver.pop()
 
             # Case B: Two Successors (Conditional Branch)
             # successors[0] is the Taken target, successors[1] is the Not-Taken target
             elif len(successors) == 2:
                 if last_branch_cond is None:
                     print("Warning: Branch with 2 successors but no condition found! Exploring both blindly.")
+                    # This case should ideally not happen in a well-formed CFG.
+                    # Explore both paths without adding new constraints.
                     for nxt in successors:
-                        dfs(nxt, state.fork(), deque(list(curr_cache), maxlen=16), path_constraints)
+                        solver.push()
+                        dfs(nxt, state.fork(), deque(list(curr_cache), maxlen=CACHE_SIZE), solver)
+                        solver.pop()
                 else:
-                    # --- Condition is True (Taken) ---
+                    # --- Branch 1: Condition is True (Taken) ---
                     nxt_true = successors[0]
+                    solver.push()
+                    solver.add(last_branch_cond)
 
-                    new_path_constraints_taken = list(path_constraints)
-                    vars_true = get_all_var_names(last_branch_cond)
-                    new_path_constraints_taken.append((last_branch_cond, vars_true))
-                    
-                    solver = Solver()
-                    solver.set("timeout", 1000) 
-                    solver.set("smt.relevancy", 2)
-                    solver.set("smt.arith.nl", True)
-                    # Constraint Slicing (Minimization)
-                    active_vars = get_all_var_names(state.gp) | \
-                                get_all_var_names(state.fp) | \
-                                get_all_var_names(state.memory)
-                    for cond_expr, cond_vars in new_path_constraints_taken:
-                        if cond_vars.issubset(active_vars):
-                            solver.add(cond_expr)
-                    
-                    if solver.check() == sat or unknown:
-                        dfs(nxt_true, state.fork(), deque(list(curr_cache), maxlen=16), new_path_constraints_taken)
+                    result = solver.check()
+                    if result == sat or result == unknown:
+                        dfs(nxt_true, state.fork(), deque(list(curr_cache), maxlen=CACHE_SIZE), solver)
+                    elif result == unsat:
+                        print(f"  [Pruned] Path to BB {nxt_true.start}{nxt_true.suffix} is unreachable (UNSAT).")
                     else:
-                        print(f"  [Pruned] Path to BB {nxt_true.start} is unreachable (UNSAT).")
+                        raise ValueError(f"Unexpected solver result: {result}")
+                    solver.pop()
 
-
-                    # --- Condition is False (Not Taken) ---
+                    # --- Branch 2: Condition is False (Not Taken) ---
                     nxt_false = successors[1]
-                    new_path_constraints_nottaken = list(path_constraints)
-                    vars_true = get_all_var_names(last_branch_cond)
-                    new_path_constraints_nottaken.append((last_branch_cond, vars_true))
-                    
-                    solver = Solver()
-                    solver.set("timeout", 1000) 
-                    solver.set("smt.relevancy", 2)
-                    solver.set("smt.arith.nl", True)
-                    # Constraint Slicing (Minimization)
-                    active_vars = get_all_var_names(state.gp) | \
-                                get_all_var_names(state.fp) | \
-                                get_all_var_names(state.memory)
-                    for cond_expr, cond_vars in new_path_constraints_nottaken:
-                        if cond_vars.issubset(active_vars):
-                            solver.add(cond_expr)
-                    
-                    if solver.check() == sat or unknown:
-                        dfs(nxt_false, state.fork(), deque(list(curr_cache), maxlen=16), new_path_constraints_nottaken)
+                    solver.push()
+                    negated_cond = Not(last_branch_cond)
+                    solver.add(negated_cond)
+
+                    result = solver.check()
+                    if result == sat or result == unknown:
+                        dfs(nxt_false, state.fork(), deque(list(curr_cache), maxlen=CACHE_SIZE), solver)
+                    elif result == unsat:
+                        print(f"  [Pruned] Path to BB {nxt_false.start}{nxt_false.suffix} is unreachable (UNSAT).")
+                        print(f"Solver Statistics: {solver.statistics()}")
                     else:
-                        print(f"  [Pruned] Path to BB {nxt_false.start} is unreachable (UNSAT).")
-                    
+                        raise ValueError(f"Unexpected solver result: {result}")
+                    solver.pop()
 
         # Backtrack (Restore Runtime)
         path_runtime = runtime_at_entry
@@ -355,10 +282,10 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
 
     # Initialize state
     initial_state = State()
-    initial_cache: deque[BitVecRef] = deque([], maxlen=16)
+    initial_cache: deque[BitVecRef] = deque([], maxlen=CACHE_SIZE)
 
     # Start DFS
-    dfs(first_block, initial_state, initial_cache, [])
+    dfs(first_block, initial_state, initial_cache, solver)
 
     return path_runtime_ub
 
