@@ -2,14 +2,24 @@ from block import Block
 from bpf import BpfClass, BpfCode, BpfInstruction, Mask, Shift, BPF_INFO, BPF_INFO_FPU
 from mem_access import process_instruction, State, fresh_gp_var, fresh_fp_var, get_all_var_names, get_vars_from_expr, \
     normalize_huge_bv
-from z3 import Solver, If, ULT, ULE, sat, unsat, BitVecRef, BoolRef, Not, unknown, Z3Exception, Then
+from z3 import Solver, If, ULT, ULE, sat, unsat, BitVecRef, BoolRef, Not, unknown, Z3Exception, Then, simplify, ExprRef
 from collections import deque
+from typing import Optional, Set
 
 CACHE_LINE_DIFF = 4
 COST_MEM_L1_HIT = 8
 COST_MEM_L2_HIT = COST_MEM_L1_HIT + 12
 COST_MEM_MISS = COST_MEM_L1_HIT + COST_MEM_L2_HIT + 87 + 87
 CACHE_SIZE = 1
+
+
+def to_str_safe(expr: ExprRef) -> str:
+    """Safely converts a Z3 expression to a string, handling RecursionError."""
+    try:
+        # simplify() might help flatten the expression tree first
+        return str(simplify(expr))
+    except (RecursionError, Z3Exception):
+        return "<complex symbolic expression>"
 
 
 def is_fpu_instr(instr: BpfInstruction) -> bool:
@@ -116,7 +126,8 @@ def check_cache_hit(curr_addr: BitVecRef, cache_list: list[BitVecRef], solver: S
             return i
 
         if result == unknown:
-            print(f"Warning: Cache check returned unknown for {curr_addr}")
+            curr_addr_str = to_str_safe(curr_addr)
+            print(f"Warning: Cache check returned unknown for {curr_addr_str}")
             pass
 
     return -1
@@ -195,6 +206,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
                 last_branch_cond = branch_cond
 
             if mem_addr is not None:
+                addr_str = to_str_safe(mem_addr)
                 if is_fpu_instr(instruction):
                     op_info = BPF_INFO_FPU.get(instruction.opcode)  # FADD / FNEG / JFEQ / JFOGT ...
                 else:
@@ -206,13 +218,13 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
 
                         # Check the distance from the most recent MEM/FMEM instruction
                         if dist == -1:
-                            print(f"  [Cache MISS] Addr: {mem_addr} (+{COST_MEM_MISS} cycles)")
+                            print(f"  [Cache MISS] Addr: {addr_str} (+{COST_MEM_MISS} cycles)")
                             path_runtime += COST_MEM_MISS
                         elif len(list(curr_cache)) - dist < 8:
-                            print(f"  [Cache HIT L1] Addr: {mem_addr} (+{COST_MEM_L1_HIT} cycles)")
+                            print(f"  [Cache HIT L1] Addr: {addr_str} (+{COST_MEM_L1_HIT} cycles)")
                             path_runtime += COST_MEM_L1_HIT
                         elif len(list(curr_cache)) - dist < 16:
-                            print(f"  [Cache HIT L2] Addr: {mem_addr} (+{COST_MEM_L2_HIT} cycles)")
+                            print(f"  [Cache HIT L2] Addr: {addr_str} (+{COST_MEM_L2_HIT} cycles)")
                             path_runtime += COST_MEM_L2_HIT
 
                 # Update cache with new access
@@ -495,6 +507,7 @@ def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
 
             # 2. Re-establish connections within this iteration slice
             # , and exit edges
+            is_last_iteration = (i == loop.max_iterations - 1)
             for member in loop.members:
                 new_member = block_map[member]
                 for succ in member.next:
@@ -506,9 +519,9 @@ def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
                         
                     # Exit link to blocks outside the loop
                     elif succ not in loop.members:
-                        # if succ in exit_targets and i != loop.max_iterations - 1:
-                        #     continue
-                        new_member.add(succ)
+                        # Only the last iteration is allowed to exit the loop.
+                        if is_last_iteration:
+                            new_member.add(succ)
 
             # Link the previous iteration's tail to this iteration's header
             if i == 0:
