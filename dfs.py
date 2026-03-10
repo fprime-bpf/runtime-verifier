@@ -9,7 +9,7 @@ from typing import Optional, Set
 CACHE_LINE_DIFF = 4
 COST_MEM_L1_HIT = 8
 COST_MEM_L2_HIT = COST_MEM_L1_HIT + 12
-COST_MEM_MISS = COST_MEM_L1_HIT + COST_MEM_L2_HIT + 87 + 87
+COST_MEM_MISS = COST_MEM_L2_HIT + 87 + 87 + 87
 CACHE_SIZE = 1
 
 
@@ -230,8 +230,8 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
                         print(f"  [Helper Call] ID {instruction.imm} at I{unique_instr_id}: +{COST_MEM_MISS} cycles")
                         path_runtime += COST_MEM_MISS
                     else:
-                        print(f"  [Helper Call] ID {instruction.imm} at I{unique_instr_id}: +500 cycles")
-                        path_runtime += 500
+                        print(f"  [Helper Call] ID {instruction.imm} at I{unique_instr_id}: +50 cycles")
+                        path_runtime += 50
 
                 if branch_cond is not None:
                     last_branch_cond = branch_cond
