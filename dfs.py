@@ -4,6 +4,7 @@ from mem_access import process_instruction, State, fresh_gp_var, fresh_fp_var, g
     normalize_huge_bv
 from z3 import Solver, If, ULT, ULE, sat, unsat, BitVecRef, BoolRef, Not, unknown, Z3Exception, Then
 from collections import deque
+from typing import Optional, Set
 
 CACHE_LINE_DIFF = 4
 COST_MEM_L1_HIT = 8
@@ -136,156 +137,152 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
     path_runtime_ub = 0
     path_runtime = 0  # Tracks cumulative runtime for the current path
 
-    # The solver is created once and passed down through the recursion.
-    # Its internal stack will manage the path constraints.
     solver = Solver()
     solver.set("timeout", 1000)
     solver.set("smt.relevancy", 2)
     solver.set("smt.arith.nl", True)
 
-    def dfs(block: 'Block', state: 'State', cache_state: deque[BitVecRef], solver: Solver):
-        nonlocal path_runtime_ub, path_runtime
-
-        # 1. Cycle detection (Back-edge)
-        if block in onpath:
-            # TODO: Plug a loop bound policy here.
-            print(f"Back-edge hit at BB({block.start}, {block.end}); ignoring extra iteration for now.")
-            return
-
-        onpath.add(block)
-
-        # Basic block information
-        instr_count = block.end - block.start + 1
-        block_instrs = [instructions[pc] for pc in sorted(instructions.keys()) if block.start <= pc <= block.end]
-        
-        print(f"\n======Visiting BB({block.start}, {block.end}){block.suffix}, instructions={instr_count}======")
-
-        # For backtracking
-        runtime_at_entry = path_runtime
-
-        # --- Cost Calculation Part 1: Base Static Cost ---
-        # Calculate the base execution time for this block (ALU, static costs)
-        base_block_cost = instr_to_runtime(instructions, block.start, block.end)
-        path_runtime += base_block_cost
-
-        last_branch_cond: Optional[BoolRef] = None
-        curr_cache = deque(list(cache_state), maxlen=CACHE_SIZE)
-        sorted_pcs = sorted([pc for pc in instructions.keys() if block.start <= pc <= block.end])
-        for i in sorted_pcs:
-            current_idx = i
-            instruction = instructions[current_idx]
-            unique_instr_id = f"{current_idx}{block.suffix}"
- 
-            # 2. Symbolic Execution
-            branch_cond, mem_addr = process_instruction(instruction, state, unique_instr_id)
-
-            # 3. Helper Call Cost Logic
-            if hasattr(instruction, 'opcode') and instruction.opcode == 0x85:
-                # The symbolic state change (clobbering R0-R5) is now handled
-                # inside process_instruction. This block only adds the runtime cost.
-                
-                if hasattr(instruction, 'imm') and instruction.imm in [1, 2, 3]:
-                    print(f"  [Helper Call] ID {instruction.imm} at I{unique_instr_id}: +{COST_MEM_MISS} cycles")
-                    path_runtime += COST_MEM_MISS
-                else:
-                    print(f"  [Helper Call] ID {instruction.imm} at I{unique_instr_id}: +100 cycles")
-                    path_runtime += 100
-
-            if branch_cond is not None:
-                last_branch_cond = branch_cond
-
-            if mem_addr is not None:
-                if is_fpu_instr(instruction):
-                    op_info = BPF_INFO_FPU.get(instruction.opcode)  # FADD / FNEG / JFEQ / JFOGT ...
-                else:
-                    op_info = BPF_INFO.get(instruction.opcode)      # ALU/MEM ... + FLDX & FSTX
-
-                if op_info:
-                    if "LD" in op_info.name:
-                        dist = check_cache_hit(mem_addr, list(curr_cache), solver, state)
-
-                        # Check the distance from the most recent MEM/FMEM instruction
-                        if dist == -1:
-                            print(f"  [Cache MISS] Addr: {mem_addr} (+{COST_MEM_MISS} cycles)")
-                            path_runtime += COST_MEM_MISS
-                        elif len(list(curr_cache)) - dist < 8:
-                            print(f"  [Cache HIT L1] Addr: {mem_addr} (+{COST_MEM_L1_HIT} cycles)")
-                            path_runtime += COST_MEM_L1_HIT
-                        elif len(list(curr_cache)) - dist < 16:
-                            print(f"  [Cache HIT L2] Addr: {mem_addr} (+{COST_MEM_L2_HIT} cycles)")
-                            path_runtime += COST_MEM_L2_HIT
-
-                # Update cache with new access
-                curr_cache.append(mem_addr)
-
-        if not block.next:
-            print(f"Reaching an exit point {block.end}, total path runtime is {path_runtime}")
-            path_runtime_ub = max(path_runtime_ub, path_runtime)
-        else:
-            # Branching
-            successors = block.next
-
-            # Case A: Single Successor (Unconditional Jump or Fall-through)
-            if len(successors) == 1:
-                nxt = successors[0]
-                solver.push()
-                if last_branch_cond is not None: # For JA, which is always true
-                    solver.add(last_branch_cond)
-                dfs(nxt, state.fork(), curr_cache, solver)
-                solver.pop()
-
-            # Case B: Two Successors (Conditional Branch)
-            # successors[0] is the Taken target, successors[1] is the Not-Taken target
-            elif len(successors) == 2:
-                if last_branch_cond is None:
-                    print("Warning: Branch with 2 successors but no condition found! Exploring both blindly.")
-                    # This case should ideally not happen in a well-formed CFG.
-                    # Explore both paths without adding new constraints.
-                    for nxt in successors:
-                        solver.push()
-                        dfs(nxt, state.fork(), deque(list(curr_cache), maxlen=CACHE_SIZE), solver)
-                        solver.pop()
-                else:
-                    # --- Branch 1: Condition is True (Taken) ---
-                    nxt_true = successors[0]
-                    solver.push()
-                    solver.add(last_branch_cond)
-
-                    result = solver.check()
-                    if result == sat or result == unknown:
-                        dfs(nxt_true, state.fork(), deque(list(curr_cache), maxlen=CACHE_SIZE), solver)
-                    elif result == unsat:
-                        print(f"  [Pruned] Path to BB {nxt_true.start}{nxt_true.suffix} is unreachable (UNSAT).")
-                    else:
-                        raise ValueError(f"Unexpected solver result: {result}")
-                    solver.pop()
-
-                    # --- Branch 2: Condition is False (Not Taken) ---
-                    nxt_false = successors[1]
-                    solver.push()
-                    negated_cond = Not(last_branch_cond)
-                    solver.add(negated_cond)
-
-                    result = solver.check()
-                    if result == sat or result == unknown:
-                        dfs(nxt_false, state.fork(), deque(list(curr_cache), maxlen=CACHE_SIZE), solver)
-                    elif result == unsat:
-                        print(f"  [Pruned] Path to BB {nxt_false.start}{nxt_false.suffix} is unreachable (UNSAT).")
-                        print(f"Solver Statistics: {solver.statistics()}")
-                    else:
-                        raise ValueError(f"Unexpected solver result: {result}")
-                    solver.pop()
-
-        # Backtrack (Restore Runtime)
-        path_runtime = runtime_at_entry
-        onpath.remove(block)
-
     # Initialize state
     initial_state = State()
     initial_cache: deque[BitVecRef] = deque([], maxlen=CACHE_SIZE)
 
-    # Start DFS
-    dfs(first_block, initial_state, initial_cache, solver)
+    # The stack stores tuples of: (Action_Type, *args)
+    # Actions:
+    # 'VISIT': Process the basic block.
+    # 'EVAL_BRANCH': Handle solver pushes, branch conditions, and trigger the next VISIT.
+    # 'BACKTRACK_BLOCK': Restore path_runtime and remove block from onpath.
+    # 'POP_SOLVER': Pop the Z3 solver state.
+    stack = [('VISIT', first_block, initial_state, initial_cache)]
+
+    while stack:
+        item = stack.pop()
+        action = item[0]
+
+        if action == 'POP_SOLVER':
+            solver.pop()
+
+        elif action == 'BACKTRACK_BLOCK':
+            _, block, runtime_at_entry = item
+            path_runtime = runtime_at_entry
+            onpath.remove(block)
+
+        elif action == 'EVAL_BRANCH':
+            _, nxt_block, cond, nxt_state, nxt_cache, needs_check, is_false_branch = item
+            
+            solver.push()
+            if cond is not None:
+                solver.add(cond)
+
+            if needs_check:
+                result = solver.check()
+                if result == sat or result == unknown:
+                    stack.append(('POP_SOLVER',))
+                    stack.append(('VISIT', nxt_block, nxt_state, nxt_cache))
+                elif result == unsat:
+                    print(f"  [Pruned] Path to BB {nxt_block.start}{nxt_block.suffix} is unreachable (UNSAT).")
+                    if is_false_branch:
+                        print(f"Solver Statistics: {solver.statistics()}")
+                    # Immediately pop since we won't schedule a VISIT
+                    solver.pop()
+                else:
+                    raise ValueError(f"Unexpected solver result: {result}")
+            else:
+                # Unconditional or unchecked branch
+                stack.append(('POP_SOLVER',))
+                stack.append(('VISIT', nxt_block, nxt_state, nxt_cache))
+
+        elif action == 'VISIT':
+            _, block, state, cache_state = item
+
+            # 1. Cycle detection (Back-edge)
+            if block in onpath:
+                print(f"Back-edge hit at BB({block.start}, {block.end}); ignoring extra iteration for now.")
+                continue
+
+            onpath.add(block)
+            runtime_at_entry = path_runtime
+
+            # Schedule the backtrack action to run AFTER all children are processed
+            stack.append(('BACKTRACK_BLOCK', block, runtime_at_entry))
+
+            instr_count = block.end - block.start + 1
+            print(f"\n======Visiting BB({block.start}, {block.end}){block.suffix}, instructions={instr_count}======")
+
+            # --- Cost Calculation Part 1: Base Static Cost ---
+            base_block_cost = instr_to_runtime(instructions, block.start, block.end)
+            path_runtime += base_block_cost
+
+            last_branch_cond: Optional[BoolRef] = None
+            curr_cache = deque(list(cache_state), maxlen=CACHE_SIZE)
+            sorted_pcs = sorted([pc for pc in instructions.keys() if block.start <= pc <= block.end])
+            
+            for i in sorted_pcs:
+                current_idx = i
+                instruction = instructions[current_idx]
+                unique_instr_id = f"{current_idx}{block.suffix}"
+    
+                # 2. Symbolic Execution
+                branch_cond, mem_addr = process_instruction(instruction, state, unique_instr_id)
+
+                # 3. Helper Call Cost Logic
+                if hasattr(instruction, 'opcode') and instruction.opcode == 0x85:
+                    if hasattr(instruction, 'imm') and instruction.imm in [1, 2, 3]:
+                        print(f"  [Helper Call] ID {instruction.imm} at I{unique_instr_id}: +{COST_MEM_MISS} cycles")
+                        path_runtime += COST_MEM_MISS
+                    else:
+                        print(f"  [Helper Call] ID {instruction.imm} at I{unique_instr_id}: +100 cycles")
+                        path_runtime += 100
+
+                if branch_cond is not None:
+                    last_branch_cond = branch_cond
+
+                if mem_addr is not None:
+                    if is_fpu_instr(instruction):
+                        op_info = BPF_INFO_FPU.get(instruction.opcode)
+                    else:
+                        op_info = BPF_INFO.get(instruction.opcode)
+
+                    if op_info:
+                        if "LD" in op_info.name:
+                            dist = check_cache_hit(mem_addr, list(curr_cache), solver, state)
+                            if dist == -1:
+                                print(f"  [Cache MISS] Addr: {mem_addr} (+{COST_MEM_MISS} cycles)")
+                                path_runtime += COST_MEM_MISS
+                            elif len(list(curr_cache)) - dist < 8:
+                                print(f"  [Cache HIT L1] Addr: {mem_addr} (+{COST_MEM_L1_HIT} cycles)")
+                                path_runtime += COST_MEM_L1_HIT
+                            elif len(list(curr_cache)) - dist < 16:
+                                print(f"  [Cache HIT L2] Addr: {mem_addr} (+{COST_MEM_L2_HIT} cycles)")
+                                path_runtime += COST_MEM_L2_HIT
+
+                    curr_cache.append(mem_addr)
+
+            if not block.next:
+                print(f"Reaching an exit point {block.end}, total path runtime is {path_runtime}")
+                path_runtime_ub = max(path_runtime_ub, path_runtime)
+            else:
+                successors = block.next
+
+                # Push successors onto the stack.
+                # Remember: Stack is LIFO. To evaluate True branch first, we must push False branch first.
+                if len(successors) == 1:
+                    nxt = successors[0]
+                    # args: action, block, cond, state, cache, needs_check, is_false_branch
+                    stack.append(('EVAL_BRANCH', nxt, last_branch_cond, state.fork(), deque(list(curr_cache), maxlen=CACHE_SIZE), False, False))
+                    
+                elif len(successors) == 2:
+                    nxt_true = successors[0]
+                    nxt_false = successors[1]
+                    
+                    if last_branch_cond is None:
+                        print("Warning: Branch with 2 successors but no condition found! Exploring both blindly.")
+                        stack.append(('EVAL_BRANCH', nxt_false, None, state.fork(), deque(list(curr_cache), maxlen=CACHE_SIZE), False, True))
+                        stack.append(('EVAL_BRANCH', nxt_true, None, state.fork(), deque(list(curr_cache), maxlen=CACHE_SIZE), False, False))
+                    else:
+                        # Push False branch (Not Taken) - executed second
+                        stack.append(('EVAL_BRANCH', nxt_false, Not(last_branch_cond), state.fork(), deque(list(curr_cache), maxlen=CACHE_SIZE), True, True))
+                        # Push True branch (Taken) - executed first
+                        stack.append(('EVAL_BRANCH', nxt_true, last_branch_cond, state.fork(), deque(list(curr_cache), maxlen=CACHE_SIZE), True, False))
 
     return path_runtime_ub
 
@@ -495,6 +492,7 @@ def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
 
             # 2. Re-establish connections within this iteration slice
             # , and exit edges
+            is_last_iteration = (i == loop.max_iterations - 1)
             for member in loop.members:
                 new_member = block_map[member]
                 for succ in member.next:
@@ -506,9 +504,9 @@ def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
                         
                     # Exit link to blocks outside the loop
                     elif succ not in loop.members:
-                        # if succ in exit_targets and i != loop.max_iterations - 1:
-                        #     continue
-                        new_member.add(succ)
+                        # Only the last iteration is allowed to exit the loop.
+                        if is_last_iteration:
+                            new_member.add(succ)
 
             # Link the previous iteration's tail to this iteration's header
             if i == 0:
