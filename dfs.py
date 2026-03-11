@@ -230,8 +230,8 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
                         print(f"  [Helper Call] ID {instruction.imm} at I{unique_instr_id}: +{COST_MEM_MISS} cycles")
                         path_runtime += COST_MEM_MISS
                     else:
-                        print(f"  [Helper Call] ID {instruction.imm} at I{unique_instr_id}: +50 cycles")
-                        path_runtime += 50
+                        print(f"  [Helper Call] ID {instruction.imm} at I{unique_instr_id}: +100 cycles")
+                        path_runtime += 100
 
                 if branch_cond is not None:
                     last_branch_cond = branch_cond
