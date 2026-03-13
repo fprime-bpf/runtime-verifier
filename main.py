@@ -3,7 +3,7 @@ import argparse
 
 from bpf import BpfInstruction, BpfClass, BpfCode, BpfS
 from block import Block
-from dfs import dfs_blocks
+from dfs import dfs_blocks, find_loops, unroll_loops_in_cfg
 
 
 parser = argparse.ArgumentParser(
@@ -13,11 +13,10 @@ parser = argparse.ArgumentParser(
 parser.add_argument("filename")
 
 
-def read_bpf_file(filename: str) -> list[BpfInstruction]:
-    # TODO: this is not always the case,
-    # some instructions are 16 bytes, and they're not that rare
+def read_bpf_file(filename: str) -> dict[int, BpfInstruction]:
     inst_size = 8
-    instructions = []
+    instructions = {}
+    current_pc = 0
     with open(filename, "rb") as file:
         while True:
             ins = file.read(inst_size)
@@ -30,143 +29,160 @@ def read_bpf_file(filename: str) -> list[BpfInstruction]:
                 more = file.read(inst_size)
                 assert more != b""
                 bpf_ins.widen_instruction(more)
-
-            instructions.append(bpf_ins)
+                instructions[current_pc] = bpf_ins
+                current_pc += 2
+            else:
+                instructions[current_pc] = bpf_ins
+                current_pc += 1
 
     return instructions
 
 
 def get_blocks_tree(
-    instructions: list[BpfInstruction], start_idx=0, seen: set | None = None
+    instructions: dict[int, BpfInstruction], start_idx=0,
+    all_blocks: dict[int, Block] | None = None, leaders=None
 ) -> Block:
-    """Processes instruction set into a Control Flow Graph (CFG).
+    """Processes instruction set into a CFG using leader-based partitioning.
 
-    Returns a Block class, resembling a Basic Block,
-    which includes a start and end index, as well as a list of children blocks.
-    All basic blocks have exactly one entry (first instruction)
-    and one exit (last instruction).
-    All basic blocks have either no following blocks (program end),
-    one following block (usually function call)
-    or two following blocks (branch condition)."""
+    Handles cyclic control flow (loops) by memoizing blocks in all_blocks
+    so back-edges return the already-constructed block rather than raising."""
 
-    if seen is None:
-        seen = set()
+    # Pre-scan phase: identify entry points (leaders) to avoid block overlaps
+    if all_blocks is None:
+        all_blocks = {}
+        leaders = {0}
+        for idx in sorted(instructions.keys()):
+            ins = instructions[idx]
+            print(f"idx={idx}: instruction={str(ins)}")
+            if ins.get_class() in [BpfClass.JMP, BpfClass.JMP32]:
+                # Target of a jump is a leader
+                if ins.opcode == (BpfCode.JMP.CALL | BpfS.K | BpfClass.JMP):
+                    if ins.src == 1:   # Calling normal function
+                        leaders.add(idx + ins.imm + 1)
+                elif ins.opcode != (BpfCode.JMP.EXIT | BpfS.K | BpfClass.JMP):
+                    target = idx + ins.off + 1 if hasattr(ins, 'off') else idx + ins.imm + 1
+                    leaders.add(target)
 
-    if start_idx in seen:
-        raise Exception(f"detected loop: block at idx={start_idx} loops")
+                # Instruction following a jump is a leader
+                if idx + 1 < max(instructions.keys()):
+                    leaders.add(idx + 1)
 
-    seen.add(start_idx)
+        leaders = sorted([l for l in leaders if l < max(instructions.keys())])
 
-    for idx in range(start_idx, len(instructions)):
+    # Cycle detection: reuse existing block and terminate recursion.
+    if start_idx in all_blocks:
+        return all_blocks[start_idx]
+
+    # Determine current block boundary based on the next leader
+    next_leader = next((l for l in leaders if l > start_idx), max(instructions.keys()))
+
+    # Find the basic block
+    curr_block_end = start_idx
+    for idx in (pc for pc in sorted(instructions.keys()) if start_idx <= pc < next_leader):
+        curr_block_end = idx
         ins = instructions[idx]
-        print(f"idx={idx}: instruction={str(ins)}")
+        if ins.get_class() in [BpfClass.JMP, BpfClass.JMP32]:
+            # Helper calls don't end a block; other jumps do
+            if not (ins.opcode == BpfCode.JMP.CALL | BpfS.K | BpfClass.JMP and ins.src in [0, 2]):
+                break
 
-        # python match case expressions are structural by default,
-        # meaning they match structure (e.g. are you of type int?),
-        # not values (e.g. are you 221?)
-        # we go around this with our `x if x == (value)`
-        match ins.opcode:
-            # unconditional jumps
-            case x if x == BpfCode.JMP.EXIT | BpfS.K | BpfClass.JMP:
-                print(f"idx={idx}: EXIT")
-                return Block(start_idx, idx)
+    block = Block(start_idx, curr_block_end)
+    all_blocks[start_idx] = block
 
-            case x if x == BpfCode.JMP.JA | BpfS.K | BpfClass.JMP:  # offset jump
-                block = Block(start_idx, idx)
-                jump_to = idx + ins.off + 1
-                print(f"idx={idx}: jump_to={jump_to}")
+    last_ins = instructions[curr_block_end]
+    idx = curr_block_end
 
-                next = get_blocks_tree(instructions, jump_to, seen.copy())
-                block.add(next)
-                return block
+    # Handle fall-through: if block ends without a terminating jump
+    if last_ins.get_class() not in [BpfClass.JMP, BpfClass.JMP32] or \
+       (last_ins.opcode == BpfCode.JMP.CALL | BpfClass.JMP and last_ins.src in [0, 2]):
+        next_step = 2 if last_ins.is_wide_instruction() else 1
+        if curr_block_end + next_step < max(instructions.keys()):
+            next_sequential_pc = curr_block_end + next_step
+            next_b = get_blocks_tree(instructions, next_sequential_pc, all_blocks, leaders)
+            block.add(next_b)
+        return block
 
-            case x if x == BpfCode.JMP.JA | BpfS.K | BpfClass.JMP32:  # imm jump
-                block = Block(start_idx, idx)
-                jump_to = idx + ins.imm + 1
-                print(f"idx={idx}: jump_to={jump_to}")
+    # Connect edges
+    match last_ins.opcode:
+        case x if x == BpfCode.JMP.EXIT | BpfS.K | BpfClass.JMP:
+            return block
 
-                next = get_blocks_tree(instructions, jump_to, seen.copy())
-                block.add(next)
-                return block
+        case x if x == BpfCode.JMP.JA | BpfS.K | BpfClass.JMP:
+            jump_to = idx + last_ins.off + 1
+            block.add(get_blocks_tree(instructions, jump_to, all_blocks, leaders))
+            return block
 
-            case x if x == BpfCode.JMP.CALL | BpfS.K | BpfClass.JMP:
-                block = Block(start_idx, idx)
-                # start.add(idx + 1)
-                match ins.src:
-                    case 0:
-                        print("calling helper function by static id")
-                        continue
-                    case 1:
-                        print(f"calling normal function")
-                        jump_to = idx + ins.imm + 1
-                        next = get_blocks_tree(instructions, jump_to, seen.copy())
-                        block.add(next)
-                        return block
-                    case 2:
-                        print("calling helper function by BTF id")
-                        continue
+        case x if x == BpfCode.JMP.JA | BpfS.K | BpfClass.JMP32:
+            jump_to = idx + last_ins.imm + 1
+            block.add(get_blocks_tree(instructions, jump_to, all_blocks, leaders))
+            return block
 
-            # conditional jumps, these jump to two blocks
-            case x if x in [
-                BpfCode.JMP.JEQ | BpfS.K | BpfClass.JMP,
-                BpfCode.JMP.JEQ | BpfS.K | BpfClass.JMP32,
-                BpfCode.JMP.JEQ | BpfS.X | BpfClass.JMP,
-                BpfCode.JMP.JEQ | BpfS.X | BpfClass.JMP32,
-                BpfCode.JMP.JGT | BpfS.K | BpfClass.JMP,
-                BpfCode.JMP.JGT | BpfS.K | BpfClass.JMP32,
-                BpfCode.JMP.JGT | BpfS.X | BpfClass.JMP,
-                BpfCode.JMP.JGT | BpfS.X | BpfClass.JMP32,
-                BpfCode.JMP.JGE | BpfS.K | BpfClass.JMP,
-                BpfCode.JMP.JGE | BpfS.K | BpfClass.JMP32,
-                BpfCode.JMP.JGE | BpfS.X | BpfClass.JMP,
-                BpfCode.JMP.JGE | BpfS.X | BpfClass.JMP32,
-                BpfCode.JMP.JSET | BpfS.K | BpfClass.JMP,
-                BpfCode.JMP.JSET | BpfS.K | BpfClass.JMP32,
-                BpfCode.JMP.JSET | BpfS.X | BpfClass.JMP,
-                BpfCode.JMP.JSET | BpfS.X | BpfClass.JMP32,
-                BpfCode.JMP.JNE | BpfS.K | BpfClass.JMP,
-                BpfCode.JMP.JNE | BpfS.K | BpfClass.JMP32,
-                BpfCode.JMP.JNE | BpfS.X | BpfClass.JMP,
-                BpfCode.JMP.JNE | BpfS.X | BpfClass.JMP32,
-                BpfCode.JMP.JSGT | BpfS.K | BpfClass.JMP,
-                BpfCode.JMP.JSGT | BpfS.K | BpfClass.JMP32,
-                BpfCode.JMP.JSGT | BpfS.X | BpfClass.JMP,
-                BpfCode.JMP.JSGT | BpfS.X | BpfClass.JMP32,
-                BpfCode.JMP.JSGE | BpfS.K | BpfClass.JMP,
-                BpfCode.JMP.JSGE | BpfS.K | BpfClass.JMP32,
-                BpfCode.JMP.JSGE | BpfS.X | BpfClass.JMP,
-                BpfCode.JMP.JSGE | BpfS.X | BpfClass.JMP32,
-                BpfCode.JMP.JLT | BpfS.K | BpfClass.JMP,
-                BpfCode.JMP.JLT | BpfS.K | BpfClass.JMP32,
-                BpfCode.JMP.JLT | BpfS.X | BpfClass.JMP,
-                BpfCode.JMP.JLT | BpfS.X | BpfClass.JMP32,
-                BpfCode.JMP.JLE | BpfS.K | BpfClass.JMP,
-                BpfCode.JMP.JLE | BpfS.K | BpfClass.JMP32,
-                BpfCode.JMP.JLE | BpfS.X | BpfClass.JMP,
-                BpfCode.JMP.JLE | BpfS.X | BpfClass.JMP32,
-                BpfCode.JMP.JSLT | BpfS.K | BpfClass.JMP,
-                BpfCode.JMP.JSLT | BpfS.K | BpfClass.JMP32,
-                BpfCode.JMP.JSLT | BpfS.X | BpfClass.JMP,
-                BpfCode.JMP.JSLT | BpfS.X | BpfClass.JMP32,
-                BpfCode.JMP.JSLE | BpfS.K | BpfClass.JMP,
-                BpfCode.JMP.JSLE | BpfS.K | BpfClass.JMP32,
-                BpfCode.JMP.JSLE | BpfS.X | BpfClass.JMP,
-                BpfCode.JMP.JSLE | BpfS.X | BpfClass.JMP32,
-            ]:
-                block = Block(start_idx, idx)
-                jump_if = idx + ins.off + 1
-                jump_else = idx + 1
-                print(f"idx={idx}: jump_if={jump_if}, jump_else={jump_else}")
+        case x if x == BpfCode.JMP.CALL | BpfS.K | BpfClass.JMP:
+            if last_ins.src == 1:
+                jump_to = idx + last_ins.imm + 1
+                block.add(get_blocks_tree(instructions, jump_to, all_blocks, leaders))
+            else:
+                # Fall-through for helper calls (src=0 or src=2)
+                block.add(get_blocks_tree(instructions, idx + 1, all_blocks, leaders))
+            return block
 
-                next_if = get_blocks_tree(instructions, jump_if, seen.copy())
-                next_else = get_blocks_tree(instructions, jump_else, seen.copy())
-                block.add(next_if)
-                block.add(next_else)
-                return block
+        # conditional jumps, these jump to two blocks
+        case x if x in [
+            BpfCode.JMP.JEQ | BpfS.K | BpfClass.JMP,
+            BpfCode.JMP.JEQ | BpfS.K | BpfClass.JMP32,
+            BpfCode.JMP.JEQ | BpfS.X | BpfClass.JMP,
+            BpfCode.JMP.JEQ | BpfS.X | BpfClass.JMP32,
+            BpfCode.JMP.JGT | BpfS.K | BpfClass.JMP,
+            BpfCode.JMP.JGT | BpfS.K | BpfClass.JMP32,
+            BpfCode.JMP.JGT | BpfS.X | BpfClass.JMP,
+            BpfCode.JMP.JGT | BpfS.X | BpfClass.JMP32,
+            BpfCode.JMP.JGE | BpfS.K | BpfClass.JMP,
+            BpfCode.JMP.JGE | BpfS.K | BpfClass.JMP32,
+            BpfCode.JMP.JGE | BpfS.X | BpfClass.JMP,
+            BpfCode.JMP.JGE | BpfS.X | BpfClass.JMP32,
+            BpfCode.JMP.JSET | BpfS.K | BpfClass.JMP,
+            BpfCode.JMP.JSET | BpfS.K | BpfClass.JMP32,
+            BpfCode.JMP.JSET | BpfS.X | BpfClass.JMP,
+            BpfCode.JMP.JSET | BpfS.X | BpfClass.JMP32,
+            BpfCode.JMP.JNE | BpfS.K | BpfClass.JMP,
+            BpfCode.JMP.JNE | BpfS.K | BpfClass.JMP32,
+            BpfCode.JMP.JNE | BpfS.X | BpfClass.JMP,
+            BpfCode.JMP.JNE | BpfS.X | BpfClass.JMP32,
+            BpfCode.JMP.JSGT | BpfS.K | BpfClass.JMP,
+            BpfCode.JMP.JSGT | BpfS.K | BpfClass.JMP32,
+            BpfCode.JMP.JSGT | BpfS.X | BpfClass.JMP,
+            BpfCode.JMP.JSGT | BpfS.X | BpfClass.JMP32,
+            BpfCode.JMP.JSGE | BpfS.K | BpfClass.JMP,
+            BpfCode.JMP.JSGE | BpfS.K | BpfClass.JMP32,
+            BpfCode.JMP.JSGE | BpfS.X | BpfClass.JMP,
+            BpfCode.JMP.JSGE | BpfS.X | BpfClass.JMP32,
+            BpfCode.JMP.JLT | BpfS.K | BpfClass.JMP,
+            BpfCode.JMP.JLT | BpfS.K | BpfClass.JMP32,
+            BpfCode.JMP.JLT | BpfS.X | BpfClass.JMP,
+            BpfCode.JMP.JLT | BpfS.X | BpfClass.JMP32,
+            BpfCode.JMP.JLE | BpfS.K | BpfClass.JMP,
+            BpfCode.JMP.JLE | BpfS.K | BpfClass.JMP32,
+            BpfCode.JMP.JLE | BpfS.X | BpfClass.JMP,
+            BpfCode.JMP.JLE | BpfS.X | BpfClass.JMP32,
+            BpfCode.JMP.JSLT | BpfS.K | BpfClass.JMP,
+            BpfCode.JMP.JSLT | BpfS.K | BpfClass.JMP32,
+            BpfCode.JMP.JSLT | BpfS.X | BpfClass.JMP,
+            BpfCode.JMP.JSLT | BpfS.X | BpfClass.JMP32,
+            BpfCode.JMP.JSLE | BpfS.K | BpfClass.JMP,
+            BpfCode.JMP.JSLE | BpfS.K | BpfClass.JMP32,
+            BpfCode.JMP.JSLE | BpfS.X | BpfClass.JMP,
+            BpfCode.JMP.JSLE | BpfS.X | BpfClass.JMP32,
+        ]:
+            jump_if = idx + last_ins.off + 1
+            jump_else = idx + 1
+            print(f"idx={idx}: jump_if={jump_if}, jump_else={jump_else}")
+            block.add(get_blocks_tree(instructions, jump_if, all_blocks, leaders))
+            block.add(get_blocks_tree(instructions, jump_else, all_blocks, leaders))
+            return block
 
-            case _:
-                if ins.get_class() in [BpfClass.JMP, BpfClass.JMP32]:
-                    raise Exception(f"idx={idx}: couldn't catch opcode: {ins.opcode}")
+        case _:
+            if last_ins.get_class() in [BpfClass.JMP, BpfClass.JMP32]:
+                raise Exception(f"idx={idx}: couldn't catch opcode: {last_ins.opcode}")
 
     raise Exception(f"unreachable")
 
@@ -177,8 +193,14 @@ def main():
     instructions = read_bpf_file(args.filename)
     first_block = get_blocks_tree(instructions)
 
-    print(f"blocks: {first_block}")
-    runtime_ub: float = dfs_blocks(first_block, instructions)
+    loop_list = find_loops(first_block, instructions)
+    for loop in loop_list:
+        print(f"Loop: {loop}\n Header: {loop.header}\n Tail: {loop.tail}\n Iteration count: {loop.max_iterations}\n "
+              f"Call0x5_pc: {loop.call_5_pc}\n w2_pc: {loop.w2_pc}\n w3_pc: {loop.w3_pc}\n Members: {loop.members}\n\n")
+
+    unrolled_block = unroll_loops_in_cfg(first_block, loop_list)
+
+    runtime_ub: float = dfs_blocks(unrolled_block, instructions)
     print(f"runtime_ub: {runtime_ub}")
 
 
