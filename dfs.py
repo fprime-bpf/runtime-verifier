@@ -6,11 +6,11 @@ from z3 import Solver, If, ULT, ULE, sat, unsat, BitVecRef, BoolRef, Not, unknow
 from collections import deque
 from typing import Optional, Set
 
-CACHE_LINE_DIFF = 4
-COST_MEM_L1_HIT = 8
-COST_MEM_L2_HIT = COST_MEM_L1_HIT + 12
-COST_MEM_MISS = COST_MEM_L2_HIT + 87 + 87 + 87
-CACHE_SIZE = 1
+CACHE_LINE_DIFF = 2 # 32B
+COST_MEM_L1_HIT = 13
+COST_MEM_L2_HIT = 200
+COST_MEM_MISS = 300
+CACHE_SIZE = 12
 
 
 def is_fpu_instr(instr: BpfInstruction) -> bool:
@@ -248,10 +248,10 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
                             if dist == -1:
                                 print(f"  [Cache MISS] Addr: {mem_addr} (+{COST_MEM_MISS} cycles)")
                                 path_runtime += COST_MEM_MISS
-                            elif len(list(curr_cache)) - dist < 8:
+                            elif len(list(curr_cache)) - dist <= 4:
                                 print(f"  [Cache HIT L1] Addr: {mem_addr} (+{COST_MEM_L1_HIT} cycles)")
                                 path_runtime += COST_MEM_L1_HIT
-                            elif len(list(curr_cache)) - dist < 16:
+                            elif len(list(curr_cache)) - dist <= 12:
                                 print(f"  [Cache HIT L2] Addr: {mem_addr} (+{COST_MEM_L2_HIT} cycles)")
                                 path_runtime += COST_MEM_L2_HIT
 
