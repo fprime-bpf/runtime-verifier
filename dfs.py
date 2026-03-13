@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from block import Block
 from bpf import BpfClass, BpfCode, BpfS, BpfSize, BpfMode, BpfInstruction, Mask, Shift
+from collections import deque
 
 from typing import Set, Optional, Dict
 
@@ -396,18 +397,18 @@ def is_fpu_instr(instr: BpfInstruction) -> bool:
     return False
 
 
-def instr_to_runtime(instructions:list, start:int, end:int) -> int:
+def instr_to_runtime(instructions: dict, start: int, end: int) -> int:
     """
     Calculate runtime of the given instructions from `start` to `end` (inclusive).
 
     Parameters
     ----------
-    instructions : list
-        A list of decoded eBPF instructions.
+    instructions : dict[int, BpfInstruction]
+        A dict mapping PC to decoded eBPF instruction.
     start : int
-        Start index (inclusive).
+        Start PC (inclusive).
     end : int
-        End index (inclusive).
+        End PC (inclusive).
 
     Returns
     -------
@@ -415,7 +416,7 @@ def instr_to_runtime(instructions:list, start:int, end:int) -> int:
         CPU cycles. Returns 0 if the input is invalid.
     """
     runtime = 0
-    for idx in range(start, end+1):
+    for idx in sorted(pc for pc in instructions if start <= pc <= end):
         instr = instructions[idx]
         if is_fpu_instr(instr):
             op_info = BPF_INFO_FPU.get(instr.opcode)  # FADD / FNEG / JFEQ / JFOGT ...
@@ -430,11 +431,12 @@ def instr_to_runtime(instructions:list, start:int, end:int) -> int:
     return runtime
 
 
-def dfs_blocks(first_block: Block | None, instructions: list) -> int:
+def dfs_blocks(first_block: Block | None, instructions: dict) -> int:
     """
-    Perform a depth-first search over the Block graph. （No loops currently)
-    Returns a integer value (CPU cycles) representing an estimated runtime upper bound
-    
+    Perform a depth-first search over the Block graph using an explicit stack
+    to avoid RecursionError on large/deeply unrolled CFGs.
+    Returns an integer value (CPU cycles) representing an estimated runtime upper bound.
+
     Parameters
     ----------
     first_block : Block (The starting basic block of the CFG)
@@ -443,42 +445,284 @@ def dfs_blocks(first_block: Block | None, instructions: list) -> int:
     -------
     int: CPU cycles. 0 if the input is invalid.
     """
-    
+
     print("\n======DFS Start======")
-    
+
     if first_block is None:
         return 0
 
-    onpath: Set[Block] = set()      # nodes on the current recursion path
+    onpath: Set[Block] = set()
     path_runtime_ub = 0
     path_runtime = 0
 
-    def dfs(block: Block):
-        nonlocal path_runtime_ub, path_runtime
+    # Stack entries are either:
+    #   ('VISIT', block)       — process a block and push its successors
+    #   ('BACKTRACK', block, cost) — undo the cost added when we entered block
+    stack = [('VISIT', first_block)]
 
-        # cycle detection (back-edge)
-        if block in onpath:
-            # TODO: plug a loop bound policy here.
-            print(f"Back-edge hit at BB({block.start}, {block.end}); ignoring extra iteration for now.")
-            return
+    while stack:
+        item = stack.pop()
 
-        onpath.add(block)
+        if item[0] == 'BACKTRACK':
+            _, block, cost = item
+            path_runtime -= cost
+            onpath.remove(block)
 
-        instr_count = block.end - block.start + 1
-        print(f"\n======Visiting BB({block.start}, {block.end}), instructions={instr_count}======")
+        else:  # 'VISIT'
+            _, block = item
 
-        instr_runtime = instr_to_runtime(instructions, block.start, block.end)
-        path_runtime += instr_runtime
+            # Cycle detection (back-edge) — should not occur after unrolling
+            if block in onpath:
+                print(f"Back-edge hit at BB({block.start}, {block.end}); ignoring extra iteration for now.")
+                continue
 
-        if not block.next:
-            print(f"Reaching an exit point {block.end}, path runtime is {path_runtime}")
-            path_runtime_ub = max(path_runtime_ub, path_runtime)
-        else:
-            for nxt in block.next:
-                dfs(nxt)
+            onpath.add(block)
 
-        path_runtime -= instr_runtime
-        onpath.remove(block)
+            instr_count = block.end - block.start + 1
+            print(f"\n======Visiting BB({block.start}, {block.end}){block.suffix}, instructions={instr_count}======")
 
-    dfs(first_block)
+            cost = instr_to_runtime(instructions, block.start, block.end)
+            path_runtime += cost
+
+            # Push backtrack action first (runs after all successors are done)
+            stack.append(('BACKTRACK', block, cost))
+
+            if not block.next:
+                print(f"Reaching an exit point {block.end}, path runtime is {path_runtime}")
+                path_runtime_ub = max(path_runtime_ub, path_runtime)
+            else:
+                for nxt in block.next:
+                    stack.append(('VISIT', nxt))
+
     return path_runtime_ub
+
+
+class Loop:
+    """
+    Metadata for a natural loop in the CFG.
+    """
+    def __init__(self, header: Block, tail: Block, members: set[Block]):
+        self.header = header
+        self.tail = tail
+        self.members = members
+        # (Source, Target)
+        self.entry_edges: set[tuple[Block, Block]] = set()
+        self.exit_edges: set[tuple[Block, Block]] = set()
+        # Loop iteration metadata
+        self.max_iterations: int | None = None
+        # Track the exact instruction PCs for loop initialization
+        self.call_5_pc: int | None = None
+        self.w2_pc: int | None = None
+        self.w3_pc: int | None = None
+
+    def find_boundaries(self):
+        """
+        Populate entry and exit edges based on membership.
+        """
+        for member in self.members:
+            # Exit: source is inside, target is outside
+            for succ in member.next:
+                if succ not in self.members:
+                    self.exit_edges.add((member, succ))
+            # Entry: source is outside, target is inside
+            for pred in member.prev:
+                if pred not in self.members:
+                    self.entry_edges.add((pred, member))
+
+    def analyze_max_iterations(self, instructions: dict):
+        """
+        Use a standard Breadth-First Search (BFS) with a queue to scan backwards
+        through the CFG. Looks for `bpf_iter_num_new` (call 0x5) and the
+        initialization of its boundary arguments (w2 and w3).
+        """
+        for pred_block, _ in self.entry_edges:
+
+            # Initialize the BFS queue.
+            # Queue element structure:
+            # (current_block, found_call_5, val_w2, val_w3, pc_call, pc_w2, pc_w3)
+            bfs_queue = deque()
+            bfs_queue.append((pred_block, False, None, None, None, None, None))
+
+            # Keep track of visited blocks to prevent infinite loops in cyclic CFGs
+            visited = set()
+
+            # Start BFS traversal
+            while len(bfs_queue) > 0:
+                # Pop a node from the front of the queue
+                (curr_block, found_call_5, val_w2, val_w3,
+                 pc_call, pc_w2, pc_w3) = bfs_queue.popleft()
+
+                # Skip if we have already evaluated this block in the current path
+                if curr_block in visited:
+                    continue
+                visited.add(curr_block)
+
+                # Extract the instruction PCs for the current block and sort them
+                # in descending order (bottom-up scan because we are moving backwards)
+                pcs = sorted([pc for pc in instructions.keys()
+                              if curr_block.start <= pc <= curr_block.end], reverse=True)
+
+                for pc in pcs:
+                    instr = instructions[pc]
+
+                    # Step 1: Look for the iterator initialization (call 0x5)
+                    # Opcode 0x85 is CALL, immediate value 5 is bpf_iter_num_new
+                    if getattr(instr, 'opcode', -1) == 0x85 and getattr(instr, 'imm', -1) == 5:
+                        found_call_5 = True
+                        pc_call = pc
+                        continue
+
+                    # Step 2: Once call 0x5 is found, look upwards for w2 and w3 assignments
+                    if found_call_5:
+                        # Opcode 0xb4 is ALU32 | MOV | K (Assign immediate value to 32-bit register)
+                        if getattr(instr, 'opcode', -1) == 0xb4:
+                            if getattr(instr, 'dst', -1) == 2 and val_w2 is None:
+                                val_w2 = instr.imm
+                                pc_w2 = pc
+                            elif getattr(instr, 'dst', -1) == 3 and val_w3 is None:
+                                val_w3 = instr.imm
+                                pc_w3 = pc
+
+                        # Step 3: If both w2 and w3 are successfully found, calculate and save
+                        if val_w2 is not None and val_w3 is not None:
+                            self.max_iterations = val_w3 - val_w2
+
+                            self.call_5_pc = pc_call
+                            self.w2_pc = pc_w2
+                            self.w3_pc = pc_w3
+
+                            print(
+                                f"Loop Header {self.header.start}: Identified {self.max_iterations} max iterations.\n"
+                                f"  -> w2={val_w2} at PC {self.w2_pc}, "
+                                f"w3={val_w3} at PC {self.w3_pc}, call 0x5 at PC {self.call_5_pc}"
+                            )
+                            # Target found, exit the analysis for this entry edge
+                            return
+
+                # Step 4: If values are not fully resolved in this block,
+                # enqueue all unvisited predecessor blocks to continue the BFS
+                if curr_block.prev:
+                    print(f"Traversing previous blocks")
+                else:
+                    print(f"Error, no prev found!")
+                for prev_block in curr_block.prev:
+                    if prev_block not in visited:
+                        bfs_queue.append((
+                            prev_block, found_call_5, val_w2, val_w3,
+                            pc_call, pc_w2, pc_w3
+                        ))
+
+
+def find_loops(root_block: Block, instructions: dict) -> list[Loop]:
+    """
+    Identifies loops using Three-Color DFS and collects members via reverse traversal.
+    """
+    visited = set()
+    visiting = set()
+
+    loop_list = []
+    back_edges = []    # (tail, header) pairs
+
+    def dfs(current_block: Block):
+        visiting.add(current_block)
+
+        for next_block in current_block.next:
+            if next_block in visiting:  # Loop detected
+                back_edges.append((current_block, next_block))
+            elif next_block not in visited:
+                dfs(next_block)
+
+        visiting.remove(current_block)
+        visited.add(current_block)
+    dfs(root_block)
+
+    # Create loop_list: list[loop]
+    for tail, header in back_edges:
+        members = {header, tail}
+        stack = [tail]
+
+        while stack:
+            curr = stack.pop()
+            for pred in curr.prev:
+                if pred not in members:
+                    members.add(pred)
+                    stack.append(pred)
+
+        new_loop = Loop(header, tail, members)
+        new_loop.find_boundaries()
+        new_loop.analyze_max_iterations(instructions)
+        loop_list.append(new_loop)
+
+    # If nested loops found, error out
+    for l1 in loop_list:
+        for l2 in loop_list:
+            if l1 == l2:
+                continue
+
+            # Check if any entry-edge source is in l2 AND any exit-edge target is in l2
+            entry_from_l2 = any(src in l2.members for src, _ in l1.entry_edges)
+            exit_to_l2 = any(target in l2.members for _, target in l1.exit_edges)
+
+            if entry_from_l2 and exit_to_l2:
+                raise Exception(
+                    f"Nested Loop Error: Loop (Header {l1.header.start}) is nested "
+                    f"inside Loop (Header {l2.header.start})."
+                )
+
+    return loop_list
+
+
+def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
+    """
+    Unrolls loops in the CFG based on the identified max_iterations.
+    """
+    sorted_loops = sorted(loop_list, key=lambda l: l.header.start, reverse=True)
+
+    for loop in sorted_loops:
+        if loop.max_iterations is None or loop.max_iterations <= 0:
+            print(f"Warning: Loop at {loop.header.start} has no bound. Skipping unroll.")
+            continue
+
+        print(f"Unrolling loop at header {loop.header.start} for {loop.max_iterations} iterations.")
+
+        entry_sources = [entry_source for entry_source, _ in loop.entry_edges]
+
+        prev_header = None
+
+        # Clone the loop body N times
+        for i in range(loop.max_iterations):
+            block_map: dict[Block, Block] = {}
+
+            # 1. Create clones with new suffix
+            for member in loop.members:
+                block_map[member] = member.copy_with_suffix(f".{i}")
+
+            # 2. Re-establish connections within this iteration slice and exit edges
+            is_last_iteration = (i == loop.max_iterations - 1)
+            for member in loop.members:
+                new_member = block_map[member]
+                for succ in member.next:
+                    if succ in loop.members:
+                        if succ == loop.header:
+                            continue
+                        # Internal link to new blocks, disconnect back edges
+                        new_member.add(block_map[succ])
+
+                    # Exit link to blocks outside the loop
+                    elif succ not in loop.members:
+                        # Only the last iteration is allowed to exit the loop.
+                        if is_last_iteration:
+                            new_member.add(succ)
+
+            # Link the previous iteration's tail to this iteration's header
+            if i == 0:
+                for entry_source in entry_sources:
+                    entry_source.next.remove(loop.header)
+                    loop.header.prev.remove(entry_source)
+                    entry_source.add(block_map[loop.header])
+                prev_header = block_map[loop.tail]
+            else:
+                prev_header.add(block_map[loop.header])
+                prev_header = block_map[loop.tail]
+
+    return root_block
