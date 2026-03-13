@@ -8,7 +8,7 @@ from typing import Optional, Set
 
 CACHE_LINE_DIFF = 2 # 32B
 COST_MEM_L1_HIT = 13
-COST_MEM_L2_HIT = 200
+COST_MEM_L2_HIT = 100
 COST_MEM_MISS = 300
 CACHE_SIZE = 12
 
