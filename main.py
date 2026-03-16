@@ -301,7 +301,7 @@ def main():
     
     runtime_cycle_ub: float = dfs_blocks(unrolled_block, instructions)
     print(f"runtime_cycle_ub: {runtime_cycle_ub}")
-    runtime_ub = runtime_cycle_ub / (6.67e8) * 1000
+    runtime_ub = runtime_cycle_ub / (1e8) * 1000
     print(f"runtime_ub: {runtime_ub} ms")
 
 

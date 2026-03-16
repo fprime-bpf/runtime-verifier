@@ -285,7 +285,7 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfCode.ALU.XOR  | BpfS.K | BpfClass.ALU:   OpInfo("XOR_K",   6),
     BpfCode.ALU.XOR  | BpfS.X | BpfClass.ALU:   OpInfo("XOR_X",   2),
     BpfCode.ALU.MOV  | BpfS.K | BpfClass.ALU:   OpInfo("MOV_K",   4),
-    BpfCode.ALU.MOV  | BpfS.X | BpfClass.ALU:   OpInfo("MOV_X",   4),
+    BpfCode.ALU.MOV  | BpfS.X | BpfClass.ALU:   OpInfo("MOV_X",   2),
     BpfCode.ALU.ARSH | BpfS.K | BpfClass.ALU:   OpInfo("ARSH_K",  1),
     BpfCode.ALU.ARSH | BpfS.X | BpfClass.ALU:   OpInfo("ARSH_X",  1),
     BpfCode.ALU.END  | BpfS.K | BpfClass.ALU:   OpInfo("END",     None),
@@ -314,7 +314,7 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfCode.ALU.XOR  | BpfS.K | BpfClass.ALU64: OpInfo("XOR64_K", 6),
     BpfCode.ALU.XOR  | BpfS.X | BpfClass.ALU64: OpInfo("XOR64_X", 2),
     BpfCode.ALU.MOV  | BpfS.K | BpfClass.ALU64: OpInfo("MOV64_K", 4),
-    BpfCode.ALU.MOV  | BpfS.X | BpfClass.ALU64: OpInfo("MOV64_X", 4),
+    BpfCode.ALU.MOV  | BpfS.X | BpfClass.ALU64: OpInfo("MOV64_X", 2),
     BpfCode.ALU.ARSH | BpfS.K | BpfClass.ALU64: OpInfo("ARSH64_K",1),
     BpfCode.ALU.ARSH | BpfS.X | BpfClass.ALU64: OpInfo("ARSH64_X",1),
     BpfCode.ALU.END  | BpfS.K | BpfClass.ALU64: OpInfo("END64",   None),
@@ -348,7 +348,7 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfCode.JMP.EXIT | BpfS.K | BpfClass.JMP:   OpInfo("EXIT",    2),
 
     # ===== JMP32 (32-bit compare) =====
-    BpfCode.JMP.JA   | BpfS.K | BpfClass.JMP32: OpInfo("JA",      2),
+    BpfCode.JMP.JA   | BpfS.K | BpfClass.JMP32: OpInfo("JA", 2),
     BpfCode.JMP.JEQ  | BpfS.K | BpfClass.JMP32: OpInfo("JEQ32_K", 8),
     BpfCode.JMP.JEQ  | BpfS.X | BpfClass.JMP32: OpInfo("JEQ32_X", 4),
     BpfCode.JMP.JNE  | BpfS.K | BpfClass.JMP32: OpInfo("JNE32_K", 8),
