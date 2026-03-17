@@ -395,10 +395,10 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfMode.MEM   | BpfSize.B  | BpfClass.LD: OpInfo("LD_MEM_B",  11),
     BpfMode.MEM   | BpfSize.DW | BpfClass.LD: OpInfo("LD_MEM_DW", 11),
 
-    BpfMode.FMEM  | BpfSize.W  | BpfClass.LD: OpInfo("FLD_W",  26),
-    BpfMode.FMEM  | BpfSize.H  | BpfClass.LD: OpInfo("FLD_H",  26),
-    BpfMode.FMEM  | BpfSize.B  | BpfClass.LD: OpInfo("FLD_B",  26),
-    BpfMode.FMEM  | BpfSize.DW | BpfClass.LD: OpInfo("FLD_DW", 26),
+    BpfMode.FMEM  | BpfSize.W  | BpfClass.LD: OpInfo("FLD_W",  11),
+    BpfMode.FMEM  | BpfSize.H  | BpfClass.LD: OpInfo("FLD_H",  11),
+    BpfMode.FMEM  | BpfSize.B  | BpfClass.LD: OpInfo("FLD_B",  11),
+    BpfMode.FMEM  | BpfSize.DW | BpfClass.LD: OpInfo("FLD_DW", 11),
 
     BpfMode.MEMSX | BpfSize.W  | BpfClass.LD: OpInfo("LD_MEMSX_W",  11),
     BpfMode.MEMSX | BpfSize.H  | BpfClass.LD: OpInfo("LD_MEMSX_H",  11),
@@ -426,10 +426,10 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfMode.MEM   | BpfSize.B  | BpfClass.LDX: OpInfo("LDX_B",  11),
     BpfMode.MEM   | BpfSize.DW | BpfClass.LDX: OpInfo("LDX_DW", 11),
     
-    BpfMode.FMEM  | BpfSize.W  | BpfClass.LDX: OpInfo("FLDX_W",  26),
-    BpfMode.FMEM  | BpfSize.H  | BpfClass.LDX: OpInfo("FLDX_H",  26),
-    BpfMode.FMEM  | BpfSize.B  | BpfClass.LDX: OpInfo("FLDX_B",  26),
-    BpfMode.FMEM  | BpfSize.DW | BpfClass.LDX: OpInfo("FLDX_DW",  26),
+    BpfMode.FMEM  | BpfSize.W  | BpfClass.LDX: OpInfo("FLDX_W",  11),
+    BpfMode.FMEM  | BpfSize.H  | BpfClass.LDX: OpInfo("FLDX_H",  11),
+    BpfMode.FMEM  | BpfSize.B  | BpfClass.LDX: OpInfo("FLDX_B",  11),
+    BpfMode.FMEM  | BpfSize.DW | BpfClass.LDX: OpInfo("FLDX_DW",  11),
 
     BpfMode.MEMSX | BpfSize.W  | BpfClass.LDX: OpInfo("LDX_MEMSX_W", 11),
     BpfMode.MEMSX | BpfSize.H  | BpfClass.LDX: OpInfo("LDX_MEMSX_H", 11),
@@ -457,10 +457,10 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfMode.MEM   | BpfSize.B  | BpfClass.ST:  OpInfo("ST_B",  11),
     BpfMode.MEM   | BpfSize.DW | BpfClass.ST:  OpInfo("ST_DW", 11),
     
-    BpfMode.FMEM  | BpfSize.W  | BpfClass.ST: OpInfo("FST_W",  26),
-    BpfMode.FMEM  | BpfSize.H  | BpfClass.ST: OpInfo("FST_H",  26),
-    BpfMode.FMEM  | BpfSize.B  | BpfClass.ST: OpInfo("FST_B",  26),
-    BpfMode.FMEM  | BpfSize.DW | BpfClass.ST: OpInfo("FST_DW",  26),
+    BpfMode.FMEM  | BpfSize.W  | BpfClass.ST: OpInfo("FST_W",  11),
+    BpfMode.FMEM  | BpfSize.H  | BpfClass.ST: OpInfo("FST_H",  11),
+    BpfMode.FMEM  | BpfSize.B  | BpfClass.ST: OpInfo("FST_B",  11),
+    BpfMode.FMEM  | BpfSize.DW | BpfClass.ST: OpInfo("FST_DW",  11),
 
     BpfMode.MEMSX | BpfSize.W  | BpfClass.ST:  OpInfo("ST_MEMSX_W",  11),
     BpfMode.MEMSX | BpfSize.H  | BpfClass.ST:  OpInfo("ST_MEMSX_H",  11),
@@ -488,10 +488,10 @@ BPF_INFO: Dict[int, OpInfo] = {
     BpfMode.MEM   | BpfSize.B  | BpfClass.STX: OpInfo("STX_B",  11),
     BpfMode.MEM   | BpfSize.DW | BpfClass.STX: OpInfo("STX_DW", 11),
     
-    BpfMode.FMEM  | BpfSize.W  | BpfClass.STX: OpInfo("FSTX_W",  26),
-    BpfMode.FMEM  | BpfSize.H  | BpfClass.STX: OpInfo("FSTX_H",  26),
-    BpfMode.FMEM  | BpfSize.B  | BpfClass.STX: OpInfo("FSTX_B",  26),
-    BpfMode.FMEM  | BpfSize.DW | BpfClass.STX: OpInfo("FSTX_DW", 26),
+    BpfMode.FMEM  | BpfSize.W  | BpfClass.STX: OpInfo("FSTX_W",  11),
+    BpfMode.FMEM  | BpfSize.H  | BpfClass.STX: OpInfo("FSTX_H",  11),
+    BpfMode.FMEM  | BpfSize.B  | BpfClass.STX: OpInfo("FSTX_B",  11),
+    BpfMode.FMEM  | BpfSize.DW | BpfClass.STX: OpInfo("FSTX_DW", 11),
 
     BpfMode.MEMSX | BpfSize.W  | BpfClass.STX: OpInfo("STX_MEMSX_W",  11),
     BpfMode.MEMSX | BpfSize.H  | BpfClass.STX: OpInfo("STX_MEMSX_H",  11),
