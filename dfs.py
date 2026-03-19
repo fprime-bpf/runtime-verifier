@@ -174,7 +174,10 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
                 solver.add(cond)
 
             if needs_check:
-                result = solver.check()
+                try:
+                    result = solver.check()
+                except Z3Exception:
+                    result = unknown
                 if result == sat or result == unknown:
                     stack.append(('POP_SOLVER',))
                     stack.append(('VISIT', nxt_block, nxt_state, nxt_cache))
