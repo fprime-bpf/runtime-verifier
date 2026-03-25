@@ -805,3 +805,26 @@ def collect_vars(e) -> set:
         else:
             stack.extend(node.children())
     return res
+
+
+def collect_var_objects(e) -> set:
+    """
+    Recursively traverses a Z3 expression and collects all unique symbolic
+    variable objects (uninterpreted functions of 0 arguments).
+    """
+    res = set()
+    stack = [e]
+    visited = set()
+    while stack:
+        node = stack.pop()
+        if not hasattr(node, 'get_id'):
+            continue
+        node_id = node.get_id()
+        if node_id in visited:
+            continue
+        visited.add(node_id)
+        if is_app(node) and node.decl().kind() == Z3_OP_UNINTERPRETED and node.num_args() == 0:
+            res.add(node)
+        elif hasattr(node, 'children'):
+            stack.extend(node.children())
+    return res

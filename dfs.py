@@ -1,16 +1,67 @@
 from block import Block
 from bpf import BpfClass, BpfCode, BpfInstruction, Mask, Shift, BPF_INFO, BPF_INFO_FPU
 from mem_access import process_instruction, State, fresh_gp_var, fresh_fp_var, get_all_var_names, get_vars_from_expr, \
-    normalize_huge_bv
-from z3 import Solver, If, ULT, ULE, sat, unsat, BitVecRef, BoolRef, Not, unknown, Z3Exception, Then
+    normalize_huge_bv, collect_var_objects
+from z3 import (Solver, If, ULT, ULE, sat, unsat, BitVecRef, BoolRef, Not, unknown, Z3Exception, Then, Or, is_true,
+                parse_smt2_string, Bool)
 from collections import deque
 from typing import Optional, Set
+import multiprocessing
+import queue
 
 CACHE_LINE_DIFF = 2 # 32B
 COST_MEM_L1_HIT = 13
 COST_MEM_L2_HIT = 100
 COST_MEM_MISS = 300
 CACHE_SIZE = 12
+
+
+# This worker function is executed in a separate process to enforce a hard timeout.
+# Z3's own timeout is cooperative and may be ignored during long-running operations.
+# It reconstructs the solver state from SMT-LIB2 strings, which is necessary
+# because Z3 objects are not picklable across processes.
+def solver_worker(path_smt2_script: str, hit_conds_sexpr: list[str], result_queue: multiprocessing.Queue):
+    try:
+        s = Solver()
+        # A soft timeout as a first line of defense, slightly less than the hard timeout.
+        s.set("timeout", 950)
+
+        # The script from to_smt2() might end with (check-sat). We must remove it
+        # to add our own query.
+        if '(check-sat)' in path_smt2_script:
+            path_smt2_script = path_smt2_script.rsplit('(check-sat)', 1)[0]
+
+        # We associate each hit condition with a new boolean variable (cond_i)
+        # to query the model and find out which condition was satisfied.
+        script_parts = [path_smt2_script]
+        cond_vars = []
+        for i, hc_sexpr in enumerate(hit_conds_sexpr):
+            cond_name = f"cond_{i}"
+            cond_vars.append(cond_name)
+            script_parts.append(f"(declare-const {cond_name} Bool)")
+            script_parts.append(f"(assert (= {cond_name} {hc_sexpr}))")
+
+        # Assert that at least one of the conditions must be true for a sat result.
+        script_parts.append(f"(assert (or {' '.join(cond_vars)}))")
+        script_parts.append("(check-sat)")
+        full_script = "\n".join(script_parts)
+
+        # The Goal object from parse_smt2_string must be unpacked into individual assertions.
+        goal = parse_smt2_string(full_script)
+        s.add(*list(goal))
+
+        result = s.check()
+
+        if result == sat:
+            m = s.model()
+            for i in reversed(range(len(cond_vars))):
+                if is_true(m.eval(Bool(cond_vars[i]), model_completion=True)):
+                    result_queue.put(i)
+                    return
+        result_queue.put(-1)
+    except (Z3Exception, Exception) as e:
+        print(f"[Solver Worker Error] {e}")
+        result_queue.put(-1)
 
 
 def is_fpu_instr(instr: BpfInstruction) -> bool:
@@ -79,7 +130,6 @@ def check_cache_hit(curr_addr: BitVecRef, cache_list: list[BitVecRef], solver: S
     Checks if the current memory address hits the simulated cache using a pre-configured solver.
     The solver is expected to be passed in with all current path constraints already asserted.
     """
-    # The solver is now passed in, already containing path constraints.
 
     for i in reversed(range(len(cache_list))):
         if curr_addr.eq(cache_list[i]):
@@ -94,33 +144,61 @@ def check_cache_hit(curr_addr: BitVecRef, cache_list: list[BitVecRef], solver: S
                 # Check if the difference is within the Cache Line size
                 if abs(curr_val - target.as_long()) <= CACHE_LINE_DIFF:
                     return i
+        # Fall through to check concrete `curr_addr` against symbolic cache entries.
+
+    # 3. Symbolic Range Check (with hard timeout via multiprocessing)
+    if not cache_list:
         return -1
 
-    # Symbolic Range Check
-    for i in reversed(range(len(cache_list))):
-        solver.push()
+    hit_conditions = []
+    for item in cache_list:
+        diff = If(ULT(curr_addr, item), item - curr_addr, curr_addr - item)
+        hit_conditions.append(ULE(diff, CACHE_LINE_DIFF))
 
-        diff = If(ULT(curr_addr, cache_list[i]),
-                  cache_list[i] - curr_addr,
-                  curr_addr - cache_list[i])
+    # To ensure all variables in hit_conditions are declared in the SMT2 script,
+    # we add a trivial constraint for each. This forces `to_smt2()` to include
+    # their declarations, creating a self-contained script for the worker.
+    solver.push()
+    try:
+        all_query_vars = set()
+        all_query_exprs = [curr_addr] + cache_list
+        for expr in all_query_exprs:
+            all_query_vars.update(collect_var_objects(expr))
 
-        solver.add(ULE(diff, CACHE_LINE_DIFF))
+        # Add a simple tautology for each variable to force its declaration.
+        for var in all_query_vars:
+            solver.add(var == var)
 
-        try:
-            result = solver.check()
-        except Z3Exception:
-            result = unknown
+        # Now, generate the SMT2 script which is guaranteed to have the declarations.
+        path_smt2 = solver.to_smt2()
+    finally:
+        # Remove the trivial constraints.
+        solver.pop()
 
-        solver.pop()  # Unconditionally pop to match the push()
+    hit_conds_sexpr = [c.sexpr() for c in hit_conditions]
 
-        if result == sat:
-            return i
+    result_queue = multiprocessing.Queue()
+    p = multiprocessing.Process(
+        target=solver_worker,
+        args=(path_smt2, hit_conds_sexpr, result_queue)
+    )
+    p.start()
 
-        if result == unknown:
-            print(f"Warning: Cache check returned unknown for {curr_addr}")
-            pass
+    # Enforce a hard timeout of 1000ms (1.0s).
+    p.join(timeout=1.0)
 
-    return -1
+    if p.is_alive():
+        print(f"Warning: Cache check for {curr_addr} timed out (>1s) and was terminated.")
+        p.terminate()
+        p.join()
+        return -1  # Treat timeout as a cache miss.
+
+    try:
+        return result_queue.get_nowait()
+    except queue.Empty:
+        print(f"Warning: Solver process finished for {curr_addr} but returned no result.")
+        return -1
+
     
     
 def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstruction]) -> int:
@@ -401,6 +479,7 @@ class Loop:
                             prev_block, found_call_5, val_w2, val_w3, 
                             pc_call, pc_w2, pc_w3
                         ))
+
 
 def find_loops(root_block: Block, instructions: dict[int, BpfInstruction]) -> list[Loop]:
     """
