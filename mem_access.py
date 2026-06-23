@@ -60,12 +60,37 @@ def normalize_huge_bv(expr):
 
 
 @dataclass
+class MemEvent:
+    """
+    A single load instruction's memory access. `distances` holds the LRU recency distances
+    (0 = most recent, increasing toward older) of every prior address in the path's rolling
+    window that Z3 confirmed aliases this load's address (i.e. falls on the same cache line).
+    Distances are computed inline during the DFS while the solver context — and thus the
+    path's full constraint set — is live. Entries where Z3 returned unknown are omitted,
+    making missed-aliasing the conservative fallback.
+
+    Realization: sort distances ascending; the minimum distance ≤ profile.associativity is
+    a cache hit at that distance. If no such distance exists, it is a miss.
+    """
+    load_name: str
+    distances: List[tuple]  # (addr_delta, recency) — addr_delta in bytes, recency 0 = most recent
+
+
+@dataclass
 class State:
     gp: List[BitVecRef] = field(default_factory=list)
     fp: List[ArithRef] = field(default_factory=list)
     memory: Dict[ExprRef, ExprRef] = field(default_factory=dict)
     # Per-path tally of how many times each instruction (by BPF_INFO name) has executed.
+    # Loads are excluded here — they're recorded in mem_events instead, since their
+    # final histogram key depends on a cache profile chosen after the DFS completes.
     hist: Dict[str, int] = field(default_factory=dict)
+    # Pending (unclassified) load accesses for this path, in execution order.
+    mem_events: List[MemEvent] = field(default_factory=list)
+    # Rolling window of the last (up to) CACHE_SIZE memory addresses (loads and stores)
+    # touched on this path so far, oldest first. Capped externally by the DFS (dfs.py
+    # owns CACHE_SIZE, to keep this module free of cache-policy specifics).
+    recent_window: List[BitVecRef] = field(default_factory=list)
     _is_initial: bool = field(default=True, repr=False)
 
     def __post_init__(self):
@@ -90,6 +115,8 @@ class State:
             fp=self.fp[:],
             memory=self.memory.copy(),
             hist=self.hist.copy(),
+            mem_events=self.mem_events.copy(),
+            recent_window=self.recent_window.copy(),
             _is_initial=False,
         )
 

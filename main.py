@@ -3,7 +3,7 @@ import argparse
 
 from bpf import BpfInstruction, BpfClass, BpfCode, BpfS
 from block import Block
-from dfs import dfs_blocks, Loop, find_loops, unroll_loops_in_cfg, instr_counts_to_cycles, build_default_cycle_mapping
+from dfs import dfs_blocks, Loop, find_loops, unroll_loops_in_cfg, instr_counts_to_cycles, build_default_cycle_mapping, build_op_info_by_name
 
 
 parser = argparse.ArgumentParser(
@@ -299,10 +299,12 @@ def main():
     unrolled_block = unroll_loops_in_cfg(first_block, loop_list)
     print_cfg_from_root(unrolled_block)
     
-    path_histograms = dfs_blocks(unrolled_block, instructions)
+    path_results = dfs_blocks(unrolled_block, instructions)
     cycle_mapping = build_default_cycle_mapping()
+    op_info_by_name = build_op_info_by_name()
     runtime_cycle_ub = max(
-        (instr_counts_to_cycles(hist, cycle_mapping) for hist in path_histograms),
+        (instr_counts_to_cycles(hist, mem_events, cycle_mapping, op_info_by_name)
+         for hist, mem_events in path_results),
         default=0,
     )
     print(f"runtime_cycle_ub: {runtime_cycle_ub}")

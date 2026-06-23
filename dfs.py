@@ -1,8 +1,9 @@
 from block import Block
 from bpf import BpfClass, BpfCode, BpfInstruction, Mask, Shift, BPF_INFO, BPF_INFO_FPU
-from mem_access import process_instruction, State, fresh_gp_var, fresh_fp_var, get_all_var_names, get_vars_from_expr, \
+from machine_profile import MachineProfile
+from mem_access import process_instruction, State, MemEvent, fresh_gp_var, fresh_fp_var, get_all_var_names, get_vars_from_expr, \
     normalize_huge_bv
-from z3 import Solver, If, ULT, ULE, sat, unsat, BitVecRef, BoolRef, Not, unknown, Z3Exception, Then
+from z3 import Solver, If, ULT, ULE, sat, unsat, BitVecRef, BoolRef, Not, unknown, Z3Exception, Then, simplify
 from collections import deque
 from typing import Optional, Set
 
@@ -13,11 +14,15 @@ COST_MEM_L3_HIT = COST_MEM_L2_HIT + 20
 COST_MEM_MISS = COST_MEM_L2_HIT + 87 + 87 + 87
 CACHE_SIZE = 64
 
-# Memory instructions whose latency depends on cache locality get their histogram key
-# suffixed with their LRU recency at access time: "<name>_CACHED_<d>" (d = 0..CACHE_SIZE-1,
-# 0 = most recently used) or "<name>_MISS". This mirrors the old `"LD" in name` check used
-# to gate cache-cost classification — stores still refresh the LRU list, but keep their
-# plain name (the old cost logic never priced stores either).
+# Load instructions are NOT tallied into a path's hist during the DFS. Their cost depends
+# on cache locality, which depends on a target cache profile (line size, associativity)
+# that isn't chosen yet at DFS time — so each load is instead recorded as a MemEvent
+# (see mem_access.py), carrying its address and the path's last CACHE_SIZE prior memory
+# addresses. A later realization pass (not implemented yet) replays these against a
+# specific profile to classify each as "<name>_CACHED_<d>"/"<name>_MISS" and fold it into
+# the histogram. Stores still update the recency window (`"LD" in name` distinguishes the
+# two, same predicate as before), but go straight into hist under their plain name, same
+# as any other profile-independent instruction.
 
 # CALL instructions get their histogram key suffixed with their helper ID too:
 # "CALL_<imm>" instead of a single shared "CALL" bucket. Helper-specific cost is looked
@@ -60,53 +65,78 @@ def is_fpu_instr(instr: BpfInstruction) -> bool:
     return False
 
 
-def _cache_distance_cost(dist: int) -> int:
-    """Old L1/L2/"L3" tiering, now keyed by true LRU recency distance instead of a 1-deep
-    FIFO approximation."""
-    if dist < 8:
-        return COST_MEM_L1_HIT
-    if dist < 16:
-        return COST_MEM_L2_HIT
-    return COST_MEM_L3_HIT
+def build_op_info_by_name() -> dict[str, MachineProfile]:
+    """Builds a name-keyed MachineProfile table from BPF_INFO and BPF_INFO_FPU.
+    Cache fields default to None; populate them with target-specific values to
+    override the fallback constants in mem_events_to_cycles."""
+    return {
+        instr.name: MachineProfile(instr.name, instr.latency)
+        for instr in list(BPF_INFO.values()) + list(BPF_INFO_FPU.values())
+    }
 
 
 def build_default_cycle_mapping() -> dict[str, int]:
+    """Builds a default instruction-name -> cycle-cost mapping from the static
+    BPF_INFO/BPF_INFO_FPU latency tables. Load instruction costs are handled separately
+    by mem_events_to_cycles and are not included here."""
+    return {
+        op.name: op.latency
+        for op in list(BPF_INFO.values()) + list(BPF_INFO_FPU.values())
+        if op.latency is not None
+    }
+
+
+def mem_events_to_cycles(
+    mem_events: list[MemEvent],
+    op_info_by_name: dict[str, MachineProfile],
+) -> int:
+    """Converts a path's pending load MemEvents into a cycle cost using the cache profile
+    bundled into each instruction's MachineProfile. Assumes an inclusive cache hierarchy.
+
+    For each load: filter distances to same-line accesses (addr_delta < line_size_bytes),
+    take the minimum recency among those, then classify into L1/L2/L3/miss by comparing
+    against each level's associativity threshold. Falls back to module-level COST_MEM_*
+    constants when the MachineProfile has no cache profile set.
     """
-    Builds a default instruction-name -> cycle-cost mapping from the static
-    BPF_INFO/BPF_INFO_FPU latency tables, for use with instr_counts_to_cycles.
-    Callers may build/pass their own mapping instead (e.g. for a different CPU).
+    total = 0
+    for event in mem_events:
+        op = op_info_by_name.get(event.load_name)
 
-    Load instructions also get CACHE_SIZE "<name>_CACHED_<d>" entries plus a
-    "<name>_MISS" entry, matching the histogram keys dfs_blocks produces for them.
-    """
-    mapping: dict[str, int] = {}
-    for op_info in list(BPF_INFO.values()) + list(BPF_INFO_FPU.values()):
-        if op_info.latency is not None:
-            mapping[op_info.name] = op_info.latency
+        line_size = op.line_size_bytes  if op and op.line_size_bytes  is not None else CACHE_LINE_DIFF
+        l1_assoc  = op.l1_associativity if op and op.l1_associativity is not None else 8
+        l1_cost   = op.l1_hit_cycles    if op and op.l1_hit_cycles    is not None else COST_MEM_L1_HIT
+        l2_cost   = op.l2_hit_cycles    if op and op.l2_hit_cycles    is not None else COST_MEM_L2_HIT
+        l3_cost   = op.l3_hit_cycles    if op and op.l3_hit_cycles    is not None else COST_MEM_L3_HIT
+        miss_cost = op.miss_cycles      if op and op.miss_cycles      is not None else COST_MEM_MISS
 
-        if "LD" in op_info.name:
-            for dist in range(CACHE_SIZE):
-                mapping[f"{op_info.name}_CACHED_{dist}"] = _cache_distance_cost(dist)
-            mapping[f"{op_info.name}_MISS"] = COST_MEM_MISS
+        same_line = sorted(recency for addr_delta, recency in event.distances
+                           if addr_delta < line_size)
 
-    return mapping
+        cost = miss_cost
+        for recency in same_line:
+            if recency < l1_assoc:
+                cost = l1_cost
+            elif op and op.l2_associativity is not None and recency < op.l2_associativity:
+                cost = l2_cost
+            elif op and op.l3_associativity is not None and recency < op.l3_associativity:
+                cost = l3_cost
+            break  # sorted ascending: first entry is the minimum; no subsequent entry can do better
+
+        total += cost
+    return total
 
 
 def instr_counts_to_cycles(
     histogram: dict[str, int],
+    mem_events: list[MemEvent],
     mapping: dict[str, int],
+    op_info_by_name: dict[str, MachineProfile],
     helper_call_costs: dict[int, int] = DEFAULT_HELPER_CALL_COSTS,
     default_helper_call_cost: int = DEFAULT_HELPER_CALL_COST,
 ) -> int:
-    """
-    Converts a path's instruction-count histogram (name -> count) into an
-    estimated cycle count.
-
-    Most names are looked up directly in `mapping` (name -> cycles), defaulting to 0
-    if absent. "CALL_<imm>" entries are resolved differently: the imm is looked up in
-    `helper_call_costs` (imm -> cycles) instead, falling back to
-    `default_helper_call_cost` for any helper ID not listed there.
-    """
+    """Converts a path's instruction-count histogram and pending load MemEvents into an
+    estimated cycle count. Non-load instructions are costed via `mapping`; CALL_{imm}
+    entries via `helper_call_costs`; loads via mem_events_to_cycles."""
     total = 0
     for name, count in histogram.items():
         if name.startswith("CALL_"):
@@ -115,6 +145,7 @@ def instr_counts_to_cycles(
         else:
             cost = mapping.get(name, 0)
         total += count * cost
+    total += mem_events_to_cycles(mem_events, op_info_by_name)
     return total
 
 
@@ -165,28 +196,13 @@ def find_cache_position(curr_addr: BitVecRef, cache_list: list[BitVecRef], solve
     return -1
 
 
-def lru_touch(curr_addr: BitVecRef, cache_list: list[BitVecRef], solver: Solver, state: State) -> int:
+def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstruction]) -> list[tuple[dict[str, int], list[MemEvent]]]:
     """
-    Looks up `curr_addr` in the LRU `cache_list` (mutated in place; index 0 = most
-    recently used) and promotes it to the front regardless of hit or miss, evicting the
-    least-recently-used entry if this grows the list past CACHE_SIZE.
-    Returns the distance `curr_addr` was found at *before* promotion (0 = already MRU),
-    or -1 if it wasn't present anywhere in the cache (a miss).
-    """
-    dist = find_cache_position(curr_addr, cache_list, solver, state)
-    if dist != -1:
-        cache_list.pop(dist)
-    cache_list.insert(0, curr_addr)
-    if len(cache_list) > CACHE_SIZE:
-        cache_list.pop()
-    return dist
-    
-    
-def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstruction]) -> list[dict[str, int]]:
-    """
-    Perform a depth-first search over the Block graph with Path Constraints & Cache Simulation.
-    Returns a list of per-path instruction-count histograms (name -> count), one per feasible
-    path through the CFG. Use instr_counts_to_cycles to turn any of these into a cycle estimate.
+    Perform a depth-first search over the Block graph with Path Constraints.
+    Returns, per feasible path through the CFG: a histogram of profile-independent
+    instruction counts (name -> count; everything except loads), and the list of pending
+    load MemEvents for that path. A separate realization pass (not implemented yet) turns
+    (histogram, mem_events) plus a chosen cache profile into a complete cost.
     """
     print("\n======DFS Start======")
 
@@ -194,7 +210,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
         return []
 
     onpath: Set['Block'] = set()
-    path_histograms: list[dict[str, int]] = []  # One instruction-count histogram per completed path
+    path_results: list[tuple[dict[str, int], list[MemEvent]]] = []  # (hist, mem_events) per completed path
 
     solver = Solver()
     solver.set("timeout", 1000)
@@ -203,7 +219,6 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
 
     # Initialize state
     initial_state = State()
-    initial_cache: list[BitVecRef] = []  # LRU list; index 0 = most recently used
 
     # The stack stores tuples of: (Action_Type, *args)
     # Actions:
@@ -211,7 +226,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
     # 'EVAL_BRANCH': Handle solver pushes, branch conditions, and trigger the next VISIT.
     # 'BACKTRACK_BLOCK': Remove block from onpath (back-edge/cycle detection).
     # 'POP_SOLVER': Pop the Z3 solver state.
-    stack = [('VISIT', first_block, initial_state, initial_cache)]
+    stack = [('VISIT', first_block, initial_state)]
 
     while stack:
         item = stack.pop()
@@ -225,7 +240,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
             onpath.remove(block)
 
         elif action == 'EVAL_BRANCH':
-            _, nxt_block, cond, nxt_state, nxt_cache, needs_check, is_false_branch = item
+            _, nxt_block, cond, nxt_state, needs_check, is_false_branch = item
 
             solver.push()
             if cond is not None:
@@ -235,7 +250,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
                 result = solver.check()
                 if result == sat or result == unknown:
                     stack.append(('POP_SOLVER',))
-                    stack.append(('VISIT', nxt_block, nxt_state, nxt_cache))
+                    stack.append(('VISIT', nxt_block, nxt_state))
                 elif result == unsat:
                     print(f"  [Pruned] Path to BB {nxt_block.start}{nxt_block.suffix} is unreachable (UNSAT).")
                     if is_false_branch:
@@ -247,10 +262,10 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
             else:
                 # Unconditional or unchecked branch
                 stack.append(('POP_SOLVER',))
-                stack.append(('VISIT', nxt_block, nxt_state, nxt_cache))
+                stack.append(('VISIT', nxt_block, nxt_state))
 
         elif action == 'VISIT':
-            _, block, state, cache_state = item
+            _, block, state = item
 
             # 1. Cycle detection (Back-edge)
             if block in onpath:
@@ -266,7 +281,6 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
             print(f"\n======Visiting BB({block.start}, {block.end}){block.suffix}, instructions={instr_count}======")
 
             last_branch_cond: Optional[BoolRef] = None
-            curr_cache = list(cache_state)
             sorted_pcs = sorted([pc for pc in instructions.keys() if block.start <= pc <= block.end])
 
             for i in sorted_pcs:
@@ -290,21 +304,39 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
                 if branch_cond is not None:
                     last_branch_cond = branch_cond
 
-                if mem_addr is not None and instr_op_info is not None and "LD" in instr_op_info.name:
-                    # Loads: fold LRU recency (or a miss) into the histogram key itself.
-                    dist = lru_touch(mem_addr, curr_cache, solver, state)
-                    instr_name = f"{instr_name}_MISS" if dist == -1 else f"{instr_name}_CACHED_{dist}"
-                elif mem_addr is not None:
-                    # Stores: just refresh the LRU position; keep the plain name.
-                    lru_touch(mem_addr, curr_cache, solver, state)
+                is_load = mem_addr is not None and instr_op_info is not None and "LD" in instr_op_info.name
 
-                # Tally this instruction (with any cache suffix applied above) into the
-                # path's instruction-count histogram.
-                state.hist[instr_name] = state.hist.get(instr_name, 0) + 1
+                if is_load:
+                    # Compute (addr_delta, recency) pairs now, while the solver has this
+                    # path's full constraint set. recent_window[0] = most recent (recency 0).
+                    # addr_delta is the concrete byte distance between the two addresses;
+                    # symbolic pairs where we can't get a concrete delta are skipped
+                    # (conservative: missed alias => predicted miss => higher cost).
+                    distances = []
+                    for recency, cached_addr in enumerate(state.recent_window):
+                        try:
+                            diff = simplify(mem_addr - cached_addr)
+                            if hasattr(diff, 'as_signed_long'):
+                                distances.append((abs(diff.as_signed_long()), recency))
+                        except Z3Exception:
+                            pass
+                    state.mem_events.append(MemEvent(instr_name, distances))
+                else:
+                    # Everything else (ALU/branch/CALL/stores) has a profile-independent
+                    # cost, so tally it directly.
+                    state.hist[instr_name] = state.hist.get(instr_name, 0) + 1
+
+                if mem_addr is not None:
+                    # Both loads and stores refresh the recency window (stores populate
+                    # the cache too), capped at CACHE_SIZE — the largest associativity
+                    # we'll ever realize against. Index 0 = most recently used.
+                    state.recent_window.insert(0, mem_addr)
+                    if len(state.recent_window) > CACHE_SIZE:
+                        state.recent_window.pop()
 
             if not block.next:
                 print(f"Reaching an exit point {block.end}")
-                path_histograms.append(dict(state.hist))
+                path_results.append((dict(state.hist), list(state.mem_events)))
             else:
                 successors = block.next
 
@@ -312,8 +344,8 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
                 # Remember: Stack is LIFO. To evaluate True branch first, we must push False branch first.
                 if len(successors) == 1:
                     nxt = successors[0]
-                    # args: action, block, cond, state, cache, needs_check, is_false_branch
-                    stack.append(('EVAL_BRANCH', nxt, last_branch_cond, state.fork(), list(curr_cache), False, False))
+                    # args: action, block, cond, state, needs_check, is_false_branch
+                    stack.append(('EVAL_BRANCH', nxt, last_branch_cond, state.fork(), False, False))
 
                 elif len(successors) == 2:
                     nxt_true = successors[0]
@@ -321,19 +353,20 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
 
                     if last_branch_cond is None:
                         print("Warning: Branch with 2 successors but no condition found! Exploring both blindly.")
-                        stack.append(('EVAL_BRANCH', nxt_false, None, state.fork(), list(curr_cache), False, True))
-                        stack.append(('EVAL_BRANCH', nxt_true, None, state.fork(), list(curr_cache), False, False))
+                        stack.append(('EVAL_BRANCH', nxt_false, None, state.fork(), False, True))
+                        stack.append(('EVAL_BRANCH', nxt_true, None, state.fork(), False, False))
                     else:
                         # Push False branch (Not Taken) - executed second
-                        stack.append(('EVAL_BRANCH', nxt_false, Not(last_branch_cond), state.fork(), list(curr_cache), True, True))
+                        stack.append(('EVAL_BRANCH', nxt_false, Not(last_branch_cond), state.fork(), True, True))
                         # Push True branch (Taken) - executed first
-                        stack.append(('EVAL_BRANCH', nxt_true, last_branch_cond, state.fork(), list(curr_cache), True, False))
+                        stack.append(('EVAL_BRANCH', nxt_true, last_branch_cond, state.fork(), True, False))
 
-    print(f"\n======DFS Complete: {len(path_histograms)} feasible path(s) enumerated======")
-    for idx, hist in enumerate(path_histograms):
-        print(f"  Path {idx}: {sum(hist.values())} instructions -> {hist}")
+    print(f"\n======DFS Complete: {len(path_results)} feasible path(s) enumerated======")
+    for idx, (hist, mem_events) in enumerate(path_results):
+        print(f"  Path {idx}: {sum(hist.values())} non-memory instructions, "
+              f"{len(mem_events)} pending load(s) -> base={hist}")
 
-    return path_histograms
+    return path_results
 
 
 class Loop:
