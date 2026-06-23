@@ -64,20 +64,22 @@ class State:
     gp: List[BitVecRef] = field(default_factory=list)
     fp: List[ArithRef] = field(default_factory=list)
     memory: Dict[ExprRef, ExprRef] = field(default_factory=dict)
+    # Per-path tally of how many times each instruction (by BPF_INFO name) has executed.
+    hist: Dict[str, int] = field(default_factory=dict)
     _is_initial: bool = field(default=True, repr=False)
-    
+
     def __post_init__(self):
         if not self._is_initial:
             return
-        
+
         self.gp = [None] * NUM_REGS
         self.fp = [None] * NUM_REGS
         for i in range(NUM_REGS):
             self.gp[i] = BitVecVal(0, WORD)
-            
+
         for i in range(NUM_REGS):
             self.fp[i] = RealVal(0)
-            
+
         self.set_gp(10, BitVec("R10_FP", WORD))
         self.set_gp(1, BitVec("R1_CTX", WORD))
         self.set_gp(0, BitVec("R0_RET", WORD))
@@ -87,6 +89,7 @@ class State:
             gp=self.gp[:],
             fp=self.fp[:],
             memory=self.memory.copy(),
+            hist=self.hist.copy(),
             _is_initial=False,
         )
 

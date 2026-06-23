@@ -3,7 +3,7 @@ import argparse
 
 from bpf import BpfInstruction, BpfClass, BpfCode, BpfS
 from block import Block
-from dfs import dfs_blocks, Loop, find_loops, unroll_loops_in_cfg
+from dfs import dfs_blocks, Loop, find_loops, unroll_loops_in_cfg, instr_counts_to_cycles, build_default_cycle_mapping
 
 
 parser = argparse.ArgumentParser(
@@ -299,7 +299,12 @@ def main():
     unrolled_block = unroll_loops_in_cfg(first_block, loop_list)
     print_cfg_from_root(unrolled_block)
     
-    runtime_cycle_ub: float = dfs_blocks(unrolled_block, instructions)
+    path_histograms = dfs_blocks(unrolled_block, instructions)
+    cycle_mapping = build_default_cycle_mapping()
+    runtime_cycle_ub = max(
+        (instr_counts_to_cycles(hist, cycle_mapping) for hist in path_histograms),
+        default=0,
+    )
     print(f"runtime_cycle_ub: {runtime_cycle_ub}")
     runtime_ub = runtime_cycle_ub / (6.67e8) * 1000
     print(f"runtime_ub: {runtime_ub} ms")
