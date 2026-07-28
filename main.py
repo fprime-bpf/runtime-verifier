@@ -3,7 +3,7 @@ import argparse
 
 from bpf import BpfInstruction, BpfClass, BpfCode, BpfS
 from block import Block
-from dfs import dfs_blocks, Loop, find_loops, unroll_loops_in_cfg
+from dfs import dfs_blocks, Loop, find_loops, unroll_loops_in_cfg, instr_counts_to_cycles, build_default_cycle_mapping, build_op_info_by_name, build_iter_value_map
 
 
 parser = argparse.ArgumentParser(
@@ -298,8 +298,17 @@ def main():
     # Duplicate loop contents in cycle
     unrolled_block = unroll_loops_in_cfg(first_block, loop_list)
     print_cfg_from_root(unrolled_block)
-    
-    runtime_cycle_ub: float = dfs_blocks(unrolled_block, instructions)
+
+    iter_value_by_call_site = build_iter_value_map(loop_list, instructions)
+    path_results = dfs_blocks(unrolled_block, instructions, iter_value_by_call_site)
+    cycle_mapping = build_default_cycle_mapping()
+    op_info_by_name = build_op_info_by_name()
+    runtime_cycle_ub = max(
+        (instr_counts_to_cycles(hist, mem_events, cycle_mapping, op_info_by_name)
+         for hist, mem_events in path_results),
+        default=0,
+    )
+
     print(f"runtime_cycle_ub: {runtime_cycle_ub}")
     runtime_ub = runtime_cycle_ub / (6.67e8) * 1000
     print(f"runtime_ub: {runtime_ub} ms")

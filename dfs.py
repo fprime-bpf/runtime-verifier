@@ -121,13 +121,26 @@ def check_cache_hit(curr_addr: BitVecRef, cache_list: list[BitVecRef], solver: S
             pass
 
     return -1
-    
-    
-def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstruction]) -> int:
+
+
+def dfs_blocks(
+    first_block: 'Block | None',
+    instructions: dict[int, BpfInstruction],
+    iter_value_by_call_site: Optional[dict[str, int]] = None,
+) -> list[tuple[dict[str, int], list[MemEvent]]]:
     """
-    Perform a depth-first search over the Block graph with Path Constraints & Cache Simulation.
-    Returns an integer value (CPU cycles) representing an estimated runtime upper bound.
+    Perform a depth-first search over the Block graph with Path Constraints.
+    Returns, per feasible path through the CFG: a histogram of profile-independent
+    instruction counts (name -> count; everything except loads), and the list of pending
+    load MemEvents for that path. A separate realization pass (not implemented yet) turns
+    (histogram, mem_events) plus a chosen cache profile into a complete cost.
+
+    `iter_value_by_call_site` (see build_iter_value_map) lets bpf_iter_num_next()
+    calls resolve to their statically-known concrete per-iteration value instead
+    of a fresh unconstrained symbol, so loop-indexed memory reuse is detectable.
     """
+    if iter_value_by_call_site is None:
+        iter_value_by_call_site = {}
     print("\n======DFS Start======")
     
     if first_block is None:
@@ -137,10 +150,43 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
     path_runtime_ub = 0
     path_runtime = 0  # Tracks cumulative runtime for the current path
 
-    solver = Solver()
-    solver.set("timeout", 1000)
-    solver.set("smt.relevancy", 2)
-    solver.set("smt.arith.nl", True)
+    def make_solver() -> Solver:
+        s = Solver()
+        s.set("timeout", 1000)
+        s.set("smt.relevancy", 2)
+        s.set("smt.arith.nl", True)
+        return s
+
+    solver = make_solver()
+
+    # A long DFS trace (many chained loops, each individually cheap) makes
+    # each solver.check() progressively more expensive even when the
+    # *logical* set of active assertions at any moment stays modest --
+    # incremental z3 solvers accumulate internal search state (e.g. learned
+    # clauses) across calls that push()/pop() alone doesn't fully discard.
+    # Periodically rebuild the Solver from its own current assertions to
+    # flush that accumulated internal state while keeping the exact same
+    # logical constraints in effect. push_depth tracks how many push()
+    # calls are currently outstanding (i.e. how many POP_SOLVER actions are
+    # still queued on the stack) so the rebuilt solver can be given that
+    # many empty scopes -- those future pops still need something to pop,
+    # even though the constraints they'd have discarded are now baked into
+    # the rebuilt solver's permanent (unpushed) base scope instead. Popping
+    # an empty scope is a no-op on the assertion set, so this is exactly
+    # equivalent to not having compacted at all.
+    push_depth = 0
+    pushes_since_compact = 0
+    COMPACT_EVERY = 100
+
+    def compact_solver():
+        nonlocal solver, pushes_since_compact
+        assertions = solver.assertions()
+        solver = make_solver()
+        for a in assertions:
+            solver.add(a)
+        for _ in range(push_depth):
+            solver.push()
+        pushes_since_compact = 0
 
     # Initialize state
     initial_state = State()
@@ -160,6 +206,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
 
         if action == 'POP_SOLVER':
             solver.pop()
+            push_depth -= 1
 
         elif action == 'BACKTRACK_BLOCK':
             _, block, runtime_at_entry = item
@@ -170,6 +217,11 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
             _, nxt_block, cond, nxt_state, nxt_cache, needs_check, is_false_branch = item
             
             solver.push()
+            push_depth += 1
+            pushes_since_compact += 1
+            if pushes_since_compact >= COMPACT_EVERY:
+                compact_solver()
+
             if cond is not None:
                 solver.add(cond)
 
@@ -184,6 +236,7 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
                         print(f"Solver Statistics: {solver.statistics()}")
                     # Immediately pop since we won't schedule a VISIT
                     solver.pop()
+                    push_depth -= 1
                 else:
                     raise ValueError(f"Unexpected solver result: {result}")
             else:
@@ -222,7 +275,8 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
                 unique_instr_id = f"{current_idx}{block.suffix}"
     
                 # 2. Symbolic Execution
-                branch_cond, mem_addr = process_instruction(instruction, state, unique_instr_id)
+                iter_value = iter_value_by_call_site.get(unique_instr_id)
+                branch_cond, mem_addr = process_instruction(instruction, state, unique_instr_id, iter_value)
 
                 # 3. Helper Call Cost Logic
                 if hasattr(instruction, 'opcode') and instruction.opcode == 0x85:
@@ -300,6 +354,10 @@ class Loop:
         self.exit_edges: set[tuple[Block, Block]] = set()
         # Loop iteration metadata
         self.max_iterations: int | None = None
+        # The concrete start value (w2) the iterator counts up from; iteration
+        # i (0-indexed, matching the unroll suffix ".{i}") therefore returns
+        # start_value + i from bpf_iter_num_next(). Used by build_iter_value_map.
+        self.start_value: int | None = None
         # Track the exact instruction PCs for loop initialization
         self.call_5_pc: int | None = None
         self.w2_pc: int | None = None
@@ -376,7 +434,8 @@ class Loop:
                         # Step 3: If both w2 and w3 are successfully found, calculate and save
                         if val_w2 is not None and val_w3 is not None:
                             self.max_iterations = val_w3 - val_w2
-                            
+                            self.start_value = val_w2
+
                             self.call_5_pc = pc_call
                             self.w2_pc = pc_w2
                             self.w3_pc = pc_w3
@@ -465,6 +524,21 @@ def find_loops(root_block: Block, instructions: dict[int, BpfInstruction]) -> li
 def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
     """
     Unrolls loops in the CFG based on the identified max_iterations.
+
+    max_iterations is a known concrete bound, so the loop always runs its
+    body exactly that many times -- there is no real choice to model at any
+    iteration, including the last one. Internal (within-members) edges are
+    therefore linked the same way for every iteration, and the loop's exit
+    edge(s) are attached exactly once, after the *last* iteration's tail --
+    never as an alternative to running that iteration's body.
+
+    (This used to attach the exit edge to the last iteration's header as a
+    second successor alongside the body, i.e. "exit instead of running the
+    last iteration" -- a fork the DFS can't resolve away since nothing
+    constrains it, even though it can never actually happen. That spurious
+    fork multiplies across every loop in a program: a kernel with N bounded
+    loops could see up to 2^N spurious path combinations from this alone,
+    on top of any genuine data-dependent branching.)
     """
     sorted_loops = sorted(loop_list, key=lambda l: l.header.start, reverse=True)
 
@@ -475,24 +549,22 @@ def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
 
         print(f"Unrolling loop at header {loop.header.start} for {loop.max_iterations} iterations.")
 
-        # 1. Identify exit targets (blocks outside the loop)
+        # Identify exit targets (blocks outside the loop) and entry sources
         exit_targets = [exit_target for _, exit_target in loop.exit_edges]
         entry_sources = [entry_source for entry_source, _ in loop.entry_edges]
-        
-        # 2. Perform the unrolling
-        prev_tails = None
-        
-        # We need to clone the loop body (members) N times
+
+        prev_tail = None
+
+        # Clone the loop body (members) N times
         for i in range(loop.max_iterations):
             block_map: dict[Block, Block] = {}
-            
+
             # 1. Create clones with new suffix
             for member in loop.members:
                 block_map[member] = member.copy_with_suffix(f".{i}")
 
-            # 2. Re-establish connections within this iteration slice
-            # , and exit edges
-            is_last_iteration = (i == loop.max_iterations - 1)
+            # 2. Re-establish connections within this iteration slice.
+            # Exit edges are handled once, after the loop, not per-member.
             for member in loop.members:
                 new_member = block_map[member]
                 for succ in member.next:
@@ -501,22 +573,61 @@ def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
                             continue
                         # Internal link to new blocks, disconnect back edges
                         new_member.add(block_map[succ])
-                        
-                    # Exit link to blocks outside the loop
-                    elif succ not in loop.members:
-                        # Only the last iteration is allowed to exit the loop.
-                        if is_last_iteration:
-                            new_member.add(succ)
 
             # Link the previous iteration's tail to this iteration's header
             if i == 0:
                 for entry_source in entry_sources:
                     entry_source.next.remove(loop.header)
                     entry_source.add(block_map[loop.header])
-                    prev_header = block_map[loop.tail]
-                    
-            elif i < loop.max_iterations:
-                prev_header.add(block_map[loop.header])
-                prev_header = block_map[loop.tail]
+            else:
+                prev_tail.add(block_map[loop.header])
+
+            prev_tail = block_map[loop.tail]
+
+        # The loop always exits after the last iteration's tail runs --
+        # attach the exit edge(s) there, unconditionally.
+        for exit_target in exit_targets:
+            prev_tail.add(exit_target)
 
     return root_block
+
+
+BPF_CALL_OPCODE = 0x85
+BPF_ITER_NEXT_HELPER_ID = 6
+
+
+def build_iter_value_map(loop_list: list[Loop], instructions: dict[int, BpfInstruction]) -> dict[str, int]:
+    """
+    For every bpf_iter_num_next() (CALL imm=6) call site inside a loop that
+    was successfully bounded and unrolled, maps that call's per-iteration
+    unique_instr_id (pc + unroll suffix, e.g. "68.3") to the concrete
+    loop-counter value it returns on that iteration (loop.start_value + i).
+
+    Feed this into dfs_blocks so process_instruction can model each
+    unrolled call's result concretely instead of as a fresh unconstrained
+    symbol -- see process_instruction's CALL handling for why that matters
+    (it's what lets loop-indexed array/table accesses be recognized as
+    aliasing/reusing across iterations rather than every access looking
+    like an unrelated fresh address).
+    """
+    result: dict[str, int] = {}
+
+    for loop in loop_list:
+        if loop.max_iterations is None or loop.max_iterations <= 0 or loop.start_value is None:
+            continue
+
+        next_call_pcs = [
+            pc
+            for member in loop.members
+            for pc in instructions.keys()
+            if member.start <= pc <= member.end
+            and getattr(instructions[pc], "opcode", -1) == BPF_CALL_OPCODE
+            and getattr(instructions[pc], "imm", -1) == BPF_ITER_NEXT_HELPER_ID
+        ]
+
+        for i in range(loop.max_iterations):
+            value = loop.start_value + i
+            for pc in next_call_pcs:
+                result[f"{pc}.{i}"] = value
+
+    return result

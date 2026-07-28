@@ -711,13 +711,47 @@ def _branch_condition(decoded_instr: DecodedInstr, state: State) -> BoolRef:
     raise ValueError(f"Unsupported integer branch opcode: {op_name}")
 
 
-def process_instruction(instr: BpfInstruction, state: State, unique_instr_id: str) -> Tuple[Optional[BoolRef], Optional[BitVecRef]]:
-    """    
+# Base for the fake addresses used to model bpf_iter_num_next()'s return
+# value (see BPF_ITER_NEXT_HELPER_ID handling in process_instruction below).
+# Chosen far outside any real stack (R10_FP-relative) or map address range so
+# it can never coincide with a legitimate address; since it's a bare
+# concrete BitVecVal it also can never structurally alias a symbolic
+# expression like R10_FP + off, concrete-vs-concrete equality is the only
+# case that matters and that's exactly what Python dict lookup on z3
+# BitVecVal keys handles correctly.
+ITER_SCRATCH_BASE = 0x7F00_0000_0000
+BPF_ITER_NEXT_HELPER_ID = 6
+
+
+def _iter_scratch_addr(unique_instr_id: str) -> BitVecRef:
+    """
+    Fixed scratch address for a given bpf_iter_num_next() call *site*
+    (keyed by PC only, not by unroll suffix) — every unrolled iteration of
+    the same call site must resolve to the same address, mirroring how the
+    real helper always returns a pointer into the same `it->curr` stack
+    slot, just with different contents each call.
+    """
+    pc = int(unique_instr_id.split('.')[0].split('@')[0])
+    return BitVecVal(ITER_SCRATCH_BASE + pc, WORD)
+
+
+def process_instruction(
+    instr: BpfInstruction,
+    state: State,
+    unique_instr_id: str,
+    iter_value: Optional[int] = None,
+) -> Tuple[Optional[BoolRef], Optional[BitVecRef]]:
+    """
     Symbolically evaluates a single eBPF instruction.
     'unique_instr_id' is used for deterministic naming of symbolic variables.
+
+    'iter_value' is the concrete trip-count value this call should return,
+    if this instruction is a bpf_iter_num_next() (CALL imm=6) call site
+    inside an already-unrolled loop whose bound is statically known (see
+    dfs.build_iter_value_map). Ignored for every other instruction.
     """
     decoded_instr = _decode_instruction(instr)
-    
+
     branch_cond: Optional[BoolRef] = None
     addr: Optional[BitVecRef] = None
 
@@ -734,20 +768,39 @@ def process_instruction(instr: BpfInstruction, state: State, unique_instr_id: st
                 addr = None
 
             elif decoded_instr.name == "CALL":
-                # Per the eBPF calling convention, helper calls can modify
-                # registers R0-R5. We model this by creating new, unconstrained
-                # symbolic variables for each of them. R0 holds the return value.
-                for reg_idx in range(6): # Clobber R0 through R5
-                    new_reg_val = fresh_gp_var(reg_idx, unique_instr_id)
-                    state.set_gp(reg_idx, new_reg_val)
+                if decoded_instr.imm == BPF_ITER_NEXT_HELPER_ID and iter_value is not None:
+                    # bpf_iter_num_next() with a statically-known concrete
+                    # trip index. Real bpf_iter_num_next returns &it->curr;
+                    # model that concretely (a fixed per-call-site scratch
+                    # address holding this iteration's index) instead of the
+                    # generic fresh-symbol clobber below, so that later
+                    # dereferences of the returned pointer — and anything
+                    # indexed off of them, like payload[*i] or gflog[coef] —
+                    # see the iteration's actual index. That's what lets the
+                    # cache-reuse analysis recognize repeated accesses
+                    # through a loop variable as aliasing instead of every
+                    # access looking like a fresh, unrelated address.
+                    scratch_addr = _iter_scratch_addr(unique_instr_id)
+                    state.set_gp(0, scratch_addr)
+                    state.memory[scratch_addr] = BitVecVal(iter_value, WORD)
+                    for reg_idx in range(1, 6): # Clobber R1 through R5 as usual
+                        new_reg_val = fresh_gp_var(reg_idx, unique_instr_id)
+                        state.set_gp(reg_idx, new_reg_val)
+                else:
+                    # Per the eBPF calling convention, helper calls can modify
+                    # registers R0-R5. We model this by creating new, unconstrained
+                    # symbolic variables for each of them. R0 holds the return value.
+                    for reg_idx in range(6): # Clobber R0 through R5
+                        new_reg_val = fresh_gp_var(reg_idx, unique_instr_id)
+                        state.set_gp(reg_idx, new_reg_val)
                 # Both addr and branch_cond are None
- 
+
             else:
                 branch_cond = _branch_condition(decoded_instr, state)
 
         case InstrClass.OTHER:
             pass
-        
+
     return (branch_cond, addr)
 
 
