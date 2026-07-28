@@ -1,67 +1,47 @@
 from block import Block
 from bpf import BpfClass, BpfCode, BpfInstruction, Mask, Shift, BPF_INFO, BPF_INFO_FPU
-from mem_access import process_instruction, State, fresh_gp_var, fresh_fp_var, get_all_var_names, get_vars_from_expr, \
-    normalize_huge_bv, collect_var_objects
-from z3 import (Solver, If, ULT, ULE, sat, unsat, BitVecRef, BoolRef, Not, unknown, Z3Exception, Then, Or, is_true,
-                parse_smt2_string, Bool)
+from machine_profile import MachineProfile
+from mem_access import process_instruction, State, MemEvent, fresh_gp_var, fresh_fp_var, get_all_var_names, get_vars_from_expr, \
+    normalize_huge_bv
+from z3 import Solver, If, ULT, ULE, sat, unsat, BitVecRef, BoolRef, Not, unknown, Z3Exception, Then, simplify
 from collections import deque
 from typing import Optional, Set
-import multiprocessing
-import queue
 
-CACHE_LINE_DIFF = 2 # 32B
+# NOEL-V target: flat 2-level cache (L1 associativity 4, L2 up to the full
+# 12-entry recency window tracked per path; no L3 tier -- see
+# build_op_info_by_name below, which is what actually activates the L2 tier
+# by setting l2_associativity on every op (mem_events_to_cycles leaves L2/L3
+# inactive by default until a MachineProfile sets their associativity).
+CACHE_LINE_DIFF = 2
 COST_MEM_L1_HIT = 13
 COST_MEM_L2_HIT = 100
+COST_MEM_L3_HIT = COST_MEM_L2_HIT
 COST_MEM_MISS = 300
 CACHE_SIZE = 12
 
+# Load instructions are NOT tallied into a path's hist during the DFS. Their cost depends
+# on cache locality, which depends on a target cache profile (line size, associativity)
+# that isn't chosen yet at DFS time — so each load is instead recorded as a MemEvent
+# (see mem_access.py), carrying its address and the path's last CACHE_SIZE prior memory
+# addresses. A later realization pass (not implemented yet) replays these against a
+# specific profile to classify each as "<name>_CACHED_<d>"/"<name>_MISS" and fold it into
+# the histogram. Stores still update the recency window (`"LD" in name` distinguishes the
+# two, same predicate as before), but go straight into hist under their plain name, same
+# as any other profile-independent instruction.
 
-# This worker function is executed in a separate process to enforce a hard timeout.
-# Z3's own timeout is cooperative and may be ignored during long-running operations.
-# It reconstructs the solver state from SMT-LIB2 strings, which is necessary
-# because Z3 objects are not picklable across processes.
-def solver_worker(path_smt2_script: str, hit_conds_sexpr: list[str], result_queue: multiprocessing.Queue):
-    try:
-        s = Solver()
-        # A soft timeout as a first line of defense, slightly less than the hard timeout.
-        s.set("timeout", 950)
-
-        # The script from to_smt2() might end with (check-sat). We must remove it
-        # to add our own query.
-        if '(check-sat)' in path_smt2_script:
-            path_smt2_script = path_smt2_script.rsplit('(check-sat)', 1)[0]
-
-        # We associate each hit condition with a new boolean variable (cond_i)
-        # to query the model and find out which condition was satisfied.
-        script_parts = [path_smt2_script]
-        cond_vars = []
-        for i, hc_sexpr in enumerate(hit_conds_sexpr):
-            cond_name = f"cond_{i}"
-            cond_vars.append(cond_name)
-            script_parts.append(f"(declare-const {cond_name} Bool)")
-            script_parts.append(f"(assert (= {cond_name} {hc_sexpr}))")
-
-        # Assert that at least one of the conditions must be true for a sat result.
-        script_parts.append(f"(assert (or {' '.join(cond_vars)}))")
-        script_parts.append("(check-sat)")
-        full_script = "\n".join(script_parts)
-
-        # The Goal object from parse_smt2_string must be unpacked into individual assertions.
-        goal = parse_smt2_string(full_script)
-        s.add(*list(goal))
-
-        result = s.check()
-
-        if result == sat:
-            m = s.model()
-            for i in reversed(range(len(cond_vars))):
-                if is_true(m.eval(Bool(cond_vars[i]), model_completion=True)):
-                    result_queue.put(i)
-                    return
-        result_queue.put(-1)
-    except (Z3Exception, Exception) as e:
-        print(f"[Solver Worker Error] {e}")
-        result_queue.put(-1)
+# CALL instructions get their histogram key suffixed with their helper ID too:
+# "CALL_<imm>" instead of a single shared "CALL" bucket. Helper-specific cost is looked
+# up from this map (keyed by imm, not the full instruction name) — separate from the
+# general name -> cycles mapping so it's easy to override just the helper costs.
+# imm 1/2/3 are bpf_map_lookup_elem/update_elem/delete_elem (see create_test/bpf_shim.h),
+# which touch a map's backing memory, so they're priced like a cache miss, matching the
+# old ad hoc special-case. Any other helper ID falls back to DEFAULT_HELPER_CALL_COST.
+DEFAULT_HELPER_CALL_COSTS: dict[int, int] = {
+    1: COST_MEM_MISS,
+    2: COST_MEM_MISS,
+    3: COST_MEM_MISS,
+}
+DEFAULT_HELPER_CALL_COST = 150
 
 
 def is_fpu_instr(instr: BpfInstruction) -> bool:
@@ -90,147 +70,225 @@ def is_fpu_instr(instr: BpfInstruction) -> bool:
     return False
 
 
-def instr_to_runtime(instructions:dict[int, BpfInstruction], start:int, end:int) -> int:
-    """
-    Calculate runtime of the given instructions from `start` to `end` (inclusive).
+def build_op_info_by_name() -> dict[str, MachineProfile]:
+    """Builds a name-keyed MachineProfile table from BPF_INFO and BPF_INFO_FPU.
 
-    Parameters
-    ----------
-    instructions : dict[int, BpfInstruction]
-        A dictionary mapping program counter to decoded eBPF instructions.
-    start : int
-        Start index (inclusive).
-    end : int
-        End index (inclusive).
+    NOEL-V's cache model is flat (same L1/L2 thresholds for every load, no
+    per-instruction variation), so every entry gets the same cache profile.
+    l2_associativity must be set explicitly here -- mem_events_to_cycles
+    leaves the L2/L3 tiers inactive (falls straight from L1 to a miss) unless
+    a MachineProfile provides them; there's no module-level fallback for it
+    the way there is for L1 (hardcoded to associativity 8 in that function)."""
+    return {
+        instr.name: MachineProfile(
+            instr.name,
+            instr.latency,
+            line_size_bytes=CACHE_LINE_DIFF,
+            l1_associativity=4,
+            l1_hit_cycles=COST_MEM_L1_HIT,
+            l2_associativity=CACHE_SIZE,
+            l2_hit_cycles=COST_MEM_L2_HIT,
+            miss_cycles=COST_MEM_MISS,
+        )
+        for instr in list(BPF_INFO.values()) + list(BPF_INFO_FPU.values())
+    }
 
-    Returns
-    -------
-    int
-        CPU cycles. Returns 0 if the input is invalid.
+
+def build_default_cycle_mapping() -> dict[str, int]:
+    """Builds a default instruction-name -> cycle-cost mapping from the static
+    BPF_INFO/BPF_INFO_FPU latency tables. Load instruction costs are handled separately
+    by mem_events_to_cycles and are not included here."""
+    return {
+        op.name: op.latency
+        for op in list(BPF_INFO.values()) + list(BPF_INFO_FPU.values())
+        if op.latency is not None
+    }
+
+
+def mem_events_to_cycles(
+    mem_events: list[MemEvent],
+    op_info_by_name: dict[str, MachineProfile],
+) -> int:
+    """Converts a path's pending load MemEvents into a cycle cost using the cache profile
+    bundled into each instruction's MachineProfile. Assumes an inclusive cache hierarchy.
+
+    For each load: filter distances to same-line accesses (addr_delta < line_size_bytes),
+    take the minimum recency among those, then classify into L1/L2/L3/miss by comparing
+    against each level's associativity threshold. Falls back to module-level COST_MEM_*
+    constants when the MachineProfile has no cache profile set.
     """
-    runtime = 0
-    for idx in (pc for pc in sorted(instructions.keys()) if start <= pc <= end):
-        instr = instructions[idx]
-        if is_fpu_instr(instr):
-            op_info = BPF_INFO_FPU.get(instr.opcode)  # FADD / FNEG / JFEQ / JFOGT ...
+    total = 0
+    for event in mem_events:
+        op = op_info_by_name.get(event.load_name)
+
+        line_size = op.line_size_bytes  if op and op.line_size_bytes  is not None else CACHE_LINE_DIFF
+        l1_assoc  = op.l1_associativity if op and op.l1_associativity is not None else 8
+        l1_cost   = op.l1_hit_cycles    if op and op.l1_hit_cycles    is not None else COST_MEM_L1_HIT
+        l2_cost   = op.l2_hit_cycles    if op and op.l2_hit_cycles    is not None else COST_MEM_L2_HIT
+        l3_cost   = op.l3_hit_cycles    if op and op.l3_hit_cycles    is not None else COST_MEM_L3_HIT
+        miss_cost = op.miss_cycles      if op and op.miss_cycles      is not None else COST_MEM_MISS
+
+        same_line = sorted(recency for addr_delta, recency in event.distances
+                           if addr_delta < line_size)
+
+        cost = miss_cost
+        for recency in same_line:
+            if recency < l1_assoc:
+                cost = l1_cost
+            elif op and op.l2_associativity is not None and recency < op.l2_associativity:
+                cost = l2_cost
+            elif op and op.l3_associativity is not None and recency < op.l3_associativity:
+                cost = l3_cost
+            break  # sorted ascending: first entry is the minimum; no subsequent entry can do better
+
+        total += cost
+    return total
+
+
+def instr_counts_to_cycles(
+    histogram: dict[str, int],
+    mem_events: list[MemEvent],
+    mapping: dict[str, int],
+    op_info_by_name: dict[str, MachineProfile],
+    helper_call_costs: dict[int, int] = DEFAULT_HELPER_CALL_COSTS,
+    default_helper_call_cost: int = DEFAULT_HELPER_CALL_COST,
+) -> int:
+    """Converts a path's instruction-count histogram and pending load MemEvents into an
+    estimated cycle count. Non-load instructions are costed via `mapping`; CALL_{imm}
+    entries via `helper_call_costs`; loads via mem_events_to_cycles."""
+    total = 0
+    for name, count in histogram.items():
+        if name.startswith("CALL_"):
+            imm = int(name.removeprefix("CALL_"))
+            cost = helper_call_costs.get(imm, default_helper_call_cost)
         else:
-            op_info = BPF_INFO.get(instr.opcode)      # ALU/MEM ... + FLDX & FSTX
-
-        if op_info:
-            print(f"idx={idx}: name={op_info.name}, latency={op_info.latency}")
-        if op_info:
-            if op_info.latency:
-                runtime += op_info.latency
-
-    return runtime
+            cost = mapping.get(name, 0)
+        total += count * cost
+    total += mem_events_to_cycles(mem_events, op_info_by_name)
+    return total
 
 
-def check_cache_hit(curr_addr: BitVecRef, cache_list: list[BitVecRef], solver: Solver, state: State) -> int:
+def find_cache_position(curr_addr: BitVecRef, cache_list: list[BitVecRef], solver: Solver, state: State) -> int:
     """
-    Checks if the current memory address hits the simulated cache using a pre-configured solver.
-    The solver is expected to be passed in with all current path constraints already asserted.
+    Finds `curr_addr`'s 0-indexed position in `cache_list` (0 = most recently used),
+    using a pre-configured solver (expected to already have all path constraints asserted).
+    Returns -1 if the address isn't present anywhere in the list.
     """
-
-    for i in reversed(range(len(cache_list))):
-        if curr_addr.eq(cache_list[i]):
+    for i, cached in enumerate(cache_list):
+        if curr_addr.eq(cached):
             return i
 
     # Concrete Value Check
     if hasattr(curr_addr, 'as_long') and curr_addr.as_long() is not None:
         curr_val = curr_addr.as_long()
-        for i in reversed(range(len(cache_list))):
-            target = cache_list[i]
-            if hasattr(target, 'as_long') and target.as_long() is not None:
+        for i, cached in enumerate(cache_list):
+            if hasattr(cached, 'as_long') and cached.as_long() is not None:
                 # Check if the difference is within the Cache Line size
-                if abs(curr_val - target.as_long()) <= CACHE_LINE_DIFF:
+                if abs(curr_val - cached.as_long()) <= CACHE_LINE_DIFF:
                     return i
-        # Fall through to check concrete `curr_addr` against symbolic cache entries.
-
-    # 3. Symbolic Range Check (with hard timeout via multiprocessing)
-    if not cache_list:
         return -1
 
-    hit_conditions = []
-    for item in cache_list:
-        diff = If(ULT(curr_addr, item), item - curr_addr, curr_addr - item)
-        hit_conditions.append(ULE(diff, CACHE_LINE_DIFF))
+    # Symbolic Range Check
+    for i, cached in enumerate(cache_list):
+        solver.push()
 
-    # To ensure all variables in hit_conditions are declared in the SMT2 script,
-    # we add a trivial constraint for each. This forces `to_smt2()` to include
-    # their declarations, creating a self-contained script for the worker.
-    solver.push()
-    try:
-        all_query_vars = set()
-        all_query_exprs = [curr_addr] + cache_list
-        for expr in all_query_exprs:
-            all_query_vars.update(collect_var_objects(expr))
+        diff = If(ULT(curr_addr, cached),
+                  cached - curr_addr,
+                  curr_addr - cached)
 
-        # Add a simple tautology for each variable to force its declaration.
-        for var in all_query_vars:
-            solver.add(var == var)
+        solver.add(ULE(diff, CACHE_LINE_DIFF))
 
-        # Now, generate the SMT2 script which is guaranteed to have the declarations.
-        path_smt2 = solver.to_smt2()
-    finally:
-        # Remove the trivial constraints.
-        solver.pop()
+        try:
+            result = solver.check()
+        except Z3Exception:
+            result = unknown
 
-    hit_conds_sexpr = [c.sexpr() for c in hit_conditions]
+        solver.pop()  # Unconditionally pop to match the push()
 
-    result_queue = multiprocessing.Queue()
-    p = multiprocessing.Process(
-        target=solver_worker,
-        args=(path_smt2, hit_conds_sexpr, result_queue)
-    )
-    p.start()
+        if result == sat:
+            return i
 
-    # Enforce a hard timeout of 1000ms (1.0s).
-    p.join(timeout=1.0)
+        if result == unknown:
+            print(f"Warning: Cache check returned unknown for {curr_addr}")
+            pass
 
-    if p.is_alive():
-        print(f"Warning: Cache check for {curr_addr} timed out (>1s) and was terminated.")
-        p.terminate()
-        p.join()
-        return -1  # Treat timeout as a cache miss.
+    return -1
 
-    try:
-        return result_queue.get_nowait()
-    except queue.Empty:
-        print(f"Warning: Solver process finished for {curr_addr} but returned no result.")
-        return -1
 
-    
-    
-def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstruction]) -> int:
+def dfs_blocks(
+    first_block: 'Block | None',
+    instructions: dict[int, BpfInstruction],
+    iter_value_by_call_site: Optional[dict[str, int]] = None,
+) -> list[tuple[dict[str, int], list[MemEvent]]]:
     """
-    Perform a depth-first search over the Block graph with Path Constraints & Cache Simulation.
-    Returns an integer value (CPU cycles) representing an estimated runtime upper bound.
+    Perform a depth-first search over the Block graph with Path Constraints.
+    Returns, per feasible path through the CFG: a histogram of profile-independent
+    instruction counts (name -> count; everything except loads), and the list of pending
+    load MemEvents for that path. A separate realization pass (not implemented yet) turns
+    (histogram, mem_events) plus a chosen cache profile into a complete cost.
+
+    `iter_value_by_call_site` (see build_iter_value_map) lets bpf_iter_num_next()
+    calls resolve to their statically-known concrete per-iteration value instead
+    of a fresh unconstrained symbol, so loop-indexed memory reuse is detectable.
     """
+    if iter_value_by_call_site is None:
+        iter_value_by_call_site = {}
     print("\n======DFS Start======")
-    
+
     if first_block is None:
-        return 0
+        return []
 
     onpath: Set['Block'] = set()
-    path_runtime_ub = 0
-    path_runtime = 0  # Tracks cumulative runtime for the current path
+    path_results: list[tuple[dict[str, int], list[MemEvent]]] = []  # (hist, mem_events) per completed path
 
-    solver = Solver()
-    solver.set("timeout", 1000)
-    solver.set("smt.relevancy", 2)
-    solver.set("smt.arith.nl", True)
+    def make_solver() -> Solver:
+        s = Solver()
+        s.set("timeout", 1000)
+        s.set("smt.relevancy", 2)
+        s.set("smt.arith.nl", True)
+        return s
+
+    solver = make_solver()
+
+    # A long DFS trace (many chained loops, each individually cheap) makes
+    # each solver.check() progressively more expensive even when the
+    # *logical* set of active assertions at any moment stays modest --
+    # incremental z3 solvers accumulate internal search state (e.g. learned
+    # clauses) across calls that push()/pop() alone doesn't fully discard.
+    # Periodically rebuild the Solver from its own current assertions to
+    # flush that accumulated internal state while keeping the exact same
+    # logical constraints in effect. push_depth tracks how many push()
+    # calls are currently outstanding (i.e. how many POP_SOLVER actions are
+    # still queued on the stack) so the rebuilt solver can be given that
+    # many empty scopes -- those future pops still need something to pop,
+    # even though the constraints they'd have discarded are now baked into
+    # the rebuilt solver's permanent (unpushed) base scope instead. Popping
+    # an empty scope is a no-op on the assertion set, so this is exactly
+    # equivalent to not having compacted at all.
+    push_depth = 0
+    pushes_since_compact = 0
+    COMPACT_EVERY = 100
+
+    def compact_solver():
+        nonlocal solver, pushes_since_compact
+        assertions = solver.assertions()
+        solver = make_solver()
+        for a in assertions:
+            solver.add(a)
+        for _ in range(push_depth):
+            solver.push()
+        pushes_since_compact = 0
 
     # Initialize state
     initial_state = State()
-    initial_cache: deque[BitVecRef] = deque([], maxlen=CACHE_SIZE)
 
     # The stack stores tuples of: (Action_Type, *args)
     # Actions:
     # 'VISIT': Process the basic block.
     # 'EVAL_BRANCH': Handle solver pushes, branch conditions, and trigger the next VISIT.
-    # 'BACKTRACK_BLOCK': Restore path_runtime and remove block from onpath.
+    # 'BACKTRACK_BLOCK': Remove block from onpath (back-edge/cycle detection).
     # 'POP_SOLVER': Pop the Z3 solver state.
-    stack = [('VISIT', first_block, initial_state, initial_cache)]
+    stack = [('VISIT', first_block, initial_state)]
 
     while stack:
         item = stack.pop()
@@ -238,16 +296,21 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
 
         if action == 'POP_SOLVER':
             solver.pop()
+            push_depth -= 1
 
         elif action == 'BACKTRACK_BLOCK':
-            _, block, runtime_at_entry = item
-            path_runtime = runtime_at_entry
+            _, block = item
             onpath.remove(block)
 
         elif action == 'EVAL_BRANCH':
-            _, nxt_block, cond, nxt_state, nxt_cache, needs_check, is_false_branch = item
-            
+            _, nxt_block, cond, nxt_state, needs_check, is_false_branch = item
+
             solver.push()
+            push_depth += 1
+            pushes_since_compact += 1
+            if pushes_since_compact >= COMPACT_EVERY:
+                compact_solver()
+
             if cond is not None:
                 solver.add(cond)
 
@@ -258,22 +321,23 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
                     result = unknown
                 if result == sat or result == unknown:
                     stack.append(('POP_SOLVER',))
-                    stack.append(('VISIT', nxt_block, nxt_state, nxt_cache))
+                    stack.append(('VISIT', nxt_block, nxt_state))
                 elif result == unsat:
                     print(f"  [Pruned] Path to BB {nxt_block.start}{nxt_block.suffix} is unreachable (UNSAT).")
                     if is_false_branch:
                         print(f"Solver Statistics: {solver.statistics()}")
                     # Immediately pop since we won't schedule a VISIT
                     solver.pop()
+                    push_depth -= 1
                 else:
                     raise ValueError(f"Unexpected solver result: {result}")
             else:
                 # Unconditional or unchecked branch
                 stack.append(('POP_SOLVER',))
-                stack.append(('VISIT', nxt_block, nxt_state, nxt_cache))
+                stack.append(('VISIT', nxt_block, nxt_state))
 
         elif action == 'VISIT':
-            _, block, state, cache_state = item
+            _, block, state = item
 
             # 1. Cycle detection (Back-edge)
             if block in onpath:
@@ -281,66 +345,71 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
                 continue
 
             onpath.add(block)
-            runtime_at_entry = path_runtime
 
             # Schedule the backtrack action to run AFTER all children are processed
-            stack.append(('BACKTRACK_BLOCK', block, runtime_at_entry))
+            stack.append(('BACKTRACK_BLOCK', block))
 
             instr_count = block.end - block.start + 1
             print(f"\n======Visiting BB({block.start}, {block.end}){block.suffix}, instructions={instr_count}======")
 
-            # --- Cost Calculation Part 1: Base Static Cost ---
-            base_block_cost = instr_to_runtime(instructions, block.start, block.end)
-            path_runtime += base_block_cost
-
             last_branch_cond: Optional[BoolRef] = None
-            curr_cache = deque(list(cache_state), maxlen=CACHE_SIZE)
             sorted_pcs = sorted([pc for pc in instructions.keys() if block.start <= pc <= block.end])
-            
+
             for i in sorted_pcs:
                 current_idx = i
                 instruction = instructions[current_idx]
                 unique_instr_id = f"{current_idx}{block.suffix}"
-    
-                # 2. Symbolic Execution
-                branch_cond, mem_addr = process_instruction(instruction, state, unique_instr_id)
 
-                # 3. Helper Call Cost Logic
-                if hasattr(instruction, 'opcode') and instruction.opcode == 0x85:
-                    if hasattr(instruction, 'imm') and instruction.imm in [1, 2, 3]:
-                        print(f"  [Helper Call] ID {instruction.imm} at I{unique_instr_id}: +{COST_MEM_MISS} cycles")
-                        path_runtime += COST_MEM_MISS
-                    else:
-                        print(f"  [Helper Call] ID {instruction.imm} at I{unique_instr_id}: +100 cycles")
-                        path_runtime += 150
+                if is_fpu_instr(instruction):
+                    instr_op_info = BPF_INFO_FPU.get(instruction.opcode)
+                else:
+                    instr_op_info = BPF_INFO.get(instruction.opcode)
+                instr_name = instr_op_info.name if instr_op_info else f"UNKNOWN_{instruction.opcode:#04x}"
+
+                # Helper calls: key by helper ID so cost can vary per-helper downstream.
+                if instr_name == "CALL":
+                    instr_name = f"CALL_{instruction.imm}"
+
+                # 2. Symbolic Execution
+                iter_value = iter_value_by_call_site.get(unique_instr_id)
+                branch_cond, mem_addr = process_instruction(instruction, state, unique_instr_id, iter_value)
 
                 if branch_cond is not None:
                     last_branch_cond = branch_cond
 
+                is_load = mem_addr is not None and instr_op_info is not None and "LD" in instr_op_info.name
+
+                if is_load:
+                    # Compute (addr_delta, recency) pairs now, while the solver has this
+                    # path's full constraint set. recent_window[0] = most recent (recency 0).
+                    # addr_delta is the concrete byte distance between the two addresses;
+                    # symbolic pairs where we can't get a concrete delta are skipped
+                    # (conservative: missed alias => predicted miss => higher cost).
+                    distances = []
+                    for recency, cached_addr in enumerate(state.recent_window):
+                        try:
+                            diff = simplify(mem_addr - cached_addr)
+                            if hasattr(diff, 'as_signed_long'):
+                                distances.append((abs(diff.as_signed_long()), recency))
+                        except Z3Exception:
+                            pass
+                    state.mem_events.append(MemEvent(instr_name, distances))
+                else:
+                    # Everything else (ALU/branch/CALL/stores) has a profile-independent
+                    # cost, so tally it directly.
+                    state.hist[instr_name] = state.hist.get(instr_name, 0) + 1
+
                 if mem_addr is not None:
-                    if is_fpu_instr(instruction):
-                        op_info = BPF_INFO_FPU.get(instruction.opcode)
-                    else:
-                        op_info = BPF_INFO.get(instruction.opcode)
-
-                    if op_info:
-                        if "LD" in op_info.name:
-                            dist = check_cache_hit(mem_addr, list(curr_cache), solver, state)
-                            if dist == -1:
-                                print(f"  [Cache MISS] Addr: {mem_addr} (+{COST_MEM_MISS} cycles)")
-                                path_runtime += COST_MEM_MISS
-                            elif len(list(curr_cache)) - dist <= 4:
-                                print(f"  [Cache HIT L1] Addr: {mem_addr} (+{COST_MEM_L1_HIT} cycles)")
-                                path_runtime += COST_MEM_L1_HIT
-                            elif len(list(curr_cache)) - dist <= 12:
-                                print(f"  [Cache HIT L2] Addr: {mem_addr} (+{COST_MEM_L2_HIT} cycles)")
-                                path_runtime += COST_MEM_L2_HIT
-
-                    curr_cache.append(mem_addr)
+                    # Both loads and stores refresh the recency window (stores populate
+                    # the cache too), capped at CACHE_SIZE — the largest associativity
+                    # we'll ever realize against. Index 0 = most recently used.
+                    state.recent_window.insert(0, mem_addr)
+                    if len(state.recent_window) > CACHE_SIZE:
+                        state.recent_window.pop()
 
             if not block.next:
-                print(f"Reaching an exit point {block.end}, total path runtime is {path_runtime}")
-                path_runtime_ub = max(path_runtime_ub, path_runtime)
+                print(f"Reaching an exit point {block.end}")
+                path_results.append((dict(state.hist), list(state.mem_events)))
             else:
                 successors = block.next
 
@@ -348,24 +417,29 @@ def dfs_blocks(first_block: 'Block | None', instructions: dict[int, BpfInstructi
                 # Remember: Stack is LIFO. To evaluate True branch first, we must push False branch first.
                 if len(successors) == 1:
                     nxt = successors[0]
-                    # args: action, block, cond, state, cache, needs_check, is_false_branch
-                    stack.append(('EVAL_BRANCH', nxt, last_branch_cond, state.fork(), deque(list(curr_cache), maxlen=CACHE_SIZE), False, False))
-                    
+                    # args: action, block, cond, state, needs_check, is_false_branch
+                    stack.append(('EVAL_BRANCH', nxt, last_branch_cond, state.fork(), False, False))
+
                 elif len(successors) == 2:
                     nxt_true = successors[0]
                     nxt_false = successors[1]
-                    
+
                     if last_branch_cond is None:
                         print("Warning: Branch with 2 successors but no condition found! Exploring both blindly.")
-                        stack.append(('EVAL_BRANCH', nxt_false, None, state.fork(), deque(list(curr_cache), maxlen=CACHE_SIZE), False, True))
-                        stack.append(('EVAL_BRANCH', nxt_true, None, state.fork(), deque(list(curr_cache), maxlen=CACHE_SIZE), False, False))
+                        stack.append(('EVAL_BRANCH', nxt_false, None, state.fork(), False, True))
+                        stack.append(('EVAL_BRANCH', nxt_true, None, state.fork(), False, False))
                     else:
                         # Push False branch (Not Taken) - executed second
-                        stack.append(('EVAL_BRANCH', nxt_false, Not(last_branch_cond), state.fork(), deque(list(curr_cache), maxlen=CACHE_SIZE), True, True))
+                        stack.append(('EVAL_BRANCH', nxt_false, Not(last_branch_cond), state.fork(), True, True))
                         # Push True branch (Taken) - executed first
-                        stack.append(('EVAL_BRANCH', nxt_true, last_branch_cond, state.fork(), deque(list(curr_cache), maxlen=CACHE_SIZE), True, False))
+                        stack.append(('EVAL_BRANCH', nxt_true, last_branch_cond, state.fork(), True, False))
 
-    return path_runtime_ub
+    print(f"\n======DFS Complete: {len(path_results)} feasible path(s) enumerated======")
+    for idx, (hist, mem_events) in enumerate(path_results):
+        print(f"  Path {idx}: {sum(hist.values())} non-memory instructions, "
+              f"{len(mem_events)} pending load(s) -> base={hist}")
+
+    return path_results
 
 
 class Loop:
@@ -381,6 +455,10 @@ class Loop:
         self.exit_edges: set[tuple[Block, Block]] = set()
         # Loop iteration metadata
         self.max_iterations: int | None = None
+        # The concrete start value (w2) the iterator counts up from; iteration
+        # i (0-indexed, matching the unroll suffix ".{i}") therefore returns
+        # start_value + i from bpf_iter_num_next(). Used by build_iter_value_map.
+        self.start_value: int | None = None
         # Track the exact instruction PCs for loop initialization
         self.call_5_pc: int | None = None
         self.w2_pc: int | None = None
@@ -457,7 +535,8 @@ class Loop:
                         # Step 3: If both w2 and w3 are successfully found, calculate and save
                         if val_w2 is not None and val_w3 is not None:
                             self.max_iterations = val_w3 - val_w2
-                            
+                            self.start_value = val_w2
+
                             self.call_5_pc = pc_call
                             self.w2_pc = pc_w2
                             self.w3_pc = pc_w3
@@ -482,7 +561,6 @@ class Loop:
                             prev_block, found_call_5, val_w2, val_w3, 
                             pc_call, pc_w2, pc_w3
                         ))
-
 
 def find_loops(root_block: Block, instructions: dict[int, BpfInstruction]) -> list[Loop]:
     """
@@ -547,6 +625,21 @@ def find_loops(root_block: Block, instructions: dict[int, BpfInstruction]) -> li
 def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
     """
     Unrolls loops in the CFG based on the identified max_iterations.
+
+    max_iterations is a known concrete bound, so the loop always runs its
+    body exactly that many times -- there is no real choice to model at any
+    iteration, including the last one. Internal (within-members) edges are
+    therefore linked the same way for every iteration, and the loop's exit
+    edge(s) are attached exactly once, after the *last* iteration's tail --
+    never as an alternative to running that iteration's body.
+
+    (This used to attach the exit edge to the last iteration's header as a
+    second successor alongside the body, i.e. "exit instead of running the
+    last iteration" -- a fork the DFS can't resolve away since nothing
+    constrains it, even though it can never actually happen. That spurious
+    fork multiplies across every loop in a program: a kernel with N bounded
+    loops could see up to 2^N spurious path combinations from this alone,
+    on top of any genuine data-dependent branching.)
     """
     sorted_loops = sorted(loop_list, key=lambda l: l.header.start, reverse=True)
 
@@ -557,24 +650,22 @@ def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
 
         print(f"Unrolling loop at header {loop.header.start} for {loop.max_iterations} iterations.")
 
-        # 1. Identify exit targets (blocks outside the loop)
+        # Identify exit targets (blocks outside the loop) and entry sources
         exit_targets = [exit_target for _, exit_target in loop.exit_edges]
         entry_sources = [entry_source for entry_source, _ in loop.entry_edges]
-        
-        # 2. Perform the unrolling
-        prev_tails = None
-        
-        # We need to clone the loop body (members) N times
+
+        prev_tail = None
+
+        # Clone the loop body (members) N times
         for i in range(loop.max_iterations):
             block_map: dict[Block, Block] = {}
-            
+
             # 1. Create clones with new suffix
             for member in loop.members:
                 block_map[member] = member.copy_with_suffix(f".{i}")
 
-            # 2. Re-establish connections within this iteration slice
-            # , and exit edges
-            is_last_iteration = (i == loop.max_iterations - 1)
+            # 2. Re-establish connections within this iteration slice.
+            # Exit edges are handled once, after the loop, not per-member.
             for member in loop.members:
                 new_member = block_map[member]
                 for succ in member.next:
@@ -583,22 +674,61 @@ def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
                             continue
                         # Internal link to new blocks, disconnect back edges
                         new_member.add(block_map[succ])
-                        
-                    # Exit link to blocks outside the loop
-                    elif succ not in loop.members:
-                        # Only the last iteration is allowed to exit the loop.
-                        if is_last_iteration:
-                            new_member.add(succ)
 
             # Link the previous iteration's tail to this iteration's header
             if i == 0:
                 for entry_source in entry_sources:
                     entry_source.next.remove(loop.header)
                     entry_source.add(block_map[loop.header])
-                    prev_header = block_map[loop.tail]
-                    
-            elif i < loop.max_iterations:
-                prev_header.add(block_map[loop.header])
-                prev_header = block_map[loop.tail]
+            else:
+                prev_tail.add(block_map[loop.header])
+
+            prev_tail = block_map[loop.tail]
+
+        # The loop always exits after the last iteration's tail runs --
+        # attach the exit edge(s) there, unconditionally.
+        for exit_target in exit_targets:
+            prev_tail.add(exit_target)
 
     return root_block
+
+
+BPF_CALL_OPCODE = 0x85
+BPF_ITER_NEXT_HELPER_ID = 6
+
+
+def build_iter_value_map(loop_list: list[Loop], instructions: dict[int, BpfInstruction]) -> dict[str, int]:
+    """
+    For every bpf_iter_num_next() (CALL imm=6) call site inside a loop that
+    was successfully bounded and unrolled, maps that call's per-iteration
+    unique_instr_id (pc + unroll suffix, e.g. "68.3") to the concrete
+    loop-counter value it returns on that iteration (loop.start_value + i).
+
+    Feed this into dfs_blocks so process_instruction can model each
+    unrolled call's result concretely instead of as a fresh unconstrained
+    symbol -- see process_instruction's CALL handling for why that matters
+    (it's what lets loop-indexed array/table accesses be recognized as
+    aliasing/reusing across iterations rather than every access looking
+    like an unrelated fresh address).
+    """
+    result: dict[str, int] = {}
+
+    for loop in loop_list:
+        if loop.max_iterations is None or loop.max_iterations <= 0 or loop.start_value is None:
+            continue
+
+        next_call_pcs = [
+            pc
+            for member in loop.members
+            for pc in instructions.keys()
+            if member.start <= pc <= member.end
+            and getattr(instructions[pc], "opcode", -1) == BPF_CALL_OPCODE
+            and getattr(instructions[pc], "imm", -1) == BPF_ITER_NEXT_HELPER_ID
+        ]
+
+        for i in range(loop.max_iterations):
+            value = loop.start_value + i
+            for pc in next_call_pcs:
+                result[f"{pc}.{i}"] = value
+
+    return result

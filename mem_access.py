@@ -60,24 +60,51 @@ def normalize_huge_bv(expr):
 
 
 @dataclass
+class MemEvent:
+    """
+    A single load instruction's memory access. `distances` holds the LRU recency distances
+    (0 = most recent, increasing toward older) of every prior address in the path's rolling
+    window that Z3 confirmed aliases this load's address (i.e. falls on the same cache line).
+    Distances are computed inline during the DFS while the solver context — and thus the
+    path's full constraint set — is live. Entries where Z3 returned unknown are omitted,
+    making missed-aliasing the conservative fallback.
+
+    Realization: sort distances ascending; the minimum distance ≤ profile.associativity is
+    a cache hit at that distance. If no such distance exists, it is a miss.
+    """
+    load_name: str
+    distances: List[tuple]  # (addr_delta, recency) — addr_delta in bytes, recency 0 = most recent
+
+
+@dataclass
 class State:
     gp: List[BitVecRef] = field(default_factory=list)
     fp: List[ArithRef] = field(default_factory=list)
     memory: Dict[ExprRef, ExprRef] = field(default_factory=dict)
+    # Per-path tally of how many times each instruction (by BPF_INFO name) has executed.
+    # Loads are excluded here — they're recorded in mem_events instead, since their
+    # final histogram key depends on a cache profile chosen after the DFS completes.
+    hist: Dict[str, int] = field(default_factory=dict)
+    # Pending (unclassified) load accesses for this path, in execution order.
+    mem_events: List[MemEvent] = field(default_factory=list)
+    # Rolling window of the last (up to) CACHE_SIZE memory addresses (loads and stores)
+    # touched on this path so far, oldest first. Capped externally by the DFS (dfs.py
+    # owns CACHE_SIZE, to keep this module free of cache-policy specifics).
+    recent_window: List[BitVecRef] = field(default_factory=list)
     _is_initial: bool = field(default=True, repr=False)
-    
+
     def __post_init__(self):
         if not self._is_initial:
             return
-        
+
         self.gp = [None] * NUM_REGS
         self.fp = [None] * NUM_REGS
         for i in range(NUM_REGS):
             self.gp[i] = BitVecVal(0, WORD)
-            
+
         for i in range(NUM_REGS):
             self.fp[i] = RealVal(0)
-            
+
         self.set_gp(10, BitVec("R10_FP", WORD))
         self.set_gp(1, BitVec("R1_CTX", WORD))
         self.set_gp(0, BitVec("R0_RET", WORD))
@@ -87,6 +114,9 @@ class State:
             gp=self.gp[:],
             fp=self.fp[:],
             memory=self.memory.copy(),
+            hist=self.hist.copy(),
+            mem_events=self.mem_events.copy(),
+            recent_window=self.recent_window.copy(),
             _is_initial=False,
         )
 
@@ -711,13 +741,47 @@ def _branch_condition(decoded_instr: DecodedInstr, state: State) -> BoolRef:
     raise ValueError(f"Unsupported integer branch opcode: {op_name}")
 
 
-def process_instruction(instr: BpfInstruction, state: State, unique_instr_id: str) -> Tuple[Optional[BoolRef], Optional[BitVecRef]]:
-    """    
+# Base for the fake addresses used to model bpf_iter_num_next()'s return
+# value (see BPF_ITER_NEXT_HELPER_ID handling in process_instruction below).
+# Chosen far outside any real stack (R10_FP-relative) or map address range so
+# it can never coincide with a legitimate address; since it's a bare
+# concrete BitVecVal it also can never structurally alias a symbolic
+# expression like R10_FP + off, concrete-vs-concrete equality is the only
+# case that matters and that's exactly what Python dict lookup on z3
+# BitVecVal keys handles correctly.
+ITER_SCRATCH_BASE = 0x7F00_0000_0000
+BPF_ITER_NEXT_HELPER_ID = 6
+
+
+def _iter_scratch_addr(unique_instr_id: str) -> BitVecRef:
+    """
+    Fixed scratch address for a given bpf_iter_num_next() call *site*
+    (keyed by PC only, not by unroll suffix) — every unrolled iteration of
+    the same call site must resolve to the same address, mirroring how the
+    real helper always returns a pointer into the same `it->curr` stack
+    slot, just with different contents each call.
+    """
+    pc = int(unique_instr_id.split('.')[0].split('@')[0])
+    return BitVecVal(ITER_SCRATCH_BASE + pc, WORD)
+
+
+def process_instruction(
+    instr: BpfInstruction,
+    state: State,
+    unique_instr_id: str,
+    iter_value: Optional[int] = None,
+) -> Tuple[Optional[BoolRef], Optional[BitVecRef]]:
+    """
     Symbolically evaluates a single eBPF instruction.
     'unique_instr_id' is used for deterministic naming of symbolic variables.
+
+    'iter_value' is the concrete trip-count value this call should return,
+    if this instruction is a bpf_iter_num_next() (CALL imm=6) call site
+    inside an already-unrolled loop whose bound is statically known (see
+    dfs.build_iter_value_map). Ignored for every other instruction.
     """
     decoded_instr = _decode_instruction(instr)
-    
+
     branch_cond: Optional[BoolRef] = None
     addr: Optional[BitVecRef] = None
 
@@ -734,20 +798,39 @@ def process_instruction(instr: BpfInstruction, state: State, unique_instr_id: st
                 addr = None
 
             elif decoded_instr.name == "CALL":
-                # Per the eBPF calling convention, helper calls can modify
-                # registers R0-R5. We model this by creating new, unconstrained
-                # symbolic variables for each of them. R0 holds the return value.
-                for reg_idx in range(6): # Clobber R0 through R5
-                    new_reg_val = fresh_gp_var(reg_idx, unique_instr_id)
-                    state.set_gp(reg_idx, new_reg_val)
+                if decoded_instr.imm == BPF_ITER_NEXT_HELPER_ID and iter_value is not None:
+                    # bpf_iter_num_next() with a statically-known concrete
+                    # trip index. Real bpf_iter_num_next returns &it->curr;
+                    # model that concretely (a fixed per-call-site scratch
+                    # address holding this iteration's index) instead of the
+                    # generic fresh-symbol clobber below, so that later
+                    # dereferences of the returned pointer — and anything
+                    # indexed off of them, like payload[*i] or gflog[coef] —
+                    # see the iteration's actual index. That's what lets the
+                    # cache-reuse analysis recognize repeated accesses
+                    # through a loop variable as aliasing instead of every
+                    # access looking like a fresh, unrelated address.
+                    scratch_addr = _iter_scratch_addr(unique_instr_id)
+                    state.set_gp(0, scratch_addr)
+                    state.memory[scratch_addr] = BitVecVal(iter_value, WORD)
+                    for reg_idx in range(1, 6): # Clobber R1 through R5 as usual
+                        new_reg_val = fresh_gp_var(reg_idx, unique_instr_id)
+                        state.set_gp(reg_idx, new_reg_val)
+                else:
+                    # Per the eBPF calling convention, helper calls can modify
+                    # registers R0-R5. We model this by creating new, unconstrained
+                    # symbolic variables for each of them. R0 holds the return value.
+                    for reg_idx in range(6): # Clobber R0 through R5
+                        new_reg_val = fresh_gp_var(reg_idx, unique_instr_id)
+                        state.set_gp(reg_idx, new_reg_val)
                 # Both addr and branch_cond are None
- 
+
             else:
                 branch_cond = _branch_condition(decoded_instr, state)
 
         case InstrClass.OTHER:
             pass
-        
+
     return (branch_cond, addr)
 
 
@@ -803,28 +886,5 @@ def collect_vars(e) -> set:
             if not _is_concrete(node) and not is_true(node) and not is_false(node):
                 res.add(str(node))
         else:
-            stack.extend(node.children())
-    return res
-
-
-def collect_var_objects(e) -> set:
-    """
-    Recursively traverses a Z3 expression and collects all unique symbolic
-    variable objects (uninterpreted functions of 0 arguments).
-    """
-    res = set()
-    stack = [e]
-    visited = set()
-    while stack:
-        node = stack.pop()
-        if not hasattr(node, 'get_id'):
-            continue
-        node_id = node.get_id()
-        if node_id in visited:
-            continue
-        visited.add(node_id)
-        if is_app(node) and node.decl().kind() == Z3_OP_UNINTERPRETED and node.num_args() == 0:
-            res.add(node)
-        elif hasattr(node, 'children'):
             stack.extend(node.children())
     return res
