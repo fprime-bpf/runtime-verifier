@@ -296,7 +296,10 @@ def dfs_blocks(
                 solver.add(cond)
 
             if needs_check:
-                result = solver.check()
+                try:
+                    result = solver.check()
+                except Z3Exception:
+                    result = unknown
                 if result == sat or result == unknown:
                     stack.append(('POP_SOLVER',))
                     stack.append(('VISIT', nxt_block, nxt_state))
