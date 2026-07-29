@@ -1,42 +1,34 @@
+from dataclasses import dataclass, replace as replace_profile
 from block import Block
 from bpf import BpfClass, BpfCode, BpfInstruction, Mask, Shift, BPF_INFO, BPF_INFO_FPU
 from machine_profile import MachineProfile
 from mem_access import process_instruction, State, MemEvent, fresh_gp_var, fresh_fp_var, get_all_var_names, get_vars_from_expr, \
     normalize_huge_bv
-from z3 import Solver, If, ULT, ULE, sat, unsat, BitVecRef, BoolRef, Not, unknown, Z3Exception, Then, simplify
+from z3 import Solver, sat, unsat, BoolRef, Not, unknown, Z3Exception, simplify
 from collections import deque
 from typing import Optional, Set
 
-CACHE_LINE_DIFF = 4
-COST_MEM_L1_HIT = 8
-COST_MEM_L2_HIT = COST_MEM_L1_HIT + 12
-COST_MEM_L3_HIT = COST_MEM_L2_HIT + 20
-COST_MEM_MISS = COST_MEM_L2_HIT + 87 + 87 + 87
-CACHE_SIZE = 64
+# All cache/latency/helper-call-cost tuning now lives on a per-target MachineProfile
+# (see profiles/) rather than module-level constants -- this file has no built-in
+# notion of "the" hardware target, only how to apply whichever profile it's given.
 
 # Load instructions are NOT tallied into a path's hist during the DFS. Their cost depends
 # on cache locality, which depends on a target cache profile (line size, associativity)
 # that isn't chosen yet at DFS time — so each load is instead recorded as a MemEvent
-# (see mem_access.py), carrying its address and the path's last CACHE_SIZE prior memory
-# addresses. A later realization pass (not implemented yet) replays these against a
-# specific profile to classify each as "<name>_CACHED_<d>"/"<name>_MISS" and fold it into
-# the histogram. Stores still update the recency window (`"LD" in name` distinguishes the
+# (see mem_access.py), carrying its address and the path's last profile.cache_size prior
+# memory addresses. A later realization pass (mem_events_to_cycles) replays these against
+# a specific profile to classify each as an L1/L2/L3 hit or a miss and fold it into the
+# histogram. Stores still update the recency window (`"LD" in name` distinguishes the
 # two, same predicate as before), but go straight into hist under their plain name, same
 # as any other profile-independent instruction.
 
 # CALL instructions get their histogram key suffixed with their helper ID too:
 # "CALL_<imm>" instead of a single shared "CALL" bucket. Helper-specific cost is looked
-# up from this map (keyed by imm, not the full instruction name) — separate from the
-# general name -> cycles mapping so it's easy to override just the helper costs.
-# imm 1/2/3 are bpf_map_lookup_elem/update_elem/delete_elem (see create_test/bpf_shim.h),
-# which touch a map's backing memory, so they're priced like a cache miss, matching the
-# old ad hoc special-case. Any other helper ID falls back to DEFAULT_HELPER_CALL_COST.
-DEFAULT_HELPER_CALL_COSTS: dict[int, int] = {
-    1: COST_MEM_MISS,
-    2: COST_MEM_MISS,
-    3: COST_MEM_MISS,
-}
-DEFAULT_HELPER_CALL_COST = 100
+# up from a map (keyed by imm, not the full instruction name) built from
+# profile.miss_cycles/default_helper_call_cost in instr_counts_to_cycles -- imm 1/2/3
+# are bpf_map_lookup_elem/update_elem/delete_elem (see create_test/bpf_shim.h), which
+# touch a map's backing memory, so they're priced like a cache miss. Any other helper ID
+# falls back to profile.default_helper_call_cost.
 
 
 def is_fpu_instr(instr: BpfInstruction) -> bool:
@@ -65,23 +57,31 @@ def is_fpu_instr(instr: BpfInstruction) -> bool:
     return False
 
 
-def build_op_info_by_name() -> dict[str, MachineProfile]:
-    """Builds a name-keyed MachineProfile table from BPF_INFO and BPF_INFO_FPU.
-    Cache fields default to None; populate them with target-specific values to
-    override the fallback constants in mem_events_to_cycles."""
+def build_op_info_by_name(profile: MachineProfile) -> dict[str, MachineProfile]:
+    """Builds a name-keyed MachineProfile table from BPF_INFO/BPF_INFO_FPU's base
+    latencies and the given target profile. Each instruction's copy inherits every
+    cache/global field from `profile` (line size, associativity, hit/miss cycles,
+    cpu_freq_hz, cache_size, default_helper_call_cost, latency_overrides -- the last
+    four are simply unused at this per-instruction granularity) and only overrides
+    name+latency, substituting `profile.latency_overrides[name]` when present."""
     return {
-        instr.name: MachineProfile(instr.name, instr.latency)
+        instr.name: replace_profile(
+            profile,
+            name=instr.name,
+            latency=profile.latency_overrides.get(instr.name, instr.latency),
+        )
         for instr in list(BPF_INFO.values()) + list(BPF_INFO_FPU.values())
     }
 
 
-def build_default_cycle_mapping() -> dict[str, int]:
-    """Builds a default instruction-name -> cycle-cost mapping from the static
-    BPF_INFO/BPF_INFO_FPU latency tables. Load instruction costs are handled separately
-    by mem_events_to_cycles and are not included here."""
+def build_cycle_mapping(op_info_by_name: dict[str, MachineProfile]) -> dict[str, int]:
+    """Builds an instruction-name -> cycle-cost mapping from build_op_info_by_name's
+    result, which already has each instruction's final (override-applied) latency for
+    the chosen target. Load instruction costs are handled separately by
+    mem_events_to_cycles and are not included here."""
     return {
-        op.name: op.latency
-        for op in list(BPF_INFO.values()) + list(BPF_INFO_FPU.values())
+        name: op.latency
+        for name, op in op_info_by_name.items()
         if op.latency is not None
     }
 
@@ -89,25 +89,28 @@ def build_default_cycle_mapping() -> dict[str, int]:
 def mem_events_to_cycles(
     mem_events: list[MemEvent],
     op_info_by_name: dict[str, MachineProfile],
+    profile: MachineProfile,
 ) -> int:
     """Converts a path's pending load MemEvents into a cycle cost using the cache profile
     bundled into each instruction's MachineProfile. Assumes an inclusive cache hierarchy.
 
     For each load: filter distances to same-line accesses (addr_delta < line_size_bytes),
     take the minimum recency among those, then classify into L1/L2/L3/miss by comparing
-    against each level's associativity threshold. Falls back to module-level COST_MEM_*
-    constants when the MachineProfile has no cache profile set.
+    against each level's associativity threshold. Falls back to the target `profile`'s
+    fields when a given instruction's MachineProfile has no cache profile set (in
+    practice unreachable today, since build_op_info_by_name always populates every
+    instruction from `profile` -- kept as defensive handling for `op is None`).
     """
     total = 0
     for event in mem_events:
         op = op_info_by_name.get(event.load_name)
 
-        line_size = op.line_size_bytes  if op and op.line_size_bytes  is not None else CACHE_LINE_DIFF
-        l1_assoc  = op.l1_associativity if op and op.l1_associativity is not None else 8
-        l1_cost   = op.l1_hit_cycles    if op and op.l1_hit_cycles    is not None else COST_MEM_L1_HIT
-        l2_cost   = op.l2_hit_cycles    if op and op.l2_hit_cycles    is not None else COST_MEM_L2_HIT
-        l3_cost   = op.l3_hit_cycles    if op and op.l3_hit_cycles    is not None else COST_MEM_L3_HIT
-        miss_cost = op.miss_cycles      if op and op.miss_cycles      is not None else COST_MEM_MISS
+        line_size = op.line_size_bytes  if op and op.line_size_bytes  is not None else profile.line_size_bytes
+        l1_assoc  = op.l1_associativity if op and op.l1_associativity is not None else profile.l1_associativity
+        l1_cost   = op.l1_hit_cycles    if op and op.l1_hit_cycles    is not None else profile.l1_hit_cycles
+        l2_cost   = op.l2_hit_cycles    if op and op.l2_hit_cycles    is not None else profile.l2_hit_cycles
+        l3_cost   = op.l3_hit_cycles    if op and op.l3_hit_cycles    is not None else profile.l3_hit_cycles
+        miss_cost = op.miss_cycles      if op and op.miss_cycles      is not None else profile.miss_cycles
 
         same_line = sorted(recency for addr_delta, recency in event.distances
                            if addr_delta < line_size)
@@ -126,87 +129,53 @@ def mem_events_to_cycles(
     return total
 
 
+@dataclass
+class ExecutionTraceProfile:
+    """Per-path DFS output: what a single feasible program path actually does,
+    decoupled from which hardware costs get applied to it (see MachineProfile)."""
+    instr_counts: dict[str, int]   # profile-independent instruction histogram
+    mem_events: list[MemEvent]     # pending per-access load records
+
+
 def instr_counts_to_cycles(
-    histogram: dict[str, int],
-    mem_events: list[MemEvent],
+    trace: ExecutionTraceProfile,
     mapping: dict[str, int],
     op_info_by_name: dict[str, MachineProfile],
-    helper_call_costs: dict[int, int] = DEFAULT_HELPER_CALL_COSTS,
-    default_helper_call_cost: int = DEFAULT_HELPER_CALL_COST,
+    profile: MachineProfile,
 ) -> int:
-    """Converts a path's instruction-count histogram and pending load MemEvents into an
-    estimated cycle count. Non-load instructions are costed via `mapping`; CALL_{imm}
-    entries via `helper_call_costs`; loads via mem_events_to_cycles."""
+    """Converts a path's ExecutionTraceProfile into an estimated cycle count for the
+    given target `profile`. Non-load instructions are costed via `mapping`; CALL_{imm}
+    entries via a helper-cost map derived from `profile`; loads via mem_events_to_cycles."""
+    helper_call_costs = {1: profile.miss_cycles, 2: profile.miss_cycles, 3: profile.miss_cycles}
     total = 0
-    for name, count in histogram.items():
+    for name, count in trace.instr_counts.items():
         if name.startswith("CALL_"):
             imm = int(name.removeprefix("CALL_"))
-            cost = helper_call_costs.get(imm, default_helper_call_cost)
+            cost = helper_call_costs.get(imm, profile.default_helper_call_cost)
         else:
             cost = mapping.get(name, 0)
         total += count * cost
-    total += mem_events_to_cycles(mem_events, op_info_by_name)
+    total += mem_events_to_cycles(trace.mem_events, op_info_by_name, profile)
     return total
-
-
-def find_cache_position(curr_addr: BitVecRef, cache_list: list[BitVecRef], solver: Solver, state: State) -> int:
-    """
-    Finds `curr_addr`'s 0-indexed position in `cache_list` (0 = most recently used),
-    using a pre-configured solver (expected to already have all path constraints asserted).
-    Returns -1 if the address isn't present anywhere in the list.
-    """
-    for i, cached in enumerate(cache_list):
-        if curr_addr.eq(cached):
-            return i
-
-    # Concrete Value Check
-    if hasattr(curr_addr, 'as_long') and curr_addr.as_long() is not None:
-        curr_val = curr_addr.as_long()
-        for i, cached in enumerate(cache_list):
-            if hasattr(cached, 'as_long') and cached.as_long() is not None:
-                # Check if the difference is within the Cache Line size
-                if abs(curr_val - cached.as_long()) <= CACHE_LINE_DIFF:
-                    return i
-        return -1
-
-    # Symbolic Range Check
-    for i, cached in enumerate(cache_list):
-        solver.push()
-
-        diff = If(ULT(curr_addr, cached),
-                  cached - curr_addr,
-                  curr_addr - cached)
-
-        solver.add(ULE(diff, CACHE_LINE_DIFF))
-
-        try:
-            result = solver.check()
-        except Z3Exception:
-            result = unknown
-
-        solver.pop()  # Unconditionally pop to match the push()
-
-        if result == sat:
-            return i
-
-        if result == unknown:
-            print(f"Warning: Cache check returned unknown for {curr_addr}")
-            pass
-
-    return -1
 
 
 def dfs_blocks(
     first_block: 'Block | None',
     instructions: dict[int, BpfInstruction],
+    profile: MachineProfile,
     iter_value_by_call_site: Optional[dict[str, int]] = None,
-) -> list[tuple[dict[str, int], list[MemEvent]]]:
+) -> list[ExecutionTraceProfile]:
     """
     Perform a depth-first search over the Block graph with Path Constraints.
-    Returns, per feasible path through the CFG: a histogram of profile-independent
-    instruction counts (name -> count; everything except loads), and the list of pending
-    load MemEvents for that path. A separate realization pass (not implemented yet) turns
-    (histogram, mem_events) plus a chosen cache profile into a complete cost.
+    Returns, per feasible path through the CFG, an ExecutionTraceProfile: a histogram
+    of profile-independent instruction counts (name -> count; everything except loads),
+    and the list of pending load MemEvents for that path. A separate realization pass
+    (instr_counts_to_cycles) turns an ExecutionTraceProfile plus a chosen `profile`
+    into a complete cost.
+
+    `profile` is only consulted here for `profile.cache_size` (bounding
+    state.recent_window) -- the rest of the DFS itself has no target-specific
+    behavior; instruction/cache costing happens entirely in the later realization pass.
 
     `iter_value_by_call_site` (see build_iter_value_map) lets bpf_iter_num_next()
     calls resolve to their statically-known concrete per-iteration value instead
@@ -220,7 +189,7 @@ def dfs_blocks(
         return []
 
     onpath: Set['Block'] = set()
-    path_results: list[tuple[dict[str, int], list[MemEvent]]] = []  # (hist, mem_events) per completed path
+    path_results: list[ExecutionTraceProfile] = []  # one per completed path
 
     def make_solver() -> Solver:
         s = Solver()
@@ -382,15 +351,15 @@ def dfs_blocks(
 
                 if mem_addr is not None:
                     # Both loads and stores refresh the recency window (stores populate
-                    # the cache too), capped at CACHE_SIZE — the largest associativity
-                    # we'll ever realize against. Index 0 = most recently used.
+                    # the cache too), capped at profile.cache_size — the largest
+                    # associativity we'll ever realize against. Index 0 = most recently used.
                     state.recent_window.insert(0, mem_addr)
-                    if len(state.recent_window) > CACHE_SIZE:
+                    if len(state.recent_window) > profile.cache_size:
                         state.recent_window.pop()
 
             if not block.next:
                 print(f"Reaching an exit point {block.end}")
-                path_results.append((dict(state.hist), list(state.mem_events)))
+                path_results.append(ExecutionTraceProfile(dict(state.hist), list(state.mem_events)))
             else:
                 successors = block.next
 
@@ -416,9 +385,9 @@ def dfs_blocks(
                         stack.append(('EVAL_BRANCH', nxt_true, last_branch_cond, state.fork(), True, False))
 
     print(f"\n======DFS Complete: {len(path_results)} feasible path(s) enumerated======")
-    for idx, (hist, mem_events) in enumerate(path_results):
-        print(f"  Path {idx}: {sum(hist.values())} non-memory instructions, "
-              f"{len(mem_events)} pending load(s) -> base={hist}")
+    for idx, trace in enumerate(path_results):
+        print(f"  Path {idx}: {sum(trace.instr_counts.values())} non-memory instructions, "
+              f"{len(trace.mem_events)} pending load(s) -> base={trace.instr_counts}")
 
     return path_results
 

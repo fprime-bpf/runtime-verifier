@@ -1,10 +1,18 @@
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 
 @dataclass(frozen=True)
 class MachineProfile:
+    """Doubles as two granularities of the same shape: a per-instruction profile
+    (as built by dfs.build_op_info_by_name, one per BPF instruction name) and a
+    per-target profile (one instance per hardware target, e.g. profiles/polarfire.py).
+    The cache model is flat/uniform across instructions on every target today, so
+    these are the same fields either way; cpu_freq_hz/cache_size/
+    default_helper_call_cost/latency_overrides are only meaningful on the
+    per-target instance and are simply unused (but harmlessly present, via
+    dataclasses.replace()) on per-instruction copies."""
     name: str
     latency: Optional[int]                  # None means unknown/unmeasured
     line_size_bytes: Optional[int] = None   # cache line size in bytes; None for non-memory instructions
@@ -15,3 +23,7 @@ class MachineProfile:
     l2_hit_cycles: Optional[int] = None
     l3_hit_cycles: Optional[int] = None
     miss_cycles: Optional[int] = None
+    cpu_freq_hz: Optional[float] = None
+    cache_size: Optional[int] = None        # bounds State.recent_window's length
+    default_helper_call_cost: Optional[int] = None
+    latency_overrides: dict[str, int] = field(default_factory=dict)  # instr name -> latency

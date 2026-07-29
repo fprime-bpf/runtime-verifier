@@ -3,7 +3,8 @@ import argparse
 
 from bpf import BpfInstruction, BpfClass, BpfCode, BpfS
 from block import Block
-from dfs import dfs_blocks, Loop, find_loops, unroll_loops_in_cfg, instr_counts_to_cycles, build_default_cycle_mapping, build_op_info_by_name, build_iter_value_map
+from dfs import dfs_blocks, Loop, find_loops, unroll_loops_in_cfg, instr_counts_to_cycles, build_cycle_mapping, build_op_info_by_name, build_iter_value_map
+from profiles import PROFILES
 
 
 parser = argparse.ArgumentParser(
@@ -11,6 +12,8 @@ parser = argparse.ArgumentParser(
     description="Estimates the runtime of BPF-Prime programs",
 )
 parser.add_argument("filename")
+parser.add_argument("--profile", choices=sorted(PROFILES), default="polarfire",
+                     help="Target hardware profile (default: polarfire)")
 
 
 def read_bpf_file(filename: str) -> dict[int, BpfInstruction]:
@@ -285,6 +288,7 @@ def print_cfg_from_root(root: Block):
 
 def main():
     args = parser.parse_args()
+    profile = PROFILES[args.profile]
 
     instructions = read_bpf_file(args.filename)  # dict[int, BpfInstruction]
     first_block = get_blocks_tree(instructions)
@@ -300,16 +304,16 @@ def main():
     print_cfg_from_root(unrolled_block)
 
     iter_value_by_call_site = build_iter_value_map(loop_list, instructions)
-    path_results = dfs_blocks(unrolled_block, instructions, iter_value_by_call_site)
-    cycle_mapping = build_default_cycle_mapping()
-    op_info_by_name = build_op_info_by_name()
+    path_results = dfs_blocks(unrolled_block, instructions, profile, iter_value_by_call_site)
+    op_info_by_name = build_op_info_by_name(profile)
+    cycle_mapping = build_cycle_mapping(op_info_by_name)
     runtime_cycle_ub = max(
-        (instr_counts_to_cycles(hist, mem_events, cycle_mapping, op_info_by_name)
-         for hist, mem_events in path_results),
+        (instr_counts_to_cycles(trace, cycle_mapping, op_info_by_name, profile)
+         for trace in path_results),
         default=0,
     )
     print(f"runtime_cycle_ub: {runtime_cycle_ub}")
-    runtime_ub = runtime_cycle_ub / (6.67e8) * 1000
+    runtime_ub = runtime_cycle_ub / profile.cpu_freq_hz * 1000
     print(f"runtime_ub: {runtime_ub} ms")
 
 
