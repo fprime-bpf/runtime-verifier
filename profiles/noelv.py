@@ -1,3 +1,4 @@
+from dataclasses import replace
 from machine_profile import MachineProfile
 
 # NOEL-V FPGA soft-core. Flat 2-level cache model (L1 associativity 4, L2 up to the
@@ -150,3 +151,10 @@ NOELV_PROFILE = MachineProfile(
         "NEG_X": 1,
     },
 )
+
+# Bounding variants for WCET sensitivity analysis: same target (same clock, same
+# instruction/latency_overrides), but every load is charged as a guaranteed L1 hit
+# or a guaranteed miss instead of being classified by recency/associativity -- gives
+# a best-case/worst-case bracket around NOELV_PROFILE's realistic estimate.
+NOELV_ALL_HIT_PROFILE = replace(NOELV_PROFILE, name="noelv_all_hit", cache_mode="always_hit")
+NOELV_ALL_MISS_PROFILE = replace(NOELV_PROFILE, name="noelv_all_miss", cache_mode="always_miss")

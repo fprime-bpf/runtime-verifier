@@ -100,17 +100,31 @@ def mem_events_to_cycles(
     fields when a given instruction's MachineProfile has no cache profile set (in
     practice unreachable today, since build_op_info_by_name always populates every
     instruction from `profile` -- kept as defensive handling for `op is None`).
+
+    profile.cache_mode short-circuits this per-event classification entirely: "always_hit"
+    charges every load L1_hit_cycles and "always_miss" charges every load miss_cycles,
+    regardless of recency/associativity or whether a same-line entry was even found --
+    these are the best-/worst-case bounding profiles (see profiles/polarfire.py's
+    *_ALL_HIT_PROFILE/*_ALL_MISS_PROFILE), not just extreme tuning of the realistic model.
     """
     total = 0
     for event in mem_events:
         op = op_info_by_name.get(event.load_name)
 
+        l1_cost   = op.l1_hit_cycles if op and op.l1_hit_cycles is not None else profile.l1_hit_cycles
+        miss_cost = op.miss_cycles   if op and op.miss_cycles   is not None else profile.miss_cycles
+
+        if profile.cache_mode == "always_hit":
+            total += l1_cost
+            continue
+        if profile.cache_mode == "always_miss":
+            total += miss_cost
+            continue
+
         line_size = op.line_size_bytes  if op and op.line_size_bytes  is not None else profile.line_size_bytes
         l1_assoc  = op.l1_associativity if op and op.l1_associativity is not None else profile.l1_associativity
-        l1_cost   = op.l1_hit_cycles    if op and op.l1_hit_cycles    is not None else profile.l1_hit_cycles
         l2_cost   = op.l2_hit_cycles    if op and op.l2_hit_cycles    is not None else profile.l2_hit_cycles
         l3_cost   = op.l3_hit_cycles    if op and op.l3_hit_cycles    is not None else profile.l3_hit_cycles
-        miss_cost = op.miss_cycles      if op and op.miss_cycles      is not None else profile.miss_cycles
 
         same_line = sorted(recency for addr_delta, recency in event.distances
                            if addr_delta < line_size)

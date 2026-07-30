@@ -27,3 +27,7 @@ class MachineProfile:
     cache_size: Optional[int] = None        # bounds State.recent_window's length
     default_helper_call_cost: Optional[int] = None
     latency_overrides: dict[str, int] = field(default_factory=dict)  # instr name -> latency
+    cache_mode: str = "realistic"           # "realistic" | "always_hit" | "always_miss" -- see
+                                             # dfs.mem_events_to_cycles; bounding variants for WCET
+                                             # sensitivity analysis, built via dataclasses.replace()
+                                             # on a target's realistic profile (e.g. profiles/polarfire.py)

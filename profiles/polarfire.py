@@ -1,3 +1,4 @@
+from dataclasses import replace
 from machine_profile import MachineProfile
 
 # PolarFire SoC / SiFive U54. Reproduces main's pre-profile-system constants exactly,
@@ -20,3 +21,10 @@ POLARFIRE_PROFILE = MachineProfile(
     cache_size=64,
     default_helper_call_cost=100,
 )
+
+# Bounding variants for WCET sensitivity analysis: same target (same clock, same
+# instruction latencies), but every load is charged as a guaranteed L1 hit or a
+# guaranteed miss instead of being classified by recency/associativity -- gives a
+# best-case/worst-case bracket around POLARFIRE_PROFILE's realistic estimate.
+POLARFIRE_ALL_HIT_PROFILE = replace(POLARFIRE_PROFILE, name="polarfire_all_hit", cache_mode="always_hit")
+POLARFIRE_ALL_MISS_PROFILE = replace(POLARFIRE_PROFILE, name="polarfire_all_miss", cache_mode="always_miss")

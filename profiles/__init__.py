@@ -1,7 +1,11 @@
-from .polarfire import POLARFIRE_PROFILE
-from .noelv import NOELV_PROFILE
+from .polarfire import POLARFIRE_PROFILE, POLARFIRE_ALL_HIT_PROFILE, POLARFIRE_ALL_MISS_PROFILE
+from .noelv import NOELV_PROFILE, NOELV_ALL_HIT_PROFILE, NOELV_ALL_MISS_PROFILE
 
 PROFILES = {
     "polarfire": POLARFIRE_PROFILE,
+    "polarfire_all_hit": POLARFIRE_ALL_HIT_PROFILE,
+    "polarfire_all_miss": POLARFIRE_ALL_MISS_PROFILE,
     "noelv": NOELV_PROFILE,
+    "noelv_all_hit": NOELV_ALL_HIT_PROFILE,
+    "noelv_all_miss": NOELV_ALL_MISS_PROFILE,
 }
