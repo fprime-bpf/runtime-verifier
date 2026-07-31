@@ -22,8 +22,8 @@ from dfs import (
 from profiles import PROFILES
 
 TARGET_FAMILIES = ["polarfire", "noelv"]
-# (csv/label suffix, PROFILES key suffix); actual == the bare target name, no suffix
-MODES = [("naive", "all_miss"), ("optimistic", "all_hit"), ("actual", None)]
+# (csv/label suffix, PROFILES key suffix); estimate == the bare target name, no suffix
+MODES = [("naive", "all_miss"), ("naive_allcache", "all_hit"), ("estimate", None)]
 
 FIELDNAMES = ["binary"] + [
     f"{target}_{mode}_{unit}"
