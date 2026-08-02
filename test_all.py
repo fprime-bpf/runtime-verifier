@@ -21,6 +21,13 @@ from dfs import (
 )
 from profiles import PROFILES
 
+# get_blocks_tree recurses once per CFG edge; fully-unrolled programs (e.g.
+# aberr's manually-unrolled 5-iteration convergence loop) produce far more
+# sequential basic blocks than Python's default ~1000-frame limit allows.
+# main.py already sets this on import, but set it explicitly here too since
+# each ProcessPoolExecutor worker gets its own interpreter.
+sys.setrecursionlimit(100000)
+
 TARGET_FAMILIES = ["polarfire", "noelv"]
 # (csv/label suffix, PROFILES key suffix); estimate == the bare target name, no suffix
 MODES = [("naive", "all_miss"), ("naive_allcache", "all_hit"), ("estimate", None)]

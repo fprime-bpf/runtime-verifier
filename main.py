@@ -1,11 +1,17 @@
 from __future__ import annotations
 import argparse
+import sys
 
 from bpf import BpfInstruction, BpfClass, BpfCode, BpfS
 from block import Block
 from dfs import dfs_blocks, Loop, find_loops, unroll_loops_in_cfg, instr_counts_to_cycles, build_cycle_mapping, build_op_info_by_name, build_iter_value_map
 from profiles import PROFILES
 
+
+# get_blocks_tree recurses once per CFG edge; fully-unrolled programs (e.g.
+# aberr's manually-unrolled 5-iteration convergence loop) produce far more
+# sequential basic blocks than Python's default ~1000-frame limit allows.
+sys.setrecursionlimit(100000)
 
 parser = argparse.ArgumentParser(
     prog="bpf-runtime-verifier",
