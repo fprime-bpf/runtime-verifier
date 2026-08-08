@@ -26,6 +26,21 @@ class MachineProfile:
     cpu_freq_hz: Optional[float] = None
     cache_size: Optional[int] = None        # bounds State.recent_window's length
     default_helper_call_cost: Optional[int] = None
+    # CALL_1/2/3 (bpf_map_lookup/update/delete_elem) cost: each acquires a real
+    # shared_mutex (Components/BpfSequencer/maps/shared_mutex.hpp), not a plain
+    # memory access, so they get their own fields instead of reusing miss_cycles.
+    # None means "no measurement yet, fall back to miss_cycles" -- see dfs.py.
+    map_lookup_cycles: Optional[int] = None   # CALL_1: bpf_map_lookup_elem (shared_lock)
+    map_update_cycles: Optional[int] = None   # CALL_2: bpf_map_update_elem (unique_lock)
+    map_delete_cycles: Optional[int] = None   # CALL_3: bpf_map_delete_elem (unique_lock)
+    # CALL_5/6/7 (bpf_iter_num_new/_next/_destroy) cost: unlike the map helpers
+    # above, these are genuinely trivial (Components/BpfSequencer/iter_bpf_helpers.cpp
+    # -- a few field reads/writes and a comparison, no mutex, no container), and
+    # measured real cost is far below the generic default_helper_call_cost guess.
+    # None means "no measurement yet, fall back to default_helper_call_cost".
+    iter_new_cycles: Optional[int] = None     # CALL_5: bpf_iter_num_new
+    iter_next_cycles: Optional[int] = None    # CALL_6: bpf_iter_num_next
+    iter_destroy_cycles: Optional[int] = None # CALL_7: bpf_iter_num_destroy
     latency_overrides: dict[str, int] = field(default_factory=dict)  # instr name -> latency
     cache_mode: str = "realistic"           # "realistic" | "always_hit" | "always_miss" -- see
                                              # dfs.mem_events_to_cycles; bounding variants for WCET

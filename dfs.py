@@ -27,8 +27,11 @@ from typing import Optional, Set
 # up from a map (keyed by imm, not the full instruction name) built from
 # profile.miss_cycles/default_helper_call_cost in instr_counts_to_cycles -- imm 1/2/3
 # are bpf_map_lookup_elem/update_elem/delete_elem (see create_test/bpf_shim.h), which
-# touch a map's backing memory, so they're priced like a cache miss. Any other helper ID
-# falls back to profile.default_helper_call_cost.
+# touch a map's backing memory, so they're priced like a cache miss; imm 5/6/7 are
+# bpf_iter_num_new/_next/_destroy, which are genuinely trivial (no mutex, no
+# container) and get their own measured-cheap fields instead. Any other helper ID
+# (bpf_rand_int, bpf_math_sqrt/sin/cos/atan2, ...) falls back to
+# profile.default_helper_call_cost -- still an unmeasured flat guess.
 
 
 def is_fpu_instr(instr: BpfInstruction) -> bool:
@@ -160,7 +163,14 @@ def instr_counts_to_cycles(
     """Converts a path's ExecutionTraceProfile into an estimated cycle count for the
     given target `profile`. Non-load instructions are costed via `mapping`; CALL_{imm}
     entries via a helper-cost map derived from `profile`; loads via mem_events_to_cycles."""
-    helper_call_costs = {1: profile.miss_cycles, 2: profile.miss_cycles, 3: profile.miss_cycles}
+    helper_call_costs = {
+        1: profile.map_lookup_cycles if profile.map_lookup_cycles is not None else profile.miss_cycles,
+        2: profile.map_update_cycles if profile.map_update_cycles is not None else profile.miss_cycles,
+        3: profile.map_delete_cycles if profile.map_delete_cycles is not None else profile.miss_cycles,
+        5: profile.iter_new_cycles if profile.iter_new_cycles is not None else profile.default_helper_call_cost,
+        6: profile.iter_next_cycles if profile.iter_next_cycles is not None else profile.default_helper_call_cost,
+        7: profile.iter_destroy_cycles if profile.iter_destroy_cycles is not None else profile.default_helper_call_cost,
+    }
     total = 0
     for name, count in trace.instr_counts.items():
         if name.startswith("CALL_"):

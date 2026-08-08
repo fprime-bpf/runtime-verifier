@@ -1,40 +1,301 @@
 from dataclasses import replace
 from machine_profile import MachineProfile
 
-# NOEL-V FPGA soft-core. Flat 2-level cache model (L1 associativity 4, L2 up to the
-# full 12-entry recency window, no L3 tier), 100MHz clock, and 127 retuned
-# per-instruction latencies (of 281 total; the rest match PolarFire's base bpf.py
-# table). latency_overrides was mechanically regenerated from a diff between
-# origin/Polarfire_test:bpf.py and origin/NOELV_test:bpf.py's InstrInfo(name, latency)
-# pairs, not hand-transcribed.
+# NOEL-V FPGA soft-core. latency_overrides is a full, self-contained 278-entry
+# table (every instruction bpf.py's BPF_INFO/BPF_INFO_FPU has a latency for), not
+# a partial patch on top of a shared base table -- previously this profile only
+# listed the ~131 entries independently measured/retuned for NOEL-V, and every
+# other instruction silently fell through to bpf.py's base (PolarFire-derived)
+# latency via dfs.py's build_op_info_by_name(). That made it easy to miss that
+# most instructions were never independently verified per-target. This table's
+# values are unchanged from before (the ~131 previously-overridden entries keep
+# their NOEL-V-specific values; everything else is still the same PolarFire-
+# derived number it always was) -- only where they live has changed, so this
+# profile is now the single source of truth for its own instruction timings.
+# See project memory (project_noelv_wcet_calibration) for the provenance of the
+# entries that ARE independently measured for NOEL-V (DIV/MOD, map helper calls,
+# stores, LDDW) vs. the majority that are still an unverified carryover.
+#
+# MUL_X=8 (was 2), MUL64_X=9 (was 2), MUL_K=12 (was 6), MUL64_K=13 (was 6):
+# the old value of 2 was never independently measured -- traced it through
+# grlib-gpl-2026.2-b4300's RTL and it's real but incomplete. mul64.vhd's
+# multiply datapath (designs/noelv-xilinx-zcu102/cfg/config_local.vhd sets
+# CFG_LOCAL_MULCONF=0, selecting mul64.vhd's split=0 path, which routes
+# through techmult with generic num_stages=2 -- "number of pipeline
+# stages", an explicit RTL constant) genuinely is a 2-cycle pipeline, which
+# is exactly where the old value of 2 came from. But that's only the bare
+# functional-unit latency, not the full instruction cost software
+# experiences -- iunv.vhd (the main pipeline datapath) has a dedicated
+# hazard interlock for this, `INFO_HOLD_RAW_MULDIV` / `ex_hold_pc_muldiv`
+# ("Hold PC due to Mul/Div Unit"), confirming the core does insert a real
+# stall around MUL/DIV register dependencies beyond the bare 2-cycle
+# datapath -- but pinning the exact stall-cycle count would mean tracing
+# much more of iunv.vhd's combined hold network (16000+ lines, hold
+# reasons from many sources merged together) than was practical here.
+# Given the interlock is confirmed to exist but not fully quantified from
+# RTL alone, used the real hardware measurement instead (bpf-prime/tests/
+# latency_test.cpp Section 2's "MUL/MUL64" block, register-register `mul`
+# for the 64-bit BPF ops and `mulw` for the 32-bit ops): mul worst=8.42
+# cyc (ceil 9) -> MUL64_X; mulw worst=7.04 cyc (ceil 8) -> MUL_X. K-shape
+# (immediate) values keep the existing +4 K-vs-X delta convention used
+# throughout this table (no native RISC-V multiply-immediate exists, so a
+# BPF MUL_K/MUL64_K has to materialize the immediate first). `mulh large`
+# (6.51 cyc) was also measured but isn't used -- eBPF has no high-multiply
+# opcode, so nothing in latency_overrides maps to it.
+#
+# DIV/DIV64/MOD/MOD64 were re-measured in the same run (worst-case: divu
+# ~40.41, remu ~41.49, divuw ~24.32, remuw ~24.42) and left UNCHANGED --
+# consistent with the existing values (DIV64_X=42/DIV_X=26, from the
+# original ~41/~25 measurement documented in project memory), well within
+# normal run-to-run noise. One row from this same run, "divuw typical
+# (1e6/7)" at 236.81 cyc, was excluded as a corrupted sample -- a
+# "typical" case can't legitimately cost 10x more than the deliberately
+# adversarial worst-case operands (max dividend, divisor=1) on this
+# leading-zero-skip SRT divider, matching the SMI/interrupt noise pattern
+# documented elsewhere in this project.
+#
+# FADD_X=FSUB_X=22 (was 16), FADD64_X=FSUB64_X=23 (was 16), FADD_K=FSUB_K=26
+# (was 20), FADD64_K=FSUB64_K=27 (was 20): CFG_LOCAL_FPUCONF=0 in this
+# board's config_local.vhd selects nanofpunv over pipefpunv -- its own file
+# header calls it "a small non-pipelined IEEE754-2008 compliant
+# implementation", a completely different design from mul64.vhd's pipelined
+# datapath. Its ADD/SUB path is a literal FSM walk (nf_flopr -> nf_flop0 ->
+# nf_flop1 -> nf_addsub2 -> nf_addsub25 -> nf_addsub3 -> [nf_addsub4] ->
+# nf_addsub5 -> nf_addsub6 -> nf_addsub7 -> nf_round -> nf_repack ->
+# nf_opdone -> nf_rdwrite -> nf_rdwrite2), one state per cycle, which is why
+# the cost is so much higher than integer ALU ops -- no further hazard-
+# interlock tracing was needed here since the FSM already fully accounts
+# for the latency (unlike MUL, there's no separate functional-unit-vs-
+# pipeline-hold gap to explain). nf_addsub4 only fires when r.rddp='1'
+# (double precision); single precision jumps addsub3 -> addsub5 directly --
+# a real, RTL-confirmed 1-state/1-cycle single-vs-double gap, which is why
+# this profile now distinguishes FADD_X from FADD64_X (previously identical
+# at 16, since the double-vs-single split had never been measured/verified).
+# Values are the worst measured cost from bpf-prime/tests/latency_test.cpp
+# Section 2's "FADD/FSUB (single)"/"(double)" blocks (normal/subnormal/
+# maximal-cancellation operand shapes all measured, since the FSM has no
+# leading-zero-skip shortcut the way the divider does, so no case should
+# create a wide best/worst gap -- confirmed by the tight ~20.3-21.0 single /
+# 21.2-22.8 double clustering) rounded up to the nearest whole cycle for
+# soundness: single worst = fsub.s cancel 21.02 cyc -> ceil 22; double worst
+# = fadd.d normal 22.78 cyc -> ceil 23. K-shape (immediate) values keep the
+# same +4 K-vs-X delta convention as MUL (no float-add-immediate exists in
+# RISC-V either).
+#
+# line_size_bytes=32, l1_associativity=1 (was 4), l2_associativity=4 (was 12):
+# traced directly through this board's GRLIB source (grlib-gpl-2026.2-b4300,
+# designs/noelv-xilinx-zcu102), not measured -- config.vhd's CFG_CFG=768
+# selects the "GP" entry (index 1) of noelv_cpu_cfg.vhd's cfg_a table, which
+# gives L1 icache/dcache (shared cctrl5nv controller): iways=dways=4,
+# ilinesize=dlinesize=8 words = 32 bytes/line (GRIP manual: "cache line size
+# in number of words", 32-bit words). L2 (l2c) comes straight from
+# config.vhd: CFG_L2_WAYS=4, CFG_L2_LSZ=32 (GRIP manual states this generic
+# directly in bytes, no word conversion needed) -- both hierarchy levels
+# land on the same 32-byte line size, confirmed via two independent unit
+# conventions.
+#
+# Associativity is NOT set to the real way-counts, though -- same reasoning
+# as PolarFire's random-replacement fix (see profiles/polarfire.py), but
+# split differently here since L1 and L2 use different replacement
+# policies on this specific hardware:
+#   - L1: cpucorenvbc.vhd line ~693 hardcodes `rnd_repl => 1` on the
+#     cctrl5nv instantiation -- not even a per-design config option, this
+#     is baked into the RTL. Random replacement gives no N-access-survival
+#     guarantee, so mem_events_to_cycles's `recency < associativity` check
+#     is only sound at recency==0 (l1_associativity=1), exactly like
+#     PolarFire's L1/L2.
+#   - L2: config.vhd's CFG_L2_RAN=0, and l2c.in.help is explicit --
+#     "Say Y here to enable random replacement policy rather than the
+#     default LRU" -- so 0 means this L2 genuinely runs LRU. LRU actually
+#     does guarantee a line survives `associativity`-many accesses to its
+#     set, and mem_events_to_cycles's flat (not per-set) recency count can
+#     only ever OVER-count real conflict pressure (every real same-set
+#     access is a subset of "everything touched"), which pushes
+#     classification toward "miss" more readily than reality -- the safe
+#     direction for a WCET bound. So l2_associativity=4 (the real,
+#     RTL-confirmed way-count) is sound here, unlike PolarFire where L2 also
+#     had to collapse to 1. (The GRIP manual describes this L2C as
+#     non-inclusive -- "data may exist in the Level-1 and Level-2 cache, or
+#     only in the Level-1 or Level-2 cache" -- but since it fills both
+#     levels together on the shared AHB-bridge miss path and only diverges
+#     via each level's later independent eviction, the over-counting
+#     argument above still holds.)
+# l1_hit_cycles=3 (was 13), l2_hit_cycles=16 (was 100), miss_cycles=100 (was
+# 300): the previous three were never independently measured -- flagged in
+# project memory as the largest unexplained gap in the NOEL-V model. Fixed
+# the same way as PolarFire: a working-set-size latency sweep
+# (bpf-prime/tests/latency_test.cpp Section 7) run on real NOEL-V hardware.
+# The L1 transition is clean and lands exactly on the RTL-confirmed
+# geometry -- flat ~2.0-2.12 cyc/access from 1KB to 16384B, jumping to
+# 10.86 at 24576B, matching L1's real 4-way x 4KB/way = 16KB capacity
+# (dways=4/dwaysize=4 from noelv_cpu_cfg.vhd's "GP" entry) almost exactly.
+# l1_hit_cycles=3 is the flat region's max (2.12) ceil'd.
+# Beyond L1 there's no second clean plateau before the real DRAM asymptote,
+# unlike PolarFire's four-stage staircase -- cycles/access climbs
+# continuously and noisily from 24KB (10.86) through 512KB (68.54) before
+# slowing toward ~84-93 cyc at 2MB-16MB, even though L2's real capacity
+# (4-way x 64KB/way = 256KB, CFG_L2_WAYS=4/CFG_L2_SIZE=64) should give a
+# flat region out to 256KB -- same kind of TLB-reach/capacity confound
+# documented for PolarFire's 128KB-1MB region, just without a clean second
+# plateau to anchor on here. l2_hit_cycles=16 uses the highest reading
+# still comfortably inside L2's real 256KB capacity (65536B: 15.50,
+# ceil'd). miss_cycles=100 is rounded up with margin from the ~92.62
+# cyc/16MB near-asymptote (still slowly climbing at the largest size
+# tested, so the raw reading isn't used directly).
+#
+# iter_new_cycles=200, iter_next_cycles=200, iter_destroy_cycles=100
+# (previously unset -> fell back to default_helper_call_cost=150):
+# bpf-prime/tests/bpf_shim.h's `struct bpf_iter_num` is 4 x 8-byte fields
+# (fd, start, end, curr) = exactly 32 bytes -- one NOEL-V cache line
+# (line_size_bytes=32). Real measured cost (Section 5 of latency_test.cpp,
+# 2000-iteration back-to-back loop: new=25.20/next=13.10/destroy=17.12 cyc)
+# isn't usable directly as a WCET bound the same way it wasn't for
+# PolarFire -- that loop keeps the struct pinned in L1 the whole time, but
+# a real BPF program interleaves other memory-touching helper calls (e.g.
+# bpf_map_update_elem) between iterator calls, so nothing guarantees it's
+# still warm. Built a cold-cache bound instead: since only 8-byte
+# alignment of the struct is guaranteed (not 32-byte), an 8-byte field at
+# struct-relative offset O sits in cache line floor((base+O)/32), and for
+# base mod 32 in {8,16,24} (3 of the 4 possible 8-byte-aligned placements)
+# the 4 fields split across 2 different lines -- e.g. base mod 32 = 8 puts
+# fd/start/end in one line and curr in the next. So iter_new (writes all 4
+# fields) and iter_next (touches fd/end/curr -- reads fd, writes+rereads
+# curr, reads end) must both assume worst-case 2 distinct lines touched;
+# iter_destroy (writes only fd, a single 8-byte-aligned field, which can
+# never itself straddle a 32-byte boundary since 8 divides 32) is always
+# exactly 1 line, provably, regardless of alignment. cost = lines_touched
+# x miss_cycles(100): 2*100=200 for new/next, 1*100=100 for destroy.
+#
+# ADD_K=ADD64_K=AND_K=AND64_K=OR_K=OR64_K=SUB_K=SUB64_K=XOR_K=XOR64_K=20
+# (was 5): these were still using the old flat "+4 over X" delta
+# convention, never independently measured. bpf-prime/tests/
+# latency_test.cpp's "Immediate-operand ALU (_K shape)" block measures the
+# real RISC-V codegen for a BPF `_K` op: an eBPF K-field immediate is a
+# full 32-bit value, and 32 bits doesn't fit RISC-V's 12-bit `addi`
+# immediate field, so the JIT has to materialize it via a multi-
+# instruction `li` sequence (lui+addi) before the actual add -- measured
+# "li (32-bit const) + add" at 16.77-19.84 cyc across two runs (ceil'd
+# worst: 20). This applies uniformly to the ADD/AND/OR/SUB/XOR K-shape
+# family (32- and 64-bit alike, since eBPF's K field is the same 32-bit
+# immediate regardless of ALU width) -- the materialization cost dominates
+# and doesn't depend on which op follows it. Small-immediate `addi` alone
+# (fits 12 bits, no `li` needed) measured only 6.61-6.80 cyc, but can't be
+# assumed as the general case since arbitrary 32-bit BPF constants aren't
+# guaranteed to fit 12 bits -- using the worst case (large immediate) for
+# soundness. Deliberately NOT touched here: LSH_K/RSH_K/ARSH_K (shift-by-
+# immediate uses slli/srli/srai, whose 6-bit shift-amount field always
+# fits an eBPF shift count 0-63 in one instruction -- no `li` needed, so
+# this family doesn't apply), MOV_K/MOV64_K (a `li` alone with no trailing
+# op -- no direct isolated measurement of just `li`, left as a follow-up),
+# and the ADD_X/AND_X/etc. *register-shape* base costs (still 1, per the
+# unresolved compressed-vs-uncompressed-JIT-codegen question flagged
+# separately -- measured Simple ALU ops cluster 5.78-6.90 cyc here too,
+# but it's not yet known how much of that is real execute cost vs. an
+# artifact of this benchmark's uncompressed 4-byte-instruction fetch
+# pattern, which may not represent real RVC-compressed JIT output).
+#
+# ADD_X=ADD64_X=5, AND_X=AND64_X=OR_X=OR64_X=XOR_X=XOR64_X=SUB_X=SUB64_X=
+# LSH_X=LSH64_X=RSH_X=RSH64_X=ARSH_X=ARSH64_X=8 (all were 1): the
+# compressed-vs-uncompressed question above is RESOLVED for `add`, still
+# open for the rest. Added a "Simple ALU (compressed, BPF dst-op=-src
+# shape)" block to latency_test.cpp using the real eBPF ALU_X shape
+# (`dst op= src`, 2-operand accumulate -- confirmed via objdump this
+# compiles to the 2-byte RVC form for add/and/or/xor/sub, never for
+# sll/srl/sra since RVC has no register-register shift at all), plus an
+# `.option norvc`-forced control for `add` (identical instruction,
+# identical dependency chain, only the encoding width differs) to
+# isolate the effect cleanly: "add (forced uncompressed, dependent)"
+# measured 6.31 cyc vs. "add (compressed, dependent)" measured 4.14 cyc --
+# same op, same chain, ~2.2 cyc saved purely from the 2-byte encoding.
+# This confirms the fetch-width theory for `add` specifically.
+# ADD_X/ADD64_X=5 uses that compressed measurement (ceil'd) directly,
+# since `C.ADD` (CR-format) has no register-class restriction beyond
+# rd/rs2 != x0 -- essentially guaranteed for any real BPF register op, so
+# assuming compression here is safe. AND/OR/XOR/SUB, though, use `C.AND`/
+# `C.OR`/`C.XOR`/`C.SUB` (CA-format), which additionally require BOTH
+# registers to land in the restricted x8-x15 range (s0/s1/a0-a5) --
+# whether `llvmbpf`'s register allocator reliably lands there for
+# arbitrary eBPF register pairs is unverified, so these (and SUB, and the
+# shifts, which never compress at all) stay at the conservative
+# uncompressed worst-case instead: ceil(7.11), the highest uncompressed
+# reading across all 3 measurement runs of both the original independent-
+# operand block and this one's forced-uncompressed variants (which track
+# each other closely, confirming the dependency-chain shape itself
+# doesn't matter -- only encoding width does).
 NOELV_PROFILE = MachineProfile(
     name="noelv",
     latency=None,
-    line_size_bytes=2,
-    l1_associativity=4,
-    l1_hit_cycles=13,
-    l2_associativity=12,
-    l2_hit_cycles=100,
+    line_size_bytes=32,
+    l1_associativity=1,
+    l1_hit_cycles=3,
+    l2_associativity=4,
+    l2_hit_cycles=16,
     l3_associativity=None,
     l3_hit_cycles=None,
-    miss_cycles=300,
+    miss_cycles=100,
     cpu_freq_hz=1e8,
     cache_size=12,
     default_helper_call_cost=150,
+    iter_new_cycles=200,
+    iter_next_cycles=200,
+    iter_destroy_cycles=100,
+    map_lookup_cycles=887,
+    map_update_cycles=771,
+    map_delete_cycles=771,
     latency_overrides={
+        "ADD64_K": 20,
+        "ADD64_X": 5,
+        "ADD_K": 20,
+        "ADD_X": 5,
+        "AND64_K": 20,
+        "AND64_X": 8,
+        "AND_K": 20,
+        "AND_X": 8,
+        "ARSH64_K": 1,
+        "ARSH64_X": 8,
+        "ARSH_K": 1,
+        "ARSH_X": 8,
+        "ATOMIC_ADD_DW": 8,
+        "ATOMIC_ADD_FETCH_DW": 8,
+        "ATOMIC_ADD_FETCH_W": 8,
+        "ATOMIC_ADD_W": 8,
+        "ATOMIC_AND_DW": 8,
+        "ATOMIC_AND_FETCH_DW": 8,
+        "ATOMIC_AND_FETCH_W": 8,
+        "ATOMIC_AND_W": 8,
         "ATOMIC_CMPXCHG_DW": 17,
-        "DIV64_K": 19,
-        "DIV64_X": 15,
-        "DIV_K": 19,
-        "DIV_X": 15,
-        "FADD64_K": 20,
-        "FADD64_X": 16,
-        "FADD_K": 20,
-        "FADD_X": 16,
+        "ATOMIC_CMPXCHG_W": 8,
+        "ATOMIC_OR_DW": 8,
+        "ATOMIC_OR_FETCH_DW": 8,
+        "ATOMIC_OR_FETCH_W": 8,
+        "ATOMIC_OR_W": 8,
+        "ATOMIC_XCHG_DW": 8,
+        "ATOMIC_XCHG_W": 8,
+        "ATOMIC_XOR_DW": 8,
+        "ATOMIC_XOR_FETCH_DW": 8,
+        "ATOMIC_XOR_FETCH_W": 8,
+        "ATOMIC_XOR_W": 8,
+        "DIV64_K": 46,
+        "DIV64_X": 42,
+        "DIV_K": 30,
+        "DIV_X": 26,
+        "EXIT": 2,
+        "FADD64_K": 27,
+        "FADD64_X": 23,
+        "FADD_K": 26,
+        "FADD_X": 22,
         "FDIV64_K": 44,
         "FDIV64_X": 40,
         "FDIV_K": 44,
         "FDIV_X": 40,
+        "FLDX_B": 11,
+        "FLDX_DW": 11,
+        "FLDX_H": 11,
+        "FLDX_W": 11,
+        "FLD_B": 11,
+        "FLD_DW": 11,
+        "FLD_H": 11,
+        "FLD_W": 11,
         "FMOV64_K": 4,
         "FMOV64_X": 4,
         "FMOV_K": 4,
@@ -47,10 +308,19 @@ NOELV_PROFILE = MachineProfile(
         "FNEG64_X": 16,
         "FNEG_K": 16,
         "FNEG_X": 16,
-        "FSUB64_K": 20,
-        "FSUB64_X": 16,
-        "FSUB_K": 20,
-        "FSUB_X": 16,
+        "FSTX_B": 11,
+        "FSTX_DW": 11,
+        "FSTX_H": 11,
+        "FSTX_W": 30,
+        "FST_B": 11,
+        "FST_DW": 11,
+        "FST_H": 11,
+        "FST_W": 11,
+        "FSUB64_K": 27,
+        "FSUB64_X": 23,
+        "FSUB_K": 26,
+        "FSUB_X": 22,
+        "JA": 2,
         "JEQ32_K": 8,
         "JEQ32_X": 4,
         "JEQ_K": 8,
@@ -135,20 +405,122 @@ NOELV_PROFILE = MachineProfile(
         "JSLT32_X": 4,
         "JSLT_K": 8,
         "JSLT_X": 4,
-        "MOD64_K": 19,
-        "MOD64_X": 15,
-        "MOD_K": 19,
-        "MOD_X": 15,
+        "LDDW": 27,
+        "LDX_ABS_B": 11,
+        "LDX_ABS_DW": 11,
+        "LDX_ABS_H": 11,
+        "LDX_ABS_W": 11,
+        "LDX_B": 11,
+        "LDX_DW": 11,
+        "LDX_H": 11,
+        "LDX_IMM_B": 11,
+        "LDX_IMM_DW": 11,
+        "LDX_IMM_H": 11,
+        "LDX_IMM_W": 11,
+        "LDX_IND_B": 11,
+        "LDX_IND_DW": 11,
+        "LDX_IND_H": 11,
+        "LDX_IND_W": 11,
+        "LDX_MEMSX_B": 11,
+        "LDX_MEMSX_DW": 11,
+        "LDX_MEMSX_H": 11,
+        "LDX_MEMSX_W": 11,
+        "LDX_W": 11,
+        "LD_ABS_B": 11,
+        "LD_ABS_DW": 11,
+        "LD_ABS_H": 11,
+        "LD_ABS_W": 11,
+        "LD_IMM_B": 11,
+        "LD_IMM_H": 11,
+        "LD_IMM_W": 11,
+        "LD_IND_B": 11,
+        "LD_IND_DW": 11,
+        "LD_IND_H": 11,
+        "LD_IND_W": 11,
+        "LD_MEMSX_B": 11,
+        "LD_MEMSX_DW": 11,
+        "LD_MEMSX_H": 11,
+        "LD_MEMSX_W": 11,
+        "LD_MEM_B": 11,
+        "LD_MEM_DW": 11,
+        "LD_MEM_H": 11,
+        "LD_MEM_W": 11,
+        "LSH64_K": 1,
+        "LSH64_X": 8,
+        "LSH_K": 1,
+        "LSH_X": 8,
+        "MOD64_K": 46,
+        "MOD64_X": 42,
+        "MOD_K": 30,
+        "MOD_X": 26,
+        "MOV64_K": 4,
         "MOV64_X": 2,
+        "MOV_K": 4,
         "MOV_X": 2,
-        "MUL64_K": 6,
-        "MUL64_X": 2,
-        "MUL_K": 6,
-        "MUL_X": 2,
+        "MUL64_K": 13,
+        "MUL64_X": 9,
+        "MUL_K": 12,
+        "MUL_X": 8,
         "NEG64_K": 1,
         "NEG64_X": 1,
         "NEG_K": 1,
         "NEG_X": 1,
+        "OR64_K": 20,
+        "OR64_X": 8,
+        "OR_K": 20,
+        "OR_X": 8,
+        "RSH64_K": 1,
+        "RSH64_X": 8,
+        "RSH_K": 1,
+        "RSH_X": 8,
+        "STX_ABS_B": 11,
+        "STX_ABS_DW": 11,
+        "STX_ABS_H": 11,
+        "STX_ABS_W": 11,
+        "STX_B": 11,
+        "STX_DW": 30,
+        "STX_H": 11,
+        "STX_IMM_B": 11,
+        "STX_IMM_DW": 11,
+        "STX_IMM_H": 11,
+        "STX_IMM_W": 11,
+        "STX_IND_B": 11,
+        "STX_IND_DW": 11,
+        "STX_IND_H": 11,
+        "STX_IND_W": 11,
+        "STX_MEMSX_B": 11,
+        "STX_MEMSX_DW": 11,
+        "STX_MEMSX_H": 11,
+        "STX_MEMSX_W": 11,
+        "STX_W": 30,
+        "ST_ABS_B": 11,
+        "ST_ABS_DW": 11,
+        "ST_ABS_H": 11,
+        "ST_ABS_W": 11,
+        "ST_B": 11,
+        "ST_DW": 11,
+        "ST_H": 11,
+        "ST_IMM_B": 11,
+        "ST_IMM_DW": 11,
+        "ST_IMM_H": 11,
+        "ST_IMM_W": 11,
+        "ST_IND_B": 11,
+        "ST_IND_DW": 11,
+        "ST_IND_H": 11,
+        "ST_IND_W": 11,
+        "ST_MEMSX_B": 11,
+        "ST_MEMSX_DW": 11,
+        "ST_MEMSX_H": 11,
+        "ST_MEMSX_W": 11,
+        "ST_W": 11,
+        "SUB64_K": 20,
+        "SUB64_X": 8,
+        "SUB_K": 20,
+        "SUB_X": 8,
+        "XOR64_K": 20,
+        "XOR64_X": 8,
+        "XOR_K": 20,
+        "XOR_X": 8,
     },
 )
 
