@@ -120,28 +120,7 @@ from machine_profile import MachineProfile
 #     levels together on the shared AHB-bridge miss path and only diverges
 #     via each level's later independent eviction, the over-counting
 #     argument above still holds.)
-# l1_hit_cycles=3 (was 13), l2_hit_cycles=16 (was 100), miss_cycles=100 (was
-# 300): the previous three were never independently measured -- flagged in
-# project memory as the largest unexplained gap in the NOEL-V model. Fixed
-# the same way as PolarFire: a working-set-size latency sweep
-# (bpf-prime/tests/latency_test.cpp Section 7) run on real NOEL-V hardware.
-# The L1 transition is clean and lands exactly on the RTL-confirmed
-# geometry -- flat ~2.0-2.12 cyc/access from 1KB to 16384B, jumping to
-# 10.86 at 24576B, matching L1's real 4-way x 4KB/way = 16KB capacity
-# (dways=4/dwaysize=4 from noelv_cpu_cfg.vhd's "GP" entry) almost exactly.
-# l1_hit_cycles=3 is the flat region's max (2.12) ceil'd.
-# Beyond L1 there's no second clean plateau before the real DRAM asymptote,
-# unlike PolarFire's four-stage staircase -- cycles/access climbs
-# continuously and noisily from 24KB (10.86) through 512KB (68.54) before
-# slowing toward ~84-93 cyc at 2MB-16MB, even though L2's real capacity
-# (4-way x 64KB/way = 256KB, CFG_L2_WAYS=4/CFG_L2_SIZE=64) should give a
-# flat region out to 256KB -- same kind of TLB-reach/capacity confound
-# documented for PolarFire's 128KB-1MB region, just without a clean second
-# plateau to anchor on here. l2_hit_cycles=16 uses the highest reading
-# still comfortably inside L2's real 256KB capacity (65536B: 15.50,
-# ceil'd). miss_cycles=100 is rounded up with margin from the ~92.62
-# cyc/16MB near-asymptote (still slowly climbing at the largest size
-# tested, so the raw reading isn't used directly).
+# l1_hit_cycles=3/l2_hit_cycles=16 unchanged; miss_cycles=60 (was 100, before that 300) -- a 2MB-hugepage re-run of the working-set sweep (bpf-prime/tests/latency_test.cpp Section 7) fixed a TLB confound in the original 4KB-page run: real DRAM cost is ~53.69 cyc/16MB (not ~92), and L2's real 256KB capacity now shows a clean jump right at that boundary instead of a smeared climb.
 #
 # iter_new_cycles=200, iter_next_cycles=200, iter_destroy_cycles=100
 # (previously unset -> fell back to default_helper_call_cost=150):
@@ -232,7 +211,7 @@ NOELV_PROFILE = MachineProfile(
     l2_hit_cycles=16,
     l3_associativity=None,
     l3_hit_cycles=None,
-    miss_cycles=100,
+    miss_cycles=60,
     cpu_freq_hz=1e8,
     cache_size=12,
     default_helper_call_cost=150,
