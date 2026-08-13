@@ -1,3 +1,6 @@
+import hashlib
+import os
+import yaml
 from dataclasses import dataclass, replace as replace_profile
 from block import Block
 from bpf import BpfClass, BpfCode, BpfInstruction, Mask, Shift, BPF_INFO, BPF_INFO_FPU
@@ -154,6 +157,88 @@ class ExecutionTraceProfile:
     mem_events: list[MemEvent]     # pending per-access load records
 
 
+TRACE_FORMAT_VERSION = 1
+
+
+def _yaml_dumper():
+    return yaml.CSafeDumper if getattr(yaml, "__with_libyaml__", False) else yaml.SafeDumper
+
+
+def _yaml_loader():
+    return yaml.CSafeLoader if getattr(yaml, "__with_libyaml__", False) else yaml.SafeLoader
+
+
+def save_trace(path_results: list[ExecutionTraceProfile], out_path: str, *, program_path: str, dfs_cache_size: int) -> None:
+    """Persists phase-1 (DFS) output so phase-2 (instr_counts_to_cycles/mem_events_to_cycles)
+    can be re-run against different MachineProfiles later without re-paying the DFS cost.
+    dfs_cache_size MUST be the cache_size of the profile the DFS was actually run with --
+    see check_trace_soundness."""
+    program_sha256 = None
+    if os.path.isfile(program_path):
+        with open(program_path, "rb") as pf:
+            program_sha256 = hashlib.sha256(pf.read()).hexdigest()
+
+    data = {
+        "metadata": {
+            "format_version": TRACE_FORMAT_VERSION,
+            "program_path": str(program_path),
+            "program_sha256": program_sha256,
+            "dfs_cache_size": dfs_cache_size,
+        },
+        "paths": [
+            {
+                "instr_counts": dict(trace.instr_counts),
+                "mem_events": [
+                    {"load_name": e.load_name, "distances": [list(d) for d in e.distances]}
+                    for e in trace.mem_events
+                ],
+            }
+            for trace in path_results
+        ],
+    }
+    with open(out_path, "w") as f:
+        yaml.dump(data, f, Dumper=_yaml_dumper(), sort_keys=False, default_flow_style=None)
+
+
+def load_trace(path: str) -> tuple[list[ExecutionTraceProfile], dict]:
+    """Inverse of save_trace. Returns (path_results, metadata) -- caller must call
+    check_trace_soundness(metadata, profile) before costing."""
+    with open(path) as f:
+        data = yaml.load(f, Loader=_yaml_loader())
+
+    metadata = data.get("metadata", {})
+    path_results = [
+        ExecutionTraceProfile(
+            instr_counts=dict(p["instr_counts"]),
+            mem_events=[
+                MemEvent(e["load_name"], [tuple(d) for d in e["distances"]])
+                for e in p["mem_events"]
+            ],
+        )
+        for p in data.get("paths", [])
+    ]
+    return path_results, metadata
+
+
+def check_trace_soundness(metadata: dict, profile: MachineProfile) -> None:
+    """Raises ValueError if `profile` might require recency-window entries a trace's DFS
+    run wasn't wide enough to have recorded (dfs_blocks only ever consults profile.cache_size
+    to bound State.recent_window). Sound iff the trace's dfs_cache_size >= profile.cache_size."""
+    trace_cache_size = metadata.get("dfs_cache_size")
+    if trace_cache_size is None:
+        raise ValueError(
+            "trace file has no 'dfs_cache_size' in its metadata (written by an "
+            "incompatible/older tool version?); refusing to cost it."
+        )
+    if profile.cache_size is not None and trace_cache_size < profile.cache_size:
+        raise ValueError(
+            f"trace was generated with dfs_cache_size={trace_cache_size}, smaller "
+            f"than --profile {profile.name!r}'s cache_size={profile.cache_size}. "
+            f"This trace is UNSOUND for this profile. Re-run with --emit-trace "
+            f"using a profile whose cache_size >= {profile.cache_size}."
+        )
+
+
 def instr_counts_to_cycles(
     trace: ExecutionTraceProfile,
     mapping: dict[str, int],
@@ -188,12 +273,15 @@ def dfs_blocks(
     instructions: dict[int, BpfInstruction],
     profile: MachineProfile,
     iter_value_by_call_site: Optional[dict[str, int]] = None,
-) -> list[ExecutionTraceProfile]:
+    collect_leaves_at: Optional[int] = None,
+    forced_decisions: Optional[list[bool]] = None,
+) -> tuple[list[ExecutionTraceProfile], list[list[bool]]]:
     """
     Perform a depth-first search over the Block graph with Path Constraints.
-    Returns, per feasible path through the CFG, an ExecutionTraceProfile: a histogram
-    of profile-independent instruction counts (name -> count; everything except loads),
-    and the list of pending load MemEvents for that path. A separate realization pass
+    Returns (path_results, leaves): path_results is, per feasible *completed* path
+    through the CFG, an ExecutionTraceProfile (a histogram of profile-independent
+    instruction counts -- name -> count; everything except loads -- and the list of
+    pending load MemEvents for that path). A separate realization pass
     (instr_counts_to_cycles) turns an ExecutionTraceProfile plus a chosen `profile`
     into a complete cost.
 
@@ -204,14 +292,30 @@ def dfs_blocks(
     `iter_value_by_call_site` (see build_iter_value_map) lets bpf_iter_num_next()
     calls resolve to their statically-known concrete per-iteration value instead
     of a fresh unconstrained symbol, so loop-indexed memory reuse is detectable.
+
+    `collect_leaves_at`/`forced_decisions` split exploration across processes (see
+    solve_in_parallel in main.py) without ever needing to serialize a Z3 Solver:
+    every 2-successor branch appends the taken side (True/False) to
+    state.decision_path, so a sequence of bools fully identifies a subtree.
+    - collect_leaves_at=K: once a path's decision_path reaches length K, stop
+      exploring it and record the K-bool path in `leaves` instead of recursing
+      further; paths that complete in fewer than K decisions land in
+      path_results as usual. Used single-threaded to enumerate independent
+      subtrees to hand out to workers.
+    - forced_decisions=[...]: at each 2-successor branch while
+      len(state.decision_path) < len(forced_decisions), only explore the
+      specified side instead of both. Used by each worker to cheaply replay
+      down to its assigned leaf (re-deriving the same prefix state, not
+      resuming a snapshot) before exploring the rest of that subtree normally.
     """
     if iter_value_by_call_site is None:
         iter_value_by_call_site = {}
     print("\n======DFS Start======")
 
     if first_block is None:
-        return []
+        return [], []
 
+    leaves: list[list[bool]] = []
     onpath: Set['Block'] = set()
     path_results: list[ExecutionTraceProfile] = []  # one per completed path
 
@@ -223,35 +327,6 @@ def dfs_blocks(
         return s
 
     solver = make_solver()
-
-    # A long DFS trace (many chained loops, each individually cheap) makes
-    # each solver.check() progressively more expensive even when the
-    # *logical* set of active assertions at any moment stays modest --
-    # incremental z3 solvers accumulate internal search state (e.g. learned
-    # clauses) across calls that push()/pop() alone doesn't fully discard.
-    # Periodically rebuild the Solver from its own current assertions to
-    # flush that accumulated internal state while keeping the exact same
-    # logical constraints in effect. push_depth tracks how many push()
-    # calls are currently outstanding (i.e. how many POP_SOLVER actions are
-    # still queued on the stack) so the rebuilt solver can be given that
-    # many empty scopes -- those future pops still need something to pop,
-    # even though the constraints they'd have discarded are now baked into
-    # the rebuilt solver's permanent (unpushed) base scope instead. Popping
-    # an empty scope is a no-op on the assertion set, so this is exactly
-    # equivalent to not having compacted at all.
-    push_depth = 0
-    pushes_since_compact = 0
-    COMPACT_EVERY = 100
-
-    def compact_solver():
-        nonlocal solver, pushes_since_compact
-        assertions = solver.assertions()
-        solver = make_solver()
-        for a in assertions:
-            solver.add(a)
-        for _ in range(push_depth):
-            solver.push()
-        pushes_since_compact = 0
 
     # Initialize state
     initial_state = State()
@@ -270,7 +345,6 @@ def dfs_blocks(
 
         if action == 'POP_SOLVER':
             solver.pop()
-            push_depth -= 1
 
         elif action == 'BACKTRACK_BLOCK':
             _, block = item
@@ -280,10 +354,6 @@ def dfs_blocks(
             _, nxt_block, cond, nxt_state, needs_check, is_false_branch = item
 
             solver.push()
-            push_depth += 1
-            pushes_since_compact += 1
-            if pushes_since_compact >= COMPACT_EVERY:
-                compact_solver()
 
             if cond is not None:
                 solver.add(cond)
@@ -302,7 +372,6 @@ def dfs_blocks(
                         print(f"Solver Statistics: {solver.statistics()}")
                     # Immediately pop since we won't schedule a VISIT
                     solver.pop()
-                    push_depth -= 1
                 else:
                     raise ValueError(f"Unexpected solver result: {result}")
             else:
@@ -397,23 +466,39 @@ def dfs_blocks(
                 elif len(successors) == 2:
                     nxt_true = successors[0]
                     nxt_false = successors[1]
+                    depth = len(state.decision_path)
+
+                    if collect_leaves_at is not None and depth >= collect_leaves_at:
+                        leaves.append(list(state.decision_path))
+                        continue
+
+                    true_state = state.fork()
+                    true_state.decision_path.append(True)
+                    false_state = state.fork()
+                    false_state.decision_path.append(False)
+
+                    force = forced_decisions[depth] if forced_decisions is not None and depth < len(forced_decisions) else None
 
                     if last_branch_cond is None:
                         print("Warning: Branch with 2 successors but no condition found! Exploring both blindly.")
-                        stack.append(('EVAL_BRANCH', nxt_false, None, state.fork(), False, True))
-                        stack.append(('EVAL_BRANCH', nxt_true, None, state.fork(), False, False))
+                        if force is not True:
+                            stack.append(('EVAL_BRANCH', nxt_false, None, false_state, False, True))
+                        if force is not False:
+                            stack.append(('EVAL_BRANCH', nxt_true, None, true_state, False, False))
                     else:
                         # Push False branch (Not Taken) - executed second
-                        stack.append(('EVAL_BRANCH', nxt_false, Not(last_branch_cond), state.fork(), True, True))
+                        if force is not True:
+                            stack.append(('EVAL_BRANCH', nxt_false, Not(last_branch_cond), false_state, True, True))
                         # Push True branch (Taken) - executed first
-                        stack.append(('EVAL_BRANCH', nxt_true, last_branch_cond, state.fork(), True, False))
+                        if force is not False:
+                            stack.append(('EVAL_BRANCH', nxt_true, last_branch_cond, true_state, True, False))
 
-    print(f"\n======DFS Complete: {len(path_results)} feasible path(s) enumerated======")
+    print(f"\n======DFS Complete: {len(path_results)} feasible path(s) enumerated, {len(leaves)} leaf/leaves handed off======")
     for idx, trace in enumerate(path_results):
         print(f"  Path {idx}: {sum(trace.instr_counts.values())} non-memory instructions, "
               f"{len(trace.mem_events)} pending load(s) -> base={trace.instr_counts}")
 
-    return path_results
+    return path_results, leaves
 
 
 class Loop:
@@ -704,5 +789,18 @@ def build_iter_value_map(loop_list: list[Loop], instructions: dict[int, BpfInstr
             value = loop.start_value + i
             for pc in next_call_pcs:
                 result[f"{pc}.{i}"] = value
+
+        # The one-time bpf_iter_num_next() priming call before the loop body
+        # (not a loop member, so not covered above) always succeeds once
+        # max_iterations is known positive -- concretize it too, or the DFS
+        # treats "loop runs zero times" as an open question and wastes a full
+        # explore-then-backtrack on a hypothesis that's already been ruled
+        # out by the unrolling above.
+        if loop.call_5_pc is not None:
+            for pc, instr in instructions.items():
+                if (loop.call_5_pc < pc < loop.header.start
+                        and getattr(instr, "opcode", -1) == BPF_CALL_OPCODE
+                        and getattr(instr, "imm", -1) == BPF_ITER_NEXT_HELPER_ID):
+                    result[str(pc)] = loop.start_value
 
     return result

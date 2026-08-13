@@ -1,10 +1,14 @@
 from __future__ import annotations
 import argparse
+import hashlib
+import multiprocessing
+import os
 import sys
+from dataclasses import replace as replace_profile
 
 from bpf import BpfInstruction, BpfClass, BpfCode, BpfS
 from block import Block
-from dfs import dfs_blocks, Loop, find_loops, unroll_loops_in_cfg, instr_counts_to_cycles, build_cycle_mapping, build_op_info_by_name, build_iter_value_map
+from dfs import dfs_blocks, ExecutionTraceProfile, Loop, find_loops, unroll_loops_in_cfg, instr_counts_to_cycles, build_cycle_mapping, build_op_info_by_name, build_iter_value_map, save_trace, load_trace, check_trace_soundness
 from profiles import PROFILES
 
 
@@ -17,9 +21,68 @@ parser = argparse.ArgumentParser(
     prog="bpf-runtime-verifier",
     description="Estimates the runtime of BPF-Prime programs",
 )
-parser.add_argument("filename")
+parser.add_argument("filename", nargs="?", default=None,
+                     help="Path to raw eBPF instructions (.o). Required unless --from-trace is given.")
 parser.add_argument("--profile", choices=sorted(PROFILES), default="polarfire",
                      help="Target hardware profile (default: polarfire)")
+parser.add_argument("--jobs", "-j", type=int, default=1,
+                     help="Worker processes to split DFS exploration across (default: 1, i.e. no split)")
+parser.add_argument("--split-depth", type=int, default=6,
+                     help="2-successor branches to enumerate single-threaded before splitting into subtrees (default: 6)")
+parser.add_argument("--emit-trace", metavar="PATH", default=None,
+                     help="After computing path_results, also persist them as a YAML trace to PATH.")
+parser.add_argument("--from-trace", metavar="PATH", default=None,
+                     help="Skip file reading/CFG/DFS entirely; load path_results from a YAML trace "
+                          "previously written by --emit-trace and cost it against --profile.")
+
+
+# Set once per forked worker process (via _init_worker, before any tasks run) so
+# workers share the CFG/instructions/profile through fork()'s copy-on-write instead
+# of repickling them per task -- only the (tiny) leaf itself crosses the task queue.
+_worker_ctx: dict = {}
+
+
+def _init_worker(unrolled_block, instructions, profile, iter_value_by_call_site):
+    _worker_ctx["unrolled_block"] = unrolled_block
+    _worker_ctx["instructions"] = instructions
+    _worker_ctx["profile"] = profile
+    _worker_ctx["iter_value_by_call_site"] = iter_value_by_call_site
+
+
+def _explore_leaf(leaf: list[bool]) -> list[ExecutionTraceProfile]:
+    path_results, _ = dfs_blocks(
+        _worker_ctx["unrolled_block"], _worker_ctx["instructions"],
+        _worker_ctx["profile"], _worker_ctx["iter_value_by_call_site"],
+        forced_decisions=leaf,
+    )
+    return path_results
+
+
+def solve_in_parallel(unrolled_block, instructions, profile, iter_value_by_call_site,
+                       collect_leaves_at: int, jobs: int) -> list[ExecutionTraceProfile]:
+    """
+    Single-threaded shallow pass down to collect_leaves_at 2-successor branches to
+    enumerate independent subtrees (dfs_blocks's collect_leaves_at), then explores
+    each subtree in its own worker process (forced_decisions replays the same
+    prefix rather than resuming a saved Z3 state, which isn't picklable), merging
+    every worker's completed paths with whatever the shallow pass itself completed.
+    """
+    initial_results, leaves = dfs_blocks(
+        unrolled_block, instructions, profile, iter_value_by_call_site,
+        collect_leaves_at=collect_leaves_at,
+    )
+    if not leaves or jobs <= 1:
+        return initial_results
+
+    print(f"\n======Splitting into {len(leaves)} subtree(s) across up to {jobs} worker process(es)======")
+    with multiprocessing.Pool(
+        processes=min(jobs, len(leaves)),
+        initializer=_init_worker,
+        initargs=(unrolled_block, instructions, profile, iter_value_by_call_site),
+    ) as pool:
+        for worker_results in pool.imap_unordered(_explore_leaf, leaves):
+            initial_results.extend(worker_results)
+    return initial_results
 
 
 def read_bpf_file(filename: str) -> dict[int, BpfInstruction]:
@@ -296,21 +359,65 @@ def main():
     args = parser.parse_args()
     profile = PROFILES[args.profile]
 
-    instructions = read_bpf_file(args.filename)  # dict[int, BpfInstruction]
-    first_block = get_blocks_tree(instructions)
+    if args.filename is None and args.from_trace is None:
+        parser.error("filename is required unless --from-trace is given")
+    if args.filename is not None and args.from_trace is not None:
+        parser.error("filename and --from-trace are mutually exclusive")
+    if args.from_trace is not None and args.emit_trace is not None:
+        parser.error("--from-trace and --emit-trace are mutually exclusive (re-emitting a trace "
+                      "you just loaded, with no new DFS work done, is a no-op)")
 
-    print_cfg_from_root(first_block)
-    loop_list = find_loops(first_block, instructions)
-    for loop in loop_list:
-        print(f"Loop: {loop}\n Header: {loop.header}\n Tail: {loop.tail}\n Iteration count: {loop.max_iterations}\n "
-              f"Call0x5_pc: {loop.call_5_pc}\n w2_pc: {loop.w2_pc}\n w3_pc: {loop.w3_pc}\n Members: {loop.members}\n\n")
-        
-    # Duplicate loop contents in cycle
-    unrolled_block = unroll_loops_in_cfg(first_block, loop_list)
-    print_cfg_from_root(unrolled_block)
+    if args.from_trace is not None:
+        path_results, metadata = load_trace(args.from_trace)
+        try:
+            check_trace_soundness(metadata, profile)
+        except ValueError as e:
+            parser.error(str(e))
 
-    iter_value_by_call_site = build_iter_value_map(loop_list, instructions)
-    path_results = dfs_blocks(unrolled_block, instructions, profile, iter_value_by_call_site)
+        trace_program_path = metadata.get("program_path")
+        trace_sha256 = metadata.get("program_sha256")
+        if trace_program_path and trace_sha256 and os.path.isfile(trace_program_path):
+            with open(trace_program_path, "rb") as pf:
+                current_sha256 = hashlib.sha256(pf.read()).hexdigest()
+            if current_sha256 != trace_sha256:
+                print(f"WARNING: trace was generated from {trace_program_path!r} but that file's "
+                      f"contents have since changed (sha256 mismatch) -- trace may be stale.",
+                      file=sys.stderr)
+    else:
+        instructions = read_bpf_file(args.filename)  # dict[int, BpfInstruction]
+        first_block = get_blocks_tree(instructions)
+
+        print_cfg_from_root(first_block)
+        loop_list = find_loops(first_block, instructions)
+        for loop in loop_list:
+            print(f"Loop: {loop}\n Header: {loop.header}\n Tail: {loop.tail}\n Iteration count: {loop.max_iterations}\n "
+                  f"Call0x5_pc: {loop.call_5_pc}\n w2_pc: {loop.w2_pc}\n w3_pc: {loop.w3_pc}\n Members: {loop.members}\n\n")
+
+        # Duplicate loop contents in cycle
+        unrolled_block = unroll_loops_in_cfg(first_block, loop_list)
+        print_cfg_from_root(unrolled_block)
+
+        # dfs_blocks only ever consults profile.cache_size (bounds State.recent_window,
+        # the rolling window of candidate same-line addresses recorded per load) -- it
+        # doesn't affect branching/pruning/path-selection at all, so running the DFS at
+        # the largest cache_size across every known profile is purely additive (more
+        # candidate distances recorded, nothing lost) and makes the resulting path_results
+        # -- and any --emit-trace file -- sound to cost against ANY current profile, not
+        # just ones sharing --profile's own hardware family.
+        dfs_cache_size = max(p.cache_size for p in PROFILES.values())
+        dfs_profile = replace_profile(profile, cache_size=dfs_cache_size) if profile.cache_size != dfs_cache_size else profile
+
+        iter_value_by_call_site = build_iter_value_map(loop_list, instructions)
+        if args.jobs > 1:
+            path_results = solve_in_parallel(unrolled_block, instructions, dfs_profile, iter_value_by_call_site,
+                                              collect_leaves_at=args.split_depth, jobs=args.jobs)
+        else:
+            path_results, _ = dfs_blocks(unrolled_block, instructions, dfs_profile, iter_value_by_call_site)
+
+        if args.emit_trace is not None:
+            save_trace(path_results, args.emit_trace, program_path=args.filename, dfs_cache_size=dfs_cache_size)
+            print(f"Trace written to {args.emit_trace}")
+
     op_info_by_name = build_op_info_by_name(profile)
     cycle_mapping = build_cycle_mapping(op_info_by_name)
     runtime_cycle_ub = max(

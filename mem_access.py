@@ -91,6 +91,9 @@ class State:
     # touched on this path so far, oldest first. Capped externally by the DFS (dfs.py
     # owns CACHE_SIZE, to keep this module free of cache-policy specifics).
     recent_window: List[BitVecRef] = field(default_factory=list)
+    # True/False choice made at each 2-successor branch reached so far on this path,
+    # in order -- used by dfs.py's multiprocess split to identify/replay a specific subtree.
+    decision_path: List[bool] = field(default_factory=list)
     _is_initial: bool = field(default=True, repr=False)
 
     def __post_init__(self):
@@ -117,6 +120,7 @@ class State:
             hist=self.hist.copy(),
             mem_events=self.mem_events.copy(),
             recent_window=self.recent_window.copy(),
+            decision_path=self.decision_path.copy(),
             _is_initial=False,
         )
 

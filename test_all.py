@@ -59,7 +59,7 @@ def analyze_binary(a_o_path: Path) -> dict[str, str]:
         loop_list = find_loops(first_block, instructions)
         unrolled = unroll_loops_in_cfg(first_block, loop_list)
         iter_value_by_call_site = build_iter_value_map(loop_list, instructions)
-        path_results = dfs_blocks(unrolled, instructions, dfs_profile, iter_value_by_call_site)
+        path_results, _ = dfs_blocks(unrolled, instructions, dfs_profile, iter_value_by_call_site)
 
     row: dict[str, str] = {}
     for target in TARGET_FAMILIES:

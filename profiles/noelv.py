@@ -82,6 +82,8 @@ from machine_profile import MachineProfile
 # same +4 K-vs-X delta convention as MUL (no float-add-immediate exists in
 # RISC-V either).
 #
+# FADD/FSUB_X=23 (was 22, single now matches double), FMUL64_X=100/K=104, FMUL_X=75/K=79, FDIV64_X=128/K=132, FDIV_X=45/K=49, FMOV/FNEG(64)_X/K=15 (was 22-26/40-44/4/16): re-measured Section 2 -- FMUL/FDIV were badly underestimated (fmul.d=99.76, fmul.s=74.50, fdiv.d=127.36, fdiv.s=44.88 cyc, ceiled), excluding fsub.d normal(163.58 cyc)/mul small(78.15 cyc) as SMI-corrupted (inconsistent with their own tight same-category clusters, same pattern as the earlier-excluded divuw typical). FMOV/FNEG unified across precision at 15 (fmv.d=13.49, fneg.s=14.81, fmv.s=14.06 cyc) since nanofpunv.vhd's nf_sgn2 state (handles FSGNJ/FSGNJN/FSGNJX, i.e. fneg/fmv) is a single-state FSM step straight to nf_opdone regardless of rddp, unlike FADD/FSUB/FMUL/FDIV's long chains -- RTL-confirms no precision-dependent cost, so fneg.d's 77.04 cyc sample is excluded as corrupted too.
+#
 # line_size_bytes=32, l1_associativity=1 (was 4), l2_associativity=4 (was 12):
 # traced directly through this board's GRLIB source (grlib-gpl-2026.2-b4300,
 # designs/noelv-xilinx-zcu102), not measured -- config.vhd's CFG_CFG=768
@@ -122,28 +124,9 @@ from machine_profile import MachineProfile
 #     argument above still holds.)
 # l1_hit_cycles=3/l2_hit_cycles=16 unchanged; miss_cycles=60 (was 100, before that 300) -- a 2MB-hugepage re-run of the working-set sweep (bpf-prime/tests/latency_test.cpp Section 7) fixed a TLB confound in the original 4KB-page run: real DRAM cost is ~53.69 cyc/16MB (not ~92), and L2's real 256KB capacity now shows a clean jump right at that boundary instead of a smeared climb.
 #
-# iter_new_cycles=200, iter_next_cycles=200, iter_destroy_cycles=100
-# (previously unset -> fell back to default_helper_call_cost=150):
-# bpf-prime/tests/bpf_shim.h's `struct bpf_iter_num` is 4 x 8-byte fields
-# (fd, start, end, curr) = exactly 32 bytes -- one NOEL-V cache line
-# (line_size_bytes=32). Real measured cost (Section 5 of latency_test.cpp,
-# 2000-iteration back-to-back loop: new=25.20/next=13.10/destroy=17.12 cyc)
-# isn't usable directly as a WCET bound the same way it wasn't for
-# PolarFire -- that loop keeps the struct pinned in L1 the whole time, but
-# a real BPF program interleaves other memory-touching helper calls (e.g.
-# bpf_map_update_elem) between iterator calls, so nothing guarantees it's
-# still warm. Built a cold-cache bound instead: since only 8-byte
-# alignment of the struct is guaranteed (not 32-byte), an 8-byte field at
-# struct-relative offset O sits in cache line floor((base+O)/32), and for
-# base mod 32 in {8,16,24} (3 of the 4 possible 8-byte-aligned placements)
-# the 4 fields split across 2 different lines -- e.g. base mod 32 = 8 puts
-# fd/start/end in one line and curr in the next. So iter_new (writes all 4
-# fields) and iter_next (touches fd/end/curr -- reads fd, writes+rereads
-# curr, reads end) must both assume worst-case 2 distinct lines touched;
-# iter_destroy (writes only fd, a single 8-byte-aligned field, which can
-# never itself straddle a 32-byte boundary since 8 divides 32) is always
-# exactly 1 line, provably, regardless of alignment. cost = lines_touched
-# x miss_cycles(100): 2*100=200 for new/next, 1*100=100 for destroy.
+# iter_new/next_cycles=120, iter_destroy_cycles=60 (was 200/200/100): re-derived cost=lines_touched(2,2,1)*miss_cycles now that miss_cycles=60 (these were never updated after that fix, still used the old 100). Re-measured Section 5 (steady non-NULL: new=26.15/next=14.85/destroy=6.70 cyc) still far below this cold bound, so the model stays sound but not tight -- no per-call warm/cold split exists since traces are order-losing per-path histograms.
+#
+# map_lookup/update/delete_cycles=240/360/120 (was 650/800/200): re-measured actuals from the new lock-free-map hardware run (BENCHMARK_RESULTS_wamr_noelv.yml, SMI-filtered/50-sample-warmup-cut worst-case) are 4-76x below each benchmark's non-map instruction cost alone, so kalman no longer binds and the original lines-touched*miss_cycles structural estimate (from array_map's real field layout under kMapsAllowRaces=true) is sound with wide margin -- no need for the padded 650/800/200.
 #
 # ADD_K=ADD64_K=AND_K=AND64_K=OR_K=OR64_K=SUB_K=SUB64_K=XOR_K=XOR64_K=20
 # (was 5): these were still using the old flat "+4 over X" delta
@@ -215,12 +198,12 @@ NOELV_PROFILE = MachineProfile(
     cpu_freq_hz=1e8,
     cache_size=12,
     default_helper_call_cost=150,
-    iter_new_cycles=200,
-    iter_next_cycles=200,
-    iter_destroy_cycles=100,
-    map_lookup_cycles=887,
-    map_update_cycles=771,
-    map_delete_cycles=771,
+    iter_new_cycles=120,
+    iter_next_cycles=120,
+    iter_destroy_cycles=60,
+    map_lookup_cycles=240,
+    map_update_cycles=360,
+    map_delete_cycles=120,
     latency_overrides={
         "ADD64_K": 20,
         "ADD64_X": 5,
@@ -261,12 +244,12 @@ NOELV_PROFILE = MachineProfile(
         "EXIT": 2,
         "FADD64_K": 27,
         "FADD64_X": 23,
-        "FADD_K": 26,
-        "FADD_X": 22,
-        "FDIV64_K": 44,
-        "FDIV64_X": 40,
-        "FDIV_K": 44,
-        "FDIV_X": 40,
+        "FADD_K": 27,
+        "FADD_X": 23,
+        "FDIV64_K": 132,
+        "FDIV64_X": 128,
+        "FDIV_K": 49,
+        "FDIV_X": 45,
         "FLDX_B": 11,
         "FLDX_DW": 11,
         "FLDX_H": 11,
@@ -275,18 +258,18 @@ NOELV_PROFILE = MachineProfile(
         "FLD_DW": 11,
         "FLD_H": 11,
         "FLD_W": 11,
-        "FMOV64_K": 4,
-        "FMOV64_X": 4,
-        "FMOV_K": 4,
-        "FMOV_X": 4,
-        "FMUL64_K": 26,
-        "FMUL64_X": 22,
-        "FMUL_K": 26,
-        "FMUL_X": 22,
-        "FNEG64_K": 16,
-        "FNEG64_X": 16,
-        "FNEG_K": 16,
-        "FNEG_X": 16,
+        "FMOV64_K": 15,
+        "FMOV64_X": 15,
+        "FMOV_K": 15,
+        "FMOV_X": 15,
+        "FMUL64_K": 104,
+        "FMUL64_X": 100,
+        "FMUL_K": 79,
+        "FMUL_X": 75,
+        "FNEG64_K": 15,
+        "FNEG64_X": 15,
+        "FNEG_K": 15,
+        "FNEG_X": 15,
         "FSTX_B": 11,
         "FSTX_DW": 11,
         "FSTX_H": 11,
@@ -297,8 +280,8 @@ NOELV_PROFILE = MachineProfile(
         "FST_W": 11,
         "FSUB64_K": 27,
         "FSUB64_X": 23,
-        "FSUB_K": 26,
-        "FSUB_X": 22,
+        "FSUB_K": 27,
+        "FSUB_X": 23,
         "JA": 2,
         "JEQ32_K": 8,
         "JEQ32_X": 4,
