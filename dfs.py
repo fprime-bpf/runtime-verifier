@@ -255,6 +255,10 @@ def instr_counts_to_cycles(
         5: profile.iter_new_cycles if profile.iter_new_cycles is not None else profile.default_helper_call_cost,
         6: profile.iter_next_cycles if profile.iter_next_cycles is not None else profile.default_helper_call_cost,
         7: profile.iter_destroy_cycles if profile.iter_destroy_cycles is not None else profile.default_helper_call_cost,
+        9: profile.math_sqrt_cycles if profile.math_sqrt_cycles is not None else profile.default_helper_call_cost,
+        10: profile.math_sin_cycles if profile.math_sin_cycles is not None else profile.default_helper_call_cost,
+        11: profile.math_cos_cycles if profile.math_cos_cycles is not None else profile.default_helper_call_cost,
+        12: profile.math_atan2_cycles if profile.math_atan2_cycles is not None else profile.default_helper_call_cost,
     }
     total = 0
     for name, count in trace.instr_counts.items():

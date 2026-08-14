@@ -41,6 +41,11 @@ class MachineProfile:
     iter_new_cycles: Optional[int] = None     # CALL_5: bpf_iter_num_new
     iter_next_cycles: Optional[int] = None    # CALL_6: bpf_iter_num_next
     iter_destroy_cycles: Optional[int] = None # CALL_7: bpf_iter_num_destroy
+    # CALL_9/10/11/12 (bpf_math_sqrt/sin/cos/atan2), real libm calls; None falls back to default_helper_call_cost.
+    math_sqrt_cycles: Optional[int] = None    # CALL_9: bpf_math_sqrt
+    math_sin_cycles: Optional[int] = None     # CALL_10: bpf_math_sin
+    math_cos_cycles: Optional[int] = None     # CALL_11: bpf_math_cos
+    math_atan2_cycles: Optional[int] = None   # CALL_12: bpf_math_atan2
     latency_overrides: dict[str, int] = field(default_factory=dict)  # instr name -> latency
     cache_mode: str = "realistic"           # "realistic" | "always_hit" | "always_miss" -- see
                                              # dfs.mem_events_to_cycles; bounding variants for WCET
