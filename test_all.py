@@ -18,6 +18,7 @@ from dfs import (
     build_op_info_by_name,
     build_cycle_mapping,
     instr_counts_to_cycles,
+    DEFAULT_MAX_UNROLLED_BLOCKS,
 )
 from profiles import PROFILES
 
@@ -44,7 +45,7 @@ def profile_key(target: str, suffix: str | None) -> str:
     return f"{target}_{suffix}" if suffix else target
 
 
-def analyze_binary(a_o_path: Path) -> dict[str, str]:
+def analyze_binary(a_o_path: Path, max_unrolled_blocks: int | None = DEFAULT_MAX_UNROLLED_BLOCKS) -> dict[str, str]:
     """Runs the CFG/loop/DFS pipeline once, then re-costs the resulting
     path_results against all 6 target x mode profiles. See the plan's Context
     section for why a single DFS run (at the largest cache_size in play) is
@@ -57,7 +58,8 @@ def analyze_binary(a_o_path: Path) -> dict[str, str]:
         instructions = read_bpf_file(str(a_o_path))
         first_block = get_blocks_tree(instructions)
         loop_list = find_loops(first_block, instructions)
-        unrolled = unroll_loops_in_cfg(first_block, loop_list)
+        unrolled = unroll_loops_in_cfg(first_block, loop_list,
+                                       max_unrolled_blocks=max_unrolled_blocks)
         iter_value_by_call_site = build_iter_value_map(loop_list, instructions)
         path_results, _ = dfs_blocks(unrolled, instructions, dfs_profile, iter_value_by_call_site)
 
@@ -79,14 +81,15 @@ def analyze_binary(a_o_path: Path) -> dict[str, str]:
     return row
 
 
-def _run_job(name: str, a_o_path: Path) -> tuple[str, dict[str, str] | None, float, str | None]:
+def _run_job(name: str, a_o_path: Path,
+              max_unrolled_blocks: int | None = DEFAULT_MAX_UNROLLED_BLOCKS) -> tuple[str, dict[str, str] | None, float, str | None]:
     """Worker-process entry point: times analyze_binary and turns any exception
     into a plain string instead of letting it propagate, since not every
     exception type (e.g. Z3Exception) is guaranteed picklable back to the
     parent process."""
     start = time.monotonic()
     try:
-        row = analyze_binary(a_o_path)
+        row = analyze_binary(a_o_path, max_unrolled_blocks)
         return name, row, time.monotonic() - start, None
     except Exception as e:
         return name, None, time.monotonic() - start, str(e)
@@ -108,6 +111,11 @@ def main():
     parser.add_argument("--output", default="estimates.csv", help="Path to write the CSV to")
     parser.add_argument("-j", "--jobs", type=int, default=os.cpu_count() or 1,
                          help="Number of binaries to analyze in parallel (default: CPU count)")
+    parser.add_argument("--max-unrolled-blocks", type=int, default=DEFAULT_MAX_UNROLLED_BLOCKS,
+                         metavar="N",
+                         help=f"Refuse to unroll a CFG projected to exceed N basic blocks "
+                              f"(default: {DEFAULT_MAX_UNROLLED_BLOCKS}); over-budget binaries "
+                              f"get an ERROR row rather than stalling the sweep.")
     args = parser.parse_args()
 
     tests_dir = Path(args.tests_dir)
@@ -122,7 +130,8 @@ def main():
         out_file.flush()
 
         with concurrent.futures.ProcessPoolExecutor(max_workers=args.jobs) as executor:
-            futures = [executor.submit(_run_job, name, a_o_path) for name, a_o_path in binaries]
+            futures = [executor.submit(_run_job, name, a_o_path, args.max_unrolled_blocks)
+                       for name, a_o_path in binaries]
 
             for i, future in enumerate(concurrent.futures.as_completed(futures), start=1):
                 name, row_data, elapsed, error = future.result()

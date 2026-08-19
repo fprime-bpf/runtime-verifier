@@ -1,4 +1,5 @@
 import hashlib
+import itertools
 import os
 import yaml
 from dataclasses import dataclass, replace as replace_profile
@@ -92,61 +93,65 @@ def build_cycle_mapping(op_info_by_name: dict[str, MachineProfile]) -> dict[str,
     }
 
 
+def classify_mem_event_cost(
+    event: MemEvent,
+    op_info_by_name: dict[str, MachineProfile],
+    profile: MachineProfile,
+) -> int:
+    """Converts a single pending load MemEvent into a cycle cost using the cache profile
+    bundled into its instruction's MachineProfile. Assumes an inclusive cache hierarchy.
+
+    Filters distances to same-line accesses (addr_delta < line_size_bytes), takes the
+    minimum recency among those, then classifies into L1/L2/L3/miss by comparing against
+    each level's associativity threshold. Falls back to the target `profile`'s fields
+    when the instruction's MachineProfile has no cache profile set (in practice
+    unreachable today, since build_op_info_by_name always populates every instruction
+    from `profile` -- kept as defensive handling for `op is None`).
+
+    profile.cache_mode short-circuits this classification entirely: "always_hit" charges
+    L1_hit_cycles and "always_miss" charges miss_cycles, regardless of recency/associativity
+    or whether a same-line entry was even found -- these are the best-/worst-case bounding
+    profiles (see profiles/polarfire.py's *_ALL_HIT_PROFILE/*_ALL_MISS_PROFILE), not just
+    extreme tuning of the realistic model.
+    """
+    op = op_info_by_name.get(event.load_name)
+
+    l1_cost   = op.l1_hit_cycles if op and op.l1_hit_cycles is not None else profile.l1_hit_cycles
+    miss_cost = op.miss_cycles   if op and op.miss_cycles   is not None else profile.miss_cycles
+
+    if profile.cache_mode == "always_hit":
+        return l1_cost
+    if profile.cache_mode == "always_miss":
+        return miss_cost
+
+    line_size = op.line_size_bytes  if op and op.line_size_bytes  is not None else profile.line_size_bytes
+    l1_assoc  = op.l1_associativity if op and op.l1_associativity is not None else profile.l1_associativity
+    l2_cost   = op.l2_hit_cycles    if op and op.l2_hit_cycles    is not None else profile.l2_hit_cycles
+    l3_cost   = op.l3_hit_cycles    if op and op.l3_hit_cycles    is not None else profile.l3_hit_cycles
+
+    same_line = sorted(recency for addr_delta, recency in event.distances
+                       if addr_delta < line_size)
+
+    cost = miss_cost
+    for recency in same_line:
+        if recency < l1_assoc:
+            cost = l1_cost
+        elif op and op.l2_associativity is not None and recency < op.l2_associativity:
+            cost = l2_cost
+        elif op and op.l3_associativity is not None and recency < op.l3_associativity:
+            cost = l3_cost
+        break  # sorted ascending: first entry is the minimum; no subsequent entry can do better
+
+    return cost
+
+
 def mem_events_to_cycles(
     mem_events: list[MemEvent],
     op_info_by_name: dict[str, MachineProfile],
     profile: MachineProfile,
 ) -> int:
-    """Converts a path's pending load MemEvents into a cycle cost using the cache profile
-    bundled into each instruction's MachineProfile. Assumes an inclusive cache hierarchy.
-
-    For each load: filter distances to same-line accesses (addr_delta < line_size_bytes),
-    take the minimum recency among those, then classify into L1/L2/L3/miss by comparing
-    against each level's associativity threshold. Falls back to the target `profile`'s
-    fields when a given instruction's MachineProfile has no cache profile set (in
-    practice unreachable today, since build_op_info_by_name always populates every
-    instruction from `profile` -- kept as defensive handling for `op is None`).
-
-    profile.cache_mode short-circuits this per-event classification entirely: "always_hit"
-    charges every load L1_hit_cycles and "always_miss" charges every load miss_cycles,
-    regardless of recency/associativity or whether a same-line entry was even found --
-    these are the best-/worst-case bounding profiles (see profiles/polarfire.py's
-    *_ALL_HIT_PROFILE/*_ALL_MISS_PROFILE), not just extreme tuning of the realistic model.
-    """
-    total = 0
-    for event in mem_events:
-        op = op_info_by_name.get(event.load_name)
-
-        l1_cost   = op.l1_hit_cycles if op and op.l1_hit_cycles is not None else profile.l1_hit_cycles
-        miss_cost = op.miss_cycles   if op and op.miss_cycles   is not None else profile.miss_cycles
-
-        if profile.cache_mode == "always_hit":
-            total += l1_cost
-            continue
-        if profile.cache_mode == "always_miss":
-            total += miss_cost
-            continue
-
-        line_size = op.line_size_bytes  if op and op.line_size_bytes  is not None else profile.line_size_bytes
-        l1_assoc  = op.l1_associativity if op and op.l1_associativity is not None else profile.l1_associativity
-        l2_cost   = op.l2_hit_cycles    if op and op.l2_hit_cycles    is not None else profile.l2_hit_cycles
-        l3_cost   = op.l3_hit_cycles    if op and op.l3_hit_cycles    is not None else profile.l3_hit_cycles
-
-        same_line = sorted(recency for addr_delta, recency in event.distances
-                           if addr_delta < line_size)
-
-        cost = miss_cost
-        for recency in same_line:
-            if recency < l1_assoc:
-                cost = l1_cost
-            elif op and op.l2_associativity is not None and recency < op.l2_associativity:
-                cost = l2_cost
-            elif op and op.l3_associativity is not None and recency < op.l3_associativity:
-                cost = l3_cost
-            break  # sorted ascending: first entry is the minimum; no subsequent entry can do better
-
-        total += cost
-    return total
+    """Sums classify_mem_event_cost over a path's pending load MemEvents."""
+    return sum(classify_mem_event_cost(event, op_info_by_name, profile) for event in mem_events)
 
 
 @dataclass
@@ -155,6 +160,7 @@ class ExecutionTraceProfile:
     decoupled from which hardware costs get applied to it (see MachineProfile)."""
     instr_counts: dict[str, int]   # profile-independent instruction histogram
     mem_events: list[MemEvent]     # pending per-access load records
+    decision_path: list[bool]      # True/False choice at each 2-successor branch, in order
 
 
 TRACE_FORMAT_VERSION = 1
@@ -192,6 +198,7 @@ def save_trace(path_results: list[ExecutionTraceProfile], out_path: str, *, prog
                     {"load_name": e.load_name, "distances": [list(d) for d in e.distances]}
                     for e in trace.mem_events
                 ],
+                "decision_path": list(trace.decision_path),
             }
             for trace in path_results
         ],
@@ -214,6 +221,9 @@ def load_trace(path: str) -> tuple[list[ExecutionTraceProfile], dict]:
                 MemEvent(e["load_name"], [tuple(d) for d in e["distances"]])
                 for e in p["mem_events"]
             ],
+            # older traces (written before decision_path was persisted) have no
+            # replay-path information; leave None rather than faking an empty path.
+            decision_path=list(p["decision_path"]) if "decision_path" in p else None,
         )
         for p in data.get("paths", [])
     ]
@@ -239,16 +249,9 @@ def check_trace_soundness(metadata: dict, profile: MachineProfile) -> None:
         )
 
 
-def instr_counts_to_cycles(
-    trace: ExecutionTraceProfile,
-    mapping: dict[str, int],
-    op_info_by_name: dict[str, MachineProfile],
-    profile: MachineProfile,
-) -> int:
-    """Converts a path's ExecutionTraceProfile into an estimated cycle count for the
-    given target `profile`. Non-load instructions are costed via `mapping`; CALL_{imm}
-    entries via a helper-cost map derived from `profile`; loads via mem_events_to_cycles."""
-    helper_call_costs = {
+def build_helper_call_costs(profile: MachineProfile) -> dict[int, int]:
+    """Maps a CALL instruction's helper-id (imm) to its per-target cycle cost."""
+    return {
         1: profile.map_lookup_cycles if profile.map_lookup_cycles is not None else profile.miss_cycles,
         2: profile.map_update_cycles if profile.map_update_cycles is not None else profile.miss_cycles,
         3: profile.map_delete_cycles if profile.map_delete_cycles is not None else profile.miss_cycles,
@@ -258,16 +261,31 @@ def instr_counts_to_cycles(
         9: profile.math_sqrt_cycles if profile.math_sqrt_cycles is not None else profile.default_helper_call_cost,
         10: profile.math_sin_cycles if profile.math_sin_cycles is not None else profile.default_helper_call_cost,
         11: profile.math_cos_cycles if profile.math_cos_cycles is not None else profile.default_helper_call_cost,
-        12: profile.math_atan2_cycles if profile.math_atan2_cycles is not None else profile.default_helper_call_cost,
+        # 13, not 12: llvmbpf hardcodes helper index 12 as bpf_tail_call (unused in this project).
+        13: profile.math_atan2_cycles if profile.math_atan2_cycles is not None else profile.default_helper_call_cost,
     }
-    total = 0
-    for name, count in trace.instr_counts.items():
-        if name.startswith("CALL_"):
-            imm = int(name.removeprefix("CALL_"))
-            cost = helper_call_costs.get(imm, profile.default_helper_call_cost)
-        else:
-            cost = mapping.get(name, 0)
-        total += count * cost
+
+
+def instr_name_cost(name: str, mapping: dict[str, int], helper_call_costs: dict[int, int], profile: MachineProfile) -> int:
+    """Cost of a single non-load instruction occurrence: CALL_{imm} via helper_call_costs, everything else via `mapping`."""
+    if name.startswith("CALL_"):
+        imm = int(name.removeprefix("CALL_"))
+        return helper_call_costs.get(imm, profile.default_helper_call_cost)
+    return mapping.get(name, 0)
+
+
+def instr_counts_to_cycles(
+    trace: ExecutionTraceProfile,
+    mapping: dict[str, int],
+    op_info_by_name: dict[str, MachineProfile],
+    profile: MachineProfile,
+) -> int:
+    """Converts a path's ExecutionTraceProfile into an estimated cycle count for the
+    given target `profile`. Non-load instructions are costed via `mapping`; CALL_{imm}
+    entries via a helper-cost map derived from `profile`; loads via mem_events_to_cycles."""
+    helper_call_costs = build_helper_call_costs(profile)
+    total = sum(count * instr_name_cost(name, mapping, helper_call_costs, profile)
+                for name, count in trace.instr_counts.items())
     total += mem_events_to_cycles(trace.mem_events, op_info_by_name, profile)
     return total
 
@@ -456,7 +474,7 @@ def dfs_blocks(
 
             if not block.next:
                 print(f"Reaching an exit point {block.end}")
-                path_results.append(ExecutionTraceProfile(dict(state.hist), list(state.mem_events)))
+                path_results.append(ExecutionTraceProfile(dict(state.hist), list(state.mem_events), list(state.decision_path)))
             else:
                 successors = block.next
 
@@ -513,9 +531,17 @@ class Loop:
         self.header = header
         self.tail = tail
         self.members = members
+        # Pre-unroll snapshot: unroll_loops_in_cfg repairs `members` of enclosing
+        # loops to point at clones, so anything needing the original block ranges
+        # (build_iter_value_map, the size projection) must read this instead.
+        self.original_members: set[Block] = set(members)
         # (Source, Target)
         self.entry_edges: set[tuple[Block, Block]] = set()
         self.exit_edges: set[tuple[Block, Block]] = set()
+        # Loop-nesting forest (see build_loop_forest). depth 0 == outermost.
+        self.parent: 'Loop | None' = None
+        self.children: list['Loop'] = []
+        self.depth: int = 0
         # Loop iteration metadata
         self.max_iterations: int | None = None
         # The concrete start value (w2) the iterator counts up from; iteration
@@ -666,26 +692,110 @@ def find_loops(root_block: Block, instructions: dict[int, BpfInstruction]) -> li
         new_loop.analyze_max_iterations(instructions)
         loop_list.append(new_loop)
         
-    # If nested loops found, error out
-    for l1 in loop_list:
-        for l2 in loop_list:
-            if l1 == l2:
-                continue
-            
-            # Check if any entry-edge source is in l2 AND any exit-edge target is in l2
-            entry_from_l2 = any(src in l2.members for src, _ in l1.entry_edges)
-            exit_to_l2 = any(target in l2.members for _, target in l1.exit_edges)
-            
-            if entry_from_l2 and exit_to_l2:
-                raise Exception(
-                    f"Nested Loop Error: Loop (Header {l1.header.start}) is nested "
-                    f"inside Loop (Header {l2.header.start})."
-                )
+    build_loop_forest(loop_list)
 
     return loop_list
 
 
-def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
+def build_loop_forest(loop_list: list[Loop]) -> None:
+    """Populates each Loop's parent/children/depth from member-set containment.
+
+    Loop A is nested inside loop B exactly when A.members is a proper subset of
+    B.members: find_loops seeds each member set with {header, tail} and then walks
+    predecessors from the tail only, so the header's own predecessors are never
+    explored and the set is exactly the natural loop body. A's parent is its
+    smallest strict container, so a chain like 139 < 121 < 104 < 90 links up one
+    level at a time rather than every ancestor claiming every descendant.
+    """
+    for loop in loop_list:
+        containers = [other for other in loop_list
+                      if other is not loop and loop.members < other.members]
+        loop.parent = min(containers, key=lambda c: len(c.members)) if containers else None
+        loop.children = []
+
+    for loop in loop_list:
+        if loop.parent is not None:
+            loop.parent.children.append(loop)
+
+    for loop in loop_list:
+        depth, ancestor = 0, loop.parent
+        while ancestor is not None:
+            depth += 1
+            ancestor = ancestor.parent
+        loop.depth = depth
+
+    for loop in sorted(loop_list, key=lambda l: l.depth):
+        parent_desc = f"inside header {loop.parent.header.start}" if loop.parent else "outermost"
+        print(f"Loop header {loop.header.start}: depth {loop.depth} ({parent_desc}), "
+              f"{loop.max_iterations} iterations")
+
+
+def loop_ancestors(loop: Loop) -> list[Loop]:
+    """Ancestors of `loop`, outermost first (excludes `loop` itself)."""
+    chain: list[Loop] = []
+    ancestor = loop.parent
+    while ancestor is not None:
+        chain.append(ancestor)
+        ancestor = ancestor.parent
+    chain.reverse()
+    return chain
+
+
+DEFAULT_MAX_UNROLLED_BLOCKS = 500_000
+
+
+def project_unrolled_block_count(root_block: 'Block | None',
+                                  loop_list: list[Loop]) -> tuple[int, dict[Loop, int]]:
+    """Projects how many Blocks unrolling will produce, per loop and in total.
+
+    A loop's own body (its members minus whatever its nested children own) gets
+    cloned once per iteration of itself AND of every enclosing loop, so the count
+    is own_blocks * product(trip counts of the loop and its ancestors). Blocks
+    outside every loop are unaffected by unrolling and pass through 1:1 -- counted
+    here via a BFS over the pre-unroll graph, since project_unrolled_block_count
+    is always called before unroll_loops_in_cfg touches anything. Lets
+    unroll_loops_in_cfg refuse a nest that would blow up before it allocates
+    anything, instead of running for hours and then OOMing.
+    """
+    per_loop: dict[Loop, int] = {}
+    total = 0
+
+    if root_block is not None:
+        in_any_loop: set[Block] = set()
+        for loop in loop_list:
+            in_any_loop |= loop.original_members
+        seen: set[Block] = set()
+        queue = deque([root_block])
+        while queue:
+            block = queue.popleft()
+            if block in seen:
+                continue
+            seen.add(block)
+            queue.extend(block.next)
+        total += len(seen - in_any_loop)
+
+    for loop in loop_list:
+        if loop.max_iterations is None or loop.max_iterations <= 0:
+            continue
+
+        nested: set[Block] = set()
+        for child in loop.children:
+            nested |= child.original_members
+        own_blocks = len(loop.original_members - nested)
+
+        factor = loop.max_iterations
+        for ancestor in loop_ancestors(loop):
+            if ancestor.max_iterations is not None and ancestor.max_iterations > 0:
+                factor *= ancestor.max_iterations
+
+        per_loop[loop] = own_blocks * factor
+        total += own_blocks * factor
+
+    return total, per_loop
+
+
+def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop],
+                         max_unrolled_blocks: 'int | None' = DEFAULT_MAX_UNROLLED_BLOCKS) -> Block:
     """
     Unrolls loops in the CFG based on the identified max_iterations.
 
@@ -703,21 +813,57 @@ def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
     fork multiplies across every loop in a program: a kernel with N bounded
     loops could see up to 2^N spurious path combinations from this alone,
     on top of any genuine data-dependent branching.)
+
+    Nested loops are unrolled innermost-first. Each pass replaces its loop's
+    members with fresh clones, which leaves every ancestor holding a stale
+    member set pointing at blocks no longer in the graph -- so after unrolling a
+    loop we repair the ancestors, swapping the originals for the clones just
+    made. Boundaries are recomputed per loop for the same reason. Suffixes
+    compose rather than replace (see Block.copy_with_suffix), so a block in a
+    4-deep nest ends up uniquely identified as e.g. ".12.34.2.4".
     """
-    sorted_loops = sorted(loop_list, key=lambda l: l.header.start, reverse=True)
+    projected, per_loop = project_unrolled_block_count(root_block, loop_list)
+    print(f"Projected unrolled CFG size: {projected} blocks.")
+    if max_unrolled_blocks is not None and projected > max_unrolled_blocks:
+        worst = max(per_loop, key=per_loop.get)
+        raise ValueError(
+            f"Unrolling this CFG would produce ~{projected} blocks, over the "
+            f"{max_unrolled_blocks} limit. Worst offender: loop at header "
+            f"{worst.header.start} (depth {worst.depth}, {worst.max_iterations} iterations) "
+            f"expanding to ~{per_loop[worst]} blocks once its {worst.depth} enclosing "
+            f"loop(s) are unrolled. Raise --max-unrolled-blocks to proceed anyway."
+        )
+
+    # Innermost-first: an outer loop must clone its inner loops' already-unrolled
+    # chain, not the original cyclic body. Siblings are disjoint, so the
+    # header.start tiebreak only matters for deterministic output.
+    sorted_loops = sorted(loop_list, key=lambda l: (-l.depth, -l.header.start))
 
     for loop in sorted_loops:
         if loop.max_iterations is None or loop.max_iterations <= 0:
             print(f"Warning: Loop at {loop.header.start} has no bound. Skipping unroll.")
             continue
 
-        print(f"Unrolling loop at header {loop.header.start} for {loop.max_iterations} iterations.")
+        print(f"Unrolling loop at header {loop.header.start} (depth {loop.depth}) "
+              f"for {loop.max_iterations} iterations.")
 
-        # Identify exit targets (blocks outside the loop) and entry sources
-        exit_targets = [exit_target for _, exit_target in loop.exit_edges]
-        entry_sources = [entry_source for entry_source, _ in loop.entry_edges]
+        # Recompute against the current graph: an inner pass may have rewired the
+        # blocks these edges refer to.
+        loop.entry_edges.clear()
+        loop.exit_edges.clear()
+        loop.find_boundaries()
+
+        # Identify exit targets (blocks outside the loop) and entry sources. Sorted
+        # because entry_edges/exit_edges are sets of Blocks whose hash includes a str:
+        # iteration order varies with PYTHONHASHSEED, which would permute a block's
+        # `next` list between processes -- and runtime_benchmark.py/pc_gap.py rebuild
+        # this CFG in a fresh process to replay decision_path against next[0]/next[1].
+        block_key = lambda b: (b.start, b.end, b.suffix)
+        exit_targets = sorted((exit_target for _, exit_target in loop.exit_edges), key=block_key)
+        entry_sources = sorted((entry_source for entry_source, _ in loop.entry_edges), key=block_key)
 
         prev_tail = None
+        all_clones: set[Block] = set()
 
         # Clone the loop body (members) N times
         for i in range(loop.max_iterations):
@@ -726,6 +872,7 @@ def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
             # 1. Create clones with new suffix
             for member in loop.members:
                 block_map[member] = member.copy_with_suffix(f".{i}")
+            all_clones.update(block_map.values())
 
             # 2. Re-establish connections within this iteration slice.
             # Exit edges are handled once, after the loop, not per-member.
@@ -741,7 +888,7 @@ def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
             # Link the previous iteration's tail to this iteration's header
             if i == 0:
                 for entry_source in entry_sources:
-                    entry_source.next.remove(loop.header)
+                    entry_source.remove_edge(loop.header)
                     entry_source.add(block_map[loop.header])
             else:
                 prev_tail.add(block_map[loop.header])
@@ -752,6 +899,22 @@ def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop]) -> Block:
         # attach the exit edge(s) there, unconditionally.
         for exit_target in exit_targets:
             prev_tail.add(exit_target)
+
+        # This loop's originals are now retired -- fully detach them (both edge
+        # directions), or they linger as stale predecessors/successors that a
+        # later (ancestor) find_boundaries() pass would misread as still live.
+        # Without this, an ancestor's entry_sources can include an orphaned
+        # original whose `.next` was never updated, crashing the next loop's
+        # `entry_source.remove_edge(loop.header)` on a header that was already
+        # replaced by clones two levels down.
+        for member in loop.members:
+            member.detach()
+
+        # Every enclosing loop must see the clones instead of the (now detached)
+        # originals, or its own pass would clone blocks no longer in the graph
+        # and lose the unrolled inner chain entirely.
+        for ancestor in loop_ancestors(loop):
+            ancestor.members = (ancestor.members - loop.members) | all_clones
 
     return root_block
 
@@ -776,35 +939,77 @@ def build_iter_value_map(loop_list: list[Loop], instructions: dict[int, BpfInstr
     """
     result: dict[str, int] = {}
 
-    for loop in loop_list:
-        if loop.max_iterations is None or loop.max_iterations <= 0 or loop.start_value is None:
+    def is_iter_next(pc: int) -> bool:
+        instr = instructions.get(pc)
+        return (getattr(instr, "opcode", -1) == BPF_CALL_OPCODE
+                and getattr(instr, "imm", -1) == BPF_ITER_NEXT_HELPER_ID)
+
+    bounded = [loop for loop in loop_list
+               if loop.max_iterations is not None and loop.max_iterations > 0
+               and loop.start_value is not None]
+
+    def unrolled_ancestors(loop: Loop) -> list[Loop]:
+        return [a for a in loop_ancestors(loop) if a in bounded]
+
+    def keys_for(pc: int, chain: list[Loop]):
+        """One key per combination of iteration indices along `chain` (outermost first),
+        matching the suffix Block.copy_with_suffix composes during unrolling."""
+        for combo in itertools.product(*(range(l.max_iterations) for l in chain)):
+            yield f"{pc}" + "".join(f".{k}" for k in combo), combo
+
+    # Claim each loop's one-time priming bpf_iter_num_next() FIRST. It sits between
+    # that loop's bpf_iter_num_new and its header -- which puts it inside the PARENT's
+    # body, so a naive "blocks this loop owns" scan would hand it to the parent and
+    # map it to the parent's counter. Worse, the key shapes coincide exactly (the
+    # child's priming call has one suffix component per ancestor; the parent's own
+    # call sites have one per ancestor plus its own index, and the child has exactly
+    # one more ancestor than the parent) -- so the collision is silent.
+    priming_owner: dict[int, Loop] = {}
+    for loop in bounded:
+        if loop.call_5_pc is None:
             continue
+        # Nearest call site BEFORE the header, not the first in range: call_5_pc is
+        # only as good as analyze_max_iterations' backwards BFS, which for a second
+        # sibling loop can walk past its own bpf_iter_num_new and report an earlier
+        # loop's (cfdp_chunk reports 55 for both of its loops). That widens the range
+        # to cover earlier loops' call sites, and the priming call is the last one.
+        candidates = sorted(pc for pc in instructions
+                            if loop.call_5_pc < pc < loop.header.start and is_iter_next(pc))
+        if candidates:
+            priming_owner[candidates[-1]] = loop
 
-        next_call_pcs = [
-            pc
-            for member in loop.members
-            for pc in instructions.keys()
-            if member.start <= pc <= member.end
-            and getattr(instructions[pc], "opcode", -1) == BPF_CALL_OPCODE
-            and getattr(instructions[pc], "imm", -1) == BPF_ITER_NEXT_HELPER_ID
-        ]
+    # Every other call site belongs to the INNERMOST loop whose (pre-unroll) members
+    # contain its block: a nested loop's blocks are a subset of its parent's, so
+    # depth breaks the tie.
+    innermost_by_block: dict[Block, Loop] = {}
+    for loop in bounded:
+        for block in loop.original_members:
+            current = innermost_by_block.get(block)
+            if current is None or loop.depth > current.depth:
+                innermost_by_block[block] = loop
 
-        for i in range(loop.max_iterations):
-            value = loop.start_value + i
-            for pc in next_call_pcs:
-                result[f"{pc}.{i}"] = value
+    in_loop_owner: dict[int, Loop] = {}
+    for block, loop in innermost_by_block.items():
+        for pc in range(block.start, block.end + 1):
+            if pc in instructions and is_iter_next(pc) and pc not in priming_owner:
+                in_loop_owner[pc] = loop
 
-        # The one-time bpf_iter_num_next() priming call before the loop body
-        # (not a loop member, so not covered above) always succeeds once
-        # max_iterations is known positive -- concretize it too, or the DFS
-        # treats "loop runs zero times" as an open question and wastes a full
-        # explore-then-backtrack on a hypothesis that's already been ruled
-        # out by the unrolling above.
-        if loop.call_5_pc is not None:
-            for pc, instr in instructions.items():
-                if (loop.call_5_pc < pc < loop.header.start
-                        and getattr(instr, "opcode", -1) == BPF_CALL_OPCODE
-                        and getattr(instr, "imm", -1) == BPF_ITER_NEXT_HELPER_ID):
-                    result[str(pc)] = loop.start_value
+    # An in-loop call site carries one suffix component per unrolled ancestor plus
+    # its own iteration index; the value depends only on that own index, since
+    # bpf_iter_num_new re-initializes the iterator on every pass through the
+    # enclosing loops.
+    for pc, loop in sorted(in_loop_owner.items()):
+        chain = unrolled_ancestors(loop) + [loop]
+        for key, combo in keys_for(pc, chain):
+            result[key] = loop.start_value + combo[-1]
+
+    # The priming call always succeeds once max_iterations is known positive --
+    # concretize it too, or the DFS treats "loop runs zero times" as an open
+    # question and wastes a full explore-then-backtrack on a hypothesis the
+    # unrolling above already ruled out. Its key carries the ancestors' components
+    # but not this loop's own, since it runs before the loop body is entered.
+    for pc, loop in sorted(priming_owner.items()):
+        for key, _ in keys_for(pc, unrolled_ancestors(loop)):
+            result[key] = loop.start_value
 
     return result

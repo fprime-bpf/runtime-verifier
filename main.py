@@ -4,11 +4,12 @@ import hashlib
 import multiprocessing
 import os
 import sys
+from collections import deque
 from dataclasses import replace as replace_profile
 
 from bpf import BpfInstruction, BpfClass, BpfCode, BpfS
 from block import Block
-from dfs import dfs_blocks, ExecutionTraceProfile, Loop, find_loops, unroll_loops_in_cfg, instr_counts_to_cycles, build_cycle_mapping, build_op_info_by_name, build_iter_value_map, save_trace, load_trace, check_trace_soundness
+from dfs import dfs_blocks, ExecutionTraceProfile, Loop, find_loops, unroll_loops_in_cfg, instr_counts_to_cycles, build_cycle_mapping, build_op_info_by_name, build_iter_value_map, save_trace, load_trace, check_trace_soundness, DEFAULT_MAX_UNROLLED_BLOCKS
 from profiles import PROFILES
 
 
@@ -34,6 +35,14 @@ parser.add_argument("--emit-trace", metavar="PATH", default=None,
 parser.add_argument("--from-trace", metavar="PATH", default=None,
                      help="Skip file reading/CFG/DFS entirely; load path_results from a YAML trace "
                           "previously written by --emit-trace and cost it against --profile.")
+parser.add_argument("--max-unrolled-blocks", type=int, default=DEFAULT_MAX_UNROLLED_BLOCKS,
+                     metavar="N",
+                     help=f"Refuse to unroll a CFG projected to exceed N basic blocks "
+                          f"(default: {DEFAULT_MAX_UNROLLED_BLOCKS}). Guards against a deeply "
+                          f"nested loop silently starting a multi-hour, multi-GB run.")
+parser.add_argument("--print-cfg", action="store_true",
+                     help="Dump the full basic-block CFG and mermaid graph. Suppressed by default "
+                          "for unrolled CFGs, which can run to hundreds of thousands of blocks.")
 
 
 # Set once per forked worker process (via _init_worker, before any tasks run) so
@@ -272,10 +281,10 @@ def print_cfg_from_root(root: Block):
     # Blocks with the same start/end but different suffixes are treated as 
     # distinct objects thanks to the custom __hash__ and __eq__ methods.
     visited_blocks = set()
-    queue = [root]
-    
+    queue = deque([root])
+
     while queue:
-        curr = queue.pop(0)
+        curr = queue.popleft()
         if curr in visited_blocks:
             continue
         
@@ -387,15 +396,21 @@ def main():
         instructions = read_bpf_file(args.filename)  # dict[int, BpfInstruction]
         first_block = get_blocks_tree(instructions)
 
-        print_cfg_from_root(first_block)
+        if args.print_cfg:
+            print_cfg_from_root(first_block)
         loop_list = find_loops(first_block, instructions)
         for loop in loop_list:
             print(f"Loop: {loop}\n Header: {loop.header}\n Tail: {loop.tail}\n Iteration count: {loop.max_iterations}\n "
-                  f"Call0x5_pc: {loop.call_5_pc}\n w2_pc: {loop.w2_pc}\n w3_pc: {loop.w3_pc}\n Members: {loop.members}\n\n")
+                  f"Depth: {loop.depth}\n Call0x5_pc: {loop.call_5_pc}\n w2_pc: {loop.w2_pc}\n w3_pc: {loop.w3_pc}\n\n")
 
         # Duplicate loop contents in cycle
-        unrolled_block = unroll_loops_in_cfg(first_block, loop_list)
-        print_cfg_from_root(unrolled_block)
+        try:
+            unrolled_block = unroll_loops_in_cfg(first_block, loop_list,
+                                                  max_unrolled_blocks=args.max_unrolled_blocks)
+        except ValueError as e:
+            parser.error(str(e))
+        if args.print_cfg:
+            print_cfg_from_root(unrolled_block)
 
         # dfs_blocks only ever consults profile.cache_size (bounds State.recent_window,
         # the rolling window of candidate same-line addresses recorded per load) -- it
