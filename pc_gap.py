@@ -1,36 +1,13 @@
 #!/usr/bin/env python3
-"""Computes the maximum number of cycles that can elapse between reaching one
-program counter (A) and subsequently reaching another (B), across every
-feasible path in a trace -- e.g. "what's the worst case from checkpoint
-candidate A to checkpoint candidate B?" Reuses replay_path (see
-runtime_benchmark.py) to get each path's per-instruction cumulative-cost walk,
-then matches A/B occurrences along that walk.
+"""Computes the max cycles from reaching PC A to next reaching PC B,
+across every feasible path in a trace. Reuses replay_path (see
+runtime_benchmark.py) for the per-instruction cumulative-cost walk.
 
-Matching rule: each occurrence of B consumes the OLDEST not-yet-consumed
-occurrence of A (FIFO), not the nearest-preceding one. This one rule handles
-both cases that matter here without ever consulting loop structure:
-  - A and B both inside the same (unrolled) loop, recurring once per
-    iteration: each B immediately consumes the A from the very same
-    iteration (it's the oldest thing pending), giving the intended
-    per-iteration span.
-  - A recurs inside a loop but B is a single point after the loop: FIFO pairs
-    that one B with the EARLIEST unconsumed A (iteration 0) -- the true
-    worst-case span. Nearest-preceding/overwrite matching would instead give
-    only the shortest (last-iteration-to-B) span, which is wrong for a
-    maximum/worst-case query.
-  - A == B (e.g. "cost of one loop iteration"): checking the end-match
-    *before* pushing the current occurrence as a new pending start turns
-    consecutive occurrences into consecutive-gap pairs instead of a
-    degenerate zero self-match.
-A loop sitting entirely *between* A and B (neither PC recurs) needs no
-special handling at all: unroll_loops_in_cfg always unrolls to the loop's
-full static bound before the DFS runs, so a path's replayed steps already
-include that loop's complete cost by construction.
-
-Unmatched trailing A occurrences (no B before path end) and unmatched B
-occurrences (nothing pending) are simply dropped -- they don't contribute a
-measurement, and a path where A never occurs contributes nothing for that
-query.
+Matching: each B consumes the oldest not-yet-consumed A (FIFO), not
+the nearest-preceding one. Gives per-iteration spans when A and B
+recur together in a loop, and the true worst-case (earliest A) span
+when A recurs but B is a single point after the loop. A == B yields
+consecutive-occurrence gaps. Unmatched occurrences are dropped.
 """
 import argparse
 from collections import deque
@@ -63,12 +40,10 @@ parser.add_argument("--max-unrolled-blocks", type=int, default=DEFAULT_MAX_UNROL
 
 def find_gaps(steps: list[tuple[int, str, int, int, "int | None"]],
               start_pc: int, end_pc: int) -> list[tuple[int, "int | None", "int | None"]]:
-    """Scans one path's replayed steps and returns (gap_cycles, start_iteration,
-    end_iteration) for every FIFO-matched (start_pc, end_pc) pair -- see module
-    docstring for why FIFO (oldest-pending-start-first), not nearest-preceding,
-    is the correct matching rule here."""
+    # Returns (gap_cycles, start_iteration, end_iteration) for every
+    # FIFO-matched (start_pc, end_pc) pair. See module docstring.
     gaps: list[tuple[int, "int | None", "int | None"]] = []
-    pending: deque[tuple[int, "int | None"]] = deque()  # (cumulative, iteration) of unconsumed starts, oldest first
+    pending: deque[tuple[int, "int | None"]] = deque()  # oldest first
 
     for pc, name, cost, cumulative, iteration in steps:
         if pc == end_pc and pending:

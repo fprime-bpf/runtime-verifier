@@ -293,8 +293,7 @@ def print_cfg_from_root(root: Block):
             if n not in visited_blocks:
                 queue.append(n)
 
-    # Sort blocks: Primary key is the start index, secondary key is the suffix.
-    # This ensures that unrolled iterations (e.g., .1, .2) are printed sequentially.
+    # Sort blocks by start index and then the suffix.
     sorted_blocks = sorted(list(visited_blocks), key=lambda b: (b.start, b.suffix))
 
     print("\n" + "="*60)
@@ -412,13 +411,6 @@ def main():
         if args.print_cfg:
             print_cfg_from_root(unrolled_block)
 
-        # dfs_blocks only ever consults profile.cache_size (bounds State.recent_window,
-        # the rolling window of candidate same-line addresses recorded per load) -- it
-        # doesn't affect branching/pruning/path-selection at all, so running the DFS at
-        # the largest cache_size across every known profile is purely additive (more
-        # candidate distances recorded, nothing lost) and makes the resulting path_results
-        # -- and any --emit-trace file -- sound to cost against ANY current profile, not
-        # just ones sharing --profile's own hardware family.
         dfs_cache_size = max(p.cache_size for p in PROFILES.values())
         dfs_profile = replace_profile(profile, cache_size=dfs_cache_size) if profile.cache_size != dfs_cache_size else profile
 

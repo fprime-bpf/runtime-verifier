@@ -12,31 +12,6 @@ from z3 import Solver, sat, unsat, BoolRef, Not, unknown, Z3Exception, simplify
 from collections import deque
 from typing import Optional, Set
 
-# All cache/latency/helper-call-cost tuning now lives on a per-target MachineProfile
-# (see profiles/) rather than module-level constants -- this file has no built-in
-# notion of "the" hardware target, only how to apply whichever profile it's given.
-
-# Load instructions are NOT tallied into a path's hist during the DFS. Their cost depends
-# on cache locality, which depends on a target cache profile (line size, associativity)
-# that isn't chosen yet at DFS time — so each load is instead recorded as a MemEvent
-# (see mem_access.py), carrying its address and the path's last profile.cache_size prior
-# memory addresses. A later realization pass (mem_events_to_cycles) replays these against
-# a specific profile to classify each as an L1/L2/L3 hit or a miss and fold it into the
-# histogram. Stores still update the recency window (`"LD" in name` distinguishes the
-# two, same predicate as before), but go straight into hist under their plain name, same
-# as any other profile-independent instruction.
-
-# CALL instructions get their histogram key suffixed with their helper ID too:
-# "CALL_<imm>" instead of a single shared "CALL" bucket. Helper-specific cost is looked
-# up from a map (keyed by imm, not the full instruction name) built from
-# profile.miss_cycles/default_helper_call_cost in instr_counts_to_cycles -- imm 1/2/3
-# are bpf_map_lookup_elem/update_elem/delete_elem (see create_test/bpf_shim.h), which
-# touch a map's backing memory, so they're priced like a cache miss; imm 5/6/7 are
-# bpf_iter_num_new/_next/_destroy, which are genuinely trivial (no mutex, no
-# container) and get their own measured-cheap fields instead. Any other helper ID
-# (bpf_rand_int, bpf_math_sqrt/sin/cos/atan2, ...) falls back to
-# profile.default_helper_call_cost -- still an unmeasured flat guess.
-
 
 def is_fpu_instr(instr: BpfInstruction) -> bool:
     cls_ = instr.get_class()
@@ -207,29 +182,6 @@ def save_trace(path_results: list[ExecutionTraceProfile], out_path: str, *, prog
         yaml.dump(data, f, Dumper=_yaml_dumper(), sort_keys=False, default_flow_style=None)
 
 
-def load_trace(path: str) -> tuple[list[ExecutionTraceProfile], dict]:
-    """Inverse of save_trace. Returns (path_results, metadata) -- caller must call
-    check_trace_soundness(metadata, profile) before costing."""
-    with open(path) as f:
-        data = yaml.load(f, Loader=_yaml_loader())
-
-    metadata = data.get("metadata", {})
-    path_results = [
-        ExecutionTraceProfile(
-            instr_counts=dict(p["instr_counts"]),
-            mem_events=[
-                MemEvent(e["load_name"], [tuple(d) for d in e["distances"]])
-                for e in p["mem_events"]
-            ],
-            # older traces (written before decision_path was persisted) have no
-            # replay-path information; leave None rather than faking an empty path.
-            decision_path=list(p["decision_path"]) if "decision_path" in p else None,
-        )
-        for p in data.get("paths", [])
-    ]
-    return path_results, metadata
-
-
 def check_trace_soundness(metadata: dict, profile: MachineProfile) -> None:
     """Raises ValueError if `profile` might require recency-window entries a trace's DFS
     run wasn't wide enough to have recorded (dfs_blocks only ever consults profile.cache_size
@@ -247,6 +199,250 @@ def check_trace_soundness(metadata: dict, profile: MachineProfile) -> None:
             f"This trace is UNSOUND for this profile. Re-run with --emit-trace "
             f"using a profile whose cache_size >= {profile.cache_size}."
         )
+
+
+def _expect(events, event_cls):
+    ev = next(events)
+    if not isinstance(ev, event_cls):
+        raise ValueError(f"trace stream: expected {event_cls.__name__}, got {type(ev).__name__} ({ev!r})")
+    return ev
+
+
+def _expect_scalar(events) -> str:
+    return _expect(events, yaml.ScalarEvent).value
+
+
+def _skip_value(events) -> None:
+    # Discards one value (scalar, mapping, or sequence, recursively)
+    # without building a Python object for it.
+    ev = next(events)
+    if isinstance(ev, yaml.ScalarEvent):
+        return
+    if isinstance(ev, yaml.MappingStartEvent):
+        depth = 1
+        while depth > 0:
+            ev = next(events)
+            if isinstance(ev, yaml.MappingStartEvent):
+                depth += 1
+            elif isinstance(ev, yaml.MappingEndEvent):
+                depth -= 1
+            elif isinstance(ev, yaml.SequenceStartEvent):
+                _skip_sequence_body(events)
+        return
+    if isinstance(ev, yaml.SequenceStartEvent):
+        _skip_sequence_body(events)
+        return
+    raise ValueError(f"trace stream: unexpected event while skipping a value: {ev!r}")
+
+
+def _skip_sequence_body(events) -> None:
+    # Consumes up to the matching SequenceEndEvent (already-open sequence).
+    depth = 1
+    while depth > 0:
+        ev = next(events)
+        if isinstance(ev, yaml.SequenceStartEvent):
+            depth += 1
+        elif isinstance(ev, yaml.SequenceEndEvent):
+            depth -= 1
+        elif isinstance(ev, yaml.MappingStartEvent):
+            _skip_mapping_body(events)
+
+
+def _skip_mapping_body(events) -> None:
+    # Consumes up to the matching MappingEndEvent (already-open mapping).
+    depth = 1
+    while depth > 0:
+        ev = next(events)
+        if isinstance(ev, yaml.MappingStartEvent):
+            depth += 1
+        elif isinstance(ev, yaml.MappingEndEvent):
+            depth -= 1
+        elif isinstance(ev, yaml.SequenceStartEvent):
+            _skip_sequence_body(events)
+
+
+def _read_metadata(events) -> dict:
+    # Reads the metadata mapping's scalar fields into a dict.
+    _expect(events, yaml.MappingStartEvent)
+    metadata: dict = {}
+    while True:
+        ev = next(events)
+        if isinstance(ev, yaml.MappingEndEvent):
+            return metadata
+        key = ev.value
+        raw = _expect_scalar(events)
+        if key in ("format_version", "dfs_cache_size"):
+            metadata[key] = int(raw)
+        elif key == "program_sha256" and raw in ("null", "~", ""):
+            metadata[key] = None
+        else:
+            metadata[key] = raw
+
+
+def _read_instr_counts(events) -> dict[str, int]:
+    # Reads one path's instr_counts mapping: name -> count.
+    _expect(events, yaml.MappingStartEvent)
+    counts: dict[str, int] = {}
+    while True:
+        ev = next(events)
+        if isinstance(ev, yaml.MappingEndEvent):
+            return counts
+        name = ev.value
+        counts[name] = int(_expect_scalar(events))
+
+
+def _iter_mem_events(events):
+    # Yields MemEvents one at a time from a mem_events sequence.
+    _expect(events, yaml.SequenceStartEvent)
+    while True:
+        ev = next(events)
+        if isinstance(ev, yaml.SequenceEndEvent):
+            return
+        if not isinstance(ev, yaml.MappingStartEvent):
+            raise ValueError(f"trace stream: expected a mem_event mapping, got {ev!r}")
+
+        load_name = None
+        distances: list[tuple[int, int]] = []
+        while True:
+            ev2 = next(events)
+            if isinstance(ev2, yaml.MappingEndEvent):
+                break
+            key = ev2.value
+            if key == "load_name":
+                load_name = _expect_scalar(events)
+            elif key == "distances":
+                _expect(events, yaml.SequenceStartEvent)
+                while True:
+                    ev3 = next(events)
+                    if isinstance(ev3, yaml.SequenceEndEvent):
+                        break
+                    if not isinstance(ev3, yaml.SequenceStartEvent):
+                        raise ValueError(f"trace stream: expected a [delta, recency] pair, got {ev3!r}")
+                    addr_delta = int(_expect_scalar(events))
+                    recency = int(_expect_scalar(events))
+                    _expect(events, yaml.SequenceEndEvent)
+                    distances.append((addr_delta, recency))
+            else:
+                _skip_value(events)
+
+        if load_name is None:
+            raise ValueError("trace stream: mem_event with no load_name")
+        yield MemEvent(load_name, distances)
+
+
+def _read_bool_list(events) -> list[bool]:
+    # Reads a decision_path sequence of true/false scalars into a list.
+    _expect(events, yaml.SequenceStartEvent)
+    result: list[bool] = []
+    while True:
+        ev = next(events)
+        if isinstance(ev, yaml.SequenceEndEvent):
+            return result
+        if not isinstance(ev, yaml.ScalarEvent):
+            raise ValueError(f"trace stream: expected a bool scalar, got {ev!r}")
+        result.append(ev.value in ("true", "True"))
+
+
+def load_trace(trace_path: str) -> tuple["Iterator[ExecutionTraceProfile]", dict]:
+    # Inverse of save_trace. Returns (path_results, metadata); call
+    # check_trace_soundness(metadata, profile) before costing.
+    #
+    # path_results is a generator, not a list. Each yielded trace's
+    # mem_events is itself a generator over the file's YAML event
+    # stream, read via yaml.parse() instead of yaml.load()'s full
+    # tree, so mem_events is never fully materialized.
+    #
+    # Two passes: pass 1 reads instr_counts/decision_path (small) and
+    # skips mem_events; pass 2 re-reads the file and streams
+    # mem_events lazily, reusing pass 1's instr_counts/decision_path.
+    #
+    # Caller must consume each path's mem_events fully, in path order,
+    # before requesting the next path (a plain `for trace in
+    # path_results: replay_path(...)` loop already does this) or the
+    # stream position desyncs.
+    def _read_header(f) -> tuple[dict, list[tuple[dict, list]]]:
+        events = yaml.parse(f, Loader=_yaml_loader())
+        _expect(events, yaml.StreamStartEvent)
+        _expect(events, yaml.DocumentStartEvent)
+        _expect(events, yaml.MappingStartEvent)
+        metadata: dict = {}
+        headers: list[tuple[dict, list]] = []
+        while True:
+            ev = next(events)
+            if isinstance(ev, yaml.MappingEndEvent):
+                break
+            key = ev.value
+            if key == "metadata":
+                metadata = _read_metadata(events)
+            elif key == "paths":
+                _expect(events, yaml.SequenceStartEvent)
+                while True:
+                    ev2 = next(events)
+                    if isinstance(ev2, yaml.SequenceEndEvent):
+                        break
+                    if not isinstance(ev2, yaml.MappingStartEvent):
+                        raise ValueError(f"trace stream: expected a path mapping, got {ev2!r}")
+                    instr_counts: "dict[str, int] | None" = None
+                    decision_path: "list[bool] | None" = None
+                    while True:
+                        ev3 = next(events)
+                        if isinstance(ev3, yaml.MappingEndEvent):
+                            break
+                        pkey = ev3.value
+                        if pkey == "instr_counts":
+                            instr_counts = _read_instr_counts(events)
+                        elif pkey == "decision_path":
+                            decision_path = _read_bool_list(events)
+                        else:
+                            _skip_value(events)  # mem_events, or a future field
+                    if instr_counts is None:
+                        raise ValueError("trace stream: path entry with no instr_counts")
+                    headers.append((instr_counts, decision_path))
+            else:
+                _skip_value(events)
+        return metadata, headers
+
+    with open(trace_path) as f:
+        metadata, headers = _read_header(f)
+
+    def _paths():
+        with open(trace_path) as f2:
+            events = yaml.parse(f2, Loader=_yaml_loader())
+            _expect(events, yaml.StreamStartEvent)
+            _expect(events, yaml.DocumentStartEvent)
+            _expect(events, yaml.MappingStartEvent)
+            header_iter = iter(headers)
+            while True:
+                ev = next(events)
+                if isinstance(ev, yaml.MappingEndEvent):
+                    return
+                key = ev.value
+                if key != "paths":
+                    _skip_value(events)
+                    continue
+                _expect(events, yaml.SequenceStartEvent)
+                while True:
+                    ev2 = next(events)
+                    if isinstance(ev2, yaml.SequenceEndEvent):
+                        break
+                    if not isinstance(ev2, yaml.MappingStartEvent):
+                        raise ValueError(f"trace stream: expected a path mapping, got {ev2!r}")
+                    instr_counts, decision_path = next(header_iter)
+                    mem_events_seen = False
+                    while True:
+                        ev3 = next(events)
+                        if isinstance(ev3, yaml.MappingEndEvent):
+                            break
+                        pkey = ev3.value
+                        if pkey == "mem_events":
+                            mem_events_seen = True
+                            yield ExecutionTraceProfile(instr_counts, _iter_mem_events(events), decision_path)
+                        else:
+                            _skip_value(events)  # instr_counts/decision_path -- already have them
+                    if not mem_events_seen:
+                        raise ValueError("trace stream: path entry with no mem_events")
+
+    return _paths(), metadata
 
 
 def build_helper_call_costs(profile: MachineProfile) -> dict[int, int]:
@@ -531,14 +727,12 @@ class Loop:
         self.header = header
         self.tail = tail
         self.members = members
-        # Pre-unroll snapshot: unroll_loops_in_cfg repairs `members` of enclosing
-        # loops to point at clones, so anything needing the original block ranges
-        # (build_iter_value_map, the size projection) must read this instead.
+        # Pre-unroll snapshot; members gets mutated during unrolling.
         self.original_members: set[Block] = set(members)
         # (Source, Target)
         self.entry_edges: set[tuple[Block, Block]] = set()
         self.exit_edges: set[tuple[Block, Block]] = set()
-        # Loop-nesting forest (see build_loop_forest). depth 0 == outermost.
+        # Nesting forest (see build_loop_forest). depth 0 = outermost.
         self.parent: 'Loop | None' = None
         self.children: list['Loop'] = []
         self.depth: int = 0
@@ -698,15 +892,9 @@ def find_loops(root_block: Block, instructions: dict[int, BpfInstruction]) -> li
 
 
 def build_loop_forest(loop_list: list[Loop]) -> None:
-    """Populates each Loop's parent/children/depth from member-set containment.
-
-    Loop A is nested inside loop B exactly when A.members is a proper subset of
-    B.members: find_loops seeds each member set with {header, tail} and then walks
-    predecessors from the tail only, so the header's own predecessors are never
-    explored and the set is exactly the natural loop body. A's parent is its
-    smallest strict container, so a chain like 139 < 121 < 104 < 90 links up one
-    level at a time rather than every ancestor claiming every descendant.
-    """
+    # Sets parent/children/depth on each Loop from member-set
+    # containment: A nests in B when A.members is a proper subset
+    # of B.members. Parent is the smallest such container.
     for loop in loop_list:
         containers = [other for other in loop_list
                       if other is not loop and loop.members < other.members]
@@ -731,7 +919,7 @@ def build_loop_forest(loop_list: list[Loop]) -> None:
 
 
 def loop_ancestors(loop: Loop) -> list[Loop]:
-    """Ancestors of `loop`, outermost first (excludes `loop` itself)."""
+    # Ancestors of loop, outermost first; excludes loop itself.
     chain: list[Loop] = []
     ancestor = loop.parent
     while ancestor is not None:
@@ -746,17 +934,10 @@ DEFAULT_MAX_UNROLLED_BLOCKS = 500_000
 
 def project_unrolled_block_count(root_block: 'Block | None',
                                   loop_list: list[Loop]) -> tuple[int, dict[Loop, int]]:
-    """Projects how many Blocks unrolling will produce, per loop and in total.
-
-    A loop's own body (its members minus whatever its nested children own) gets
-    cloned once per iteration of itself AND of every enclosing loop, so the count
-    is own_blocks * product(trip counts of the loop and its ancestors). Blocks
-    outside every loop are unaffected by unrolling and pass through 1:1 -- counted
-    here via a BFS over the pre-unroll graph, since project_unrolled_block_count
-    is always called before unroll_loops_in_cfg touches anything. Lets
-    unroll_loops_in_cfg refuse a nest that would blow up before it allocates
-    anything, instead of running for hours and then OOMing.
-    """
+    # Projects the unrolled block count, per loop and total, before any
+    # cloning happens. Per loop: own blocks (members minus nested
+    # children's) times the product of its own and its ancestors'
+    # trip counts. Blocks outside every loop count once each.
     per_loop: dict[Loop, int] = {}
     total = 0
 
@@ -814,13 +995,11 @@ def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop],
     loops could see up to 2^N spurious path combinations from this alone,
     on top of any genuine data-dependent branching.)
 
-    Nested loops are unrolled innermost-first. Each pass replaces its loop's
-    members with fresh clones, which leaves every ancestor holding a stale
-    member set pointing at blocks no longer in the graph -- so after unrolling a
-    loop we repair the ancestors, swapping the originals for the clones just
-    made. Boundaries are recomputed per loop for the same reason. Suffixes
-    compose rather than replace (see Block.copy_with_suffix), so a block in a
-    4-deep nest ends up uniquely identified as e.g. ".12.34.2.4".
+    Nested loops unroll innermost-first. After each loop, its
+    ancestors' member sets are repaired to point at the new clones
+    instead of the now-retired originals, and boundaries are
+    recomputed per loop. Suffixes compose (Block.copy_with_suffix),
+    so a 4-deep nest gets suffixes like ".12.34.2.4".
     """
     projected, per_loop = project_unrolled_block_count(root_block, loop_list)
     print(f"Projected unrolled CFG size: {projected} blocks.")
@@ -834,9 +1013,8 @@ def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop],
             f"loop(s) are unrolled. Raise --max-unrolled-blocks to proceed anyway."
         )
 
-    # Innermost-first: an outer loop must clone its inner loops' already-unrolled
-    # chain, not the original cyclic body. Siblings are disjoint, so the
-    # header.start tiebreak only matters for deterministic output.
+    # Innermost-first, so an outer loop clones its inner loops'
+    # already-unrolled chain, not the original cyclic body.
     sorted_loops = sorted(loop_list, key=lambda l: (-l.depth, -l.header.start))
 
     for loop in sorted_loops:
@@ -847,17 +1025,14 @@ def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop],
         print(f"Unrolling loop at header {loop.header.start} (depth {loop.depth}) "
               f"for {loop.max_iterations} iterations.")
 
-        # Recompute against the current graph: an inner pass may have rewired the
-        # blocks these edges refer to.
+        # Recompute against the current graph, since an inner pass may
+        # have rewired the blocks these edges refer to.
         loop.entry_edges.clear()
         loop.exit_edges.clear()
         loop.find_boundaries()
 
-        # Identify exit targets (blocks outside the loop) and entry sources. Sorted
-        # because entry_edges/exit_edges are sets of Blocks whose hash includes a str:
-        # iteration order varies with PYTHONHASHSEED, which would permute a block's
-        # `next` list between processes -- and runtime_benchmark.py/pc_gap.py rebuild
-        # this CFG in a fresh process to replay decision_path against next[0]/next[1].
+        # Sorted for a deterministic block.next order across processes
+        # (PYTHONHASHSEED affects set iteration order otherwise).
         block_key = lambda b: (b.start, b.end, b.suffix)
         exit_targets = sorted((exit_target for _, exit_target in loop.exit_edges), key=block_key)
         entry_sources = sorted((entry_source for entry_source, _ in loop.entry_edges), key=block_key)
@@ -900,19 +1075,12 @@ def unroll_loops_in_cfg(root_block: Block, loop_list: list[Loop],
         for exit_target in exit_targets:
             prev_tail.add(exit_target)
 
-        # This loop's originals are now retired -- fully detach them (both edge
-        # directions), or they linger as stale predecessors/successors that a
-        # later (ancestor) find_boundaries() pass would misread as still live.
-        # Without this, an ancestor's entry_sources can include an orphaned
-        # original whose `.next` was never updated, crashing the next loop's
-        # `entry_source.remove_edge(loop.header)` on a header that was already
-        # replaced by clones two levels down.
+        # Detach the now-retired originals so they don't linger as
+        # stale predecessors/successors for an ancestor's later pass.
         for member in loop.members:
             member.detach()
 
-        # Every enclosing loop must see the clones instead of the (now detached)
-        # originals, or its own pass would clone blocks no longer in the graph
-        # and lose the unrolled inner chain entirely.
+        # Ancestors must see the clones, not the detached originals.
         for ancestor in loop_ancestors(loop):
             ancestor.members = (ancestor.members - loop.members) | all_clones
 
@@ -924,19 +1092,10 @@ BPF_ITER_NEXT_HELPER_ID = 6
 
 
 def build_iter_value_map(loop_list: list[Loop], instructions: dict[int, BpfInstruction]) -> dict[str, int]:
-    """
-    For every bpf_iter_num_next() (CALL imm=6) call site inside a loop that
-    was successfully bounded and unrolled, maps that call's per-iteration
-    unique_instr_id (pc + unroll suffix, e.g. "68.3") to the concrete
-    loop-counter value it returns on that iteration (loop.start_value + i).
-
-    Feed this into dfs_blocks so process_instruction can model each
-    unrolled call's result concretely instead of as a fresh unconstrained
-    symbol -- see process_instruction's CALL handling for why that matters
-    (it's what lets loop-indexed array/table accesses be recognized as
-    aliasing/reusing across iterations rather than every access looking
-    like an unrelated fresh address).
-    """
+    # Maps each bpf_iter_num_next() call site's pc+suffix (e.g.
+    # "68.3.2") to the concrete value it returns on that iteration,
+    # for every bounded, unrolled loop. Feeds dfs_blocks so those
+    # calls resolve concretely instead of as fresh symbols.
     result: dict[str, int] = {}
 
     def is_iter_next(pc: int) -> bool:
@@ -952,35 +1111,25 @@ def build_iter_value_map(loop_list: list[Loop], instructions: dict[int, BpfInstr
         return [a for a in loop_ancestors(loop) if a in bounded]
 
     def keys_for(pc: int, chain: list[Loop]):
-        """One key per combination of iteration indices along `chain` (outermost first),
-        matching the suffix Block.copy_with_suffix composes during unrolling."""
+        # One key per iteration-index combo along chain, outermost
+        # first, matching Block.copy_with_suffix's composed suffixes.
         for combo in itertools.product(*(range(l.max_iterations) for l in chain)):
             yield f"{pc}" + "".join(f".{k}" for k in combo), combo
 
-    # Claim each loop's one-time priming bpf_iter_num_next() FIRST. It sits between
-    # that loop's bpf_iter_num_new and its header -- which puts it inside the PARENT's
-    # body, so a naive "blocks this loop owns" scan would hand it to the parent and
-    # map it to the parent's counter. Worse, the key shapes coincide exactly (the
-    # child's priming call has one suffix component per ancestor; the parent's own
-    # call sites have one per ancestor plus its own index, and the child has exactly
-    # one more ancestor than the parent) -- so the collision is silent.
+    # Each loop's one-time priming call, keyed by the pc nearest its
+    # header (not the first in range: a second sibling loop's
+    # call_5_pc can point past its own bpf_iter_num_new).
     priming_owner: dict[int, Loop] = {}
     for loop in bounded:
         if loop.call_5_pc is None:
             continue
-        # Nearest call site BEFORE the header, not the first in range: call_5_pc is
-        # only as good as analyze_max_iterations' backwards BFS, which for a second
-        # sibling loop can walk past its own bpf_iter_num_new and report an earlier
-        # loop's (cfdp_chunk reports 55 for both of its loops). That widens the range
-        # to cover earlier loops' call sites, and the priming call is the last one.
+
         candidates = sorted(pc for pc in instructions
                             if loop.call_5_pc < pc < loop.header.start and is_iter_next(pc))
         if candidates:
             priming_owner[candidates[-1]] = loop
 
-    # Every other call site belongs to the INNERMOST loop whose (pre-unroll) members
-    # contain its block: a nested loop's blocks are a subset of its parent's, so
-    # depth breaks the tie.
+    # Other call sites belong to the innermost loop containing them.
     innermost_by_block: dict[Block, Loop] = {}
     for loop in bounded:
         for block in loop.original_members:
@@ -994,20 +1143,11 @@ def build_iter_value_map(loop_list: list[Loop], instructions: dict[int, BpfInstr
             if pc in instructions and is_iter_next(pc) and pc not in priming_owner:
                 in_loop_owner[pc] = loop
 
-    # An in-loop call site carries one suffix component per unrolled ancestor plus
-    # its own iteration index; the value depends only on that own index, since
-    # bpf_iter_num_new re-initializes the iterator on every pass through the
-    # enclosing loops.
     for pc, loop in sorted(in_loop_owner.items()):
         chain = unrolled_ancestors(loop) + [loop]
         for key, combo in keys_for(pc, chain):
             result[key] = loop.start_value + combo[-1]
 
-    # The priming call always succeeds once max_iterations is known positive --
-    # concretize it too, or the DFS treats "loop runs zero times" as an open
-    # question and wastes a full explore-then-backtrack on a hypothesis the
-    # unrolling above already ruled out. Its key carries the ancestors' components
-    # but not this loop's own, since it runs before the loop body is entered.
     for pc, loop in sorted(priming_owner.items()):
         for key, _ in keys_for(pc, unrolled_ancestors(loop)):
             result[key] = loop.start_value
