@@ -11,6 +11,8 @@ consecutive-occurrence gaps. Unmatched occurrences are dropped.
 """
 import argparse
 from collections import deque
+from collections.abc import Generator
+from pathlib import Path
 
 import yaml
 
@@ -54,6 +56,60 @@ def find_gaps(steps: list[tuple[int, str, int, int, "int | None"]],
 
     return gaps
 
+def gapsInSet(
+    pcs: set[int],
+    filename: Path,
+    trace: Path,
+    profile: str = "polarfire",
+    max_unrolled_blocks: int = DEFAULT_MAX_UNROLLED_BLOCKS,
+) -> Generator[tuple[int, int, int], None, None]:
+    """Yield the maximum FIFO-matched gap for every reachable ordered PC pair.
+
+    ``filename`` and ``trace`` are the same inputs accepted by the command
+    line's ``filename`` argument and ``--trace`` option. ``profile`` and
+    ``max_unrolled_blocks`` mirror their command-line defaults. Pairs for which
+    no path reaches ``end`` after ``start`` are omitted.
+    """
+    target_profile = PROFILES[profile]
+
+    path_results, metadata = load_trace(trace)
+    check_trace_soundness(metadata, target_profile)
+
+    instructions = read_bpf_file(filename)
+    first_block = get_blocks_tree(instructions)
+    loop_list = find_loops(first_block, instructions)
+    unrolled_block = unroll_loops_in_cfg(
+        first_block, loop_list, max_unrolled_blocks=max_unrolled_blocks
+    )
+
+    op_info_by_name = build_op_info_by_name(target_profile)
+    cycle_mapping = build_cycle_mapping(op_info_by_name)
+    helper_call_costs = build_helper_call_costs(target_profile)
+    all_steps = []
+    for path_idx, path_trace in enumerate(path_results):
+        if path_trace.decision_path is None:
+            raise ValueError(
+                f"path {path_idx} in {str(trace)!r} has no decision_path -- this trace predates "
+                f"decision_path being persisted. Re-run main.py --emit-trace to regenerate it."
+            )
+        all_steps.append(replay_path(unrolled_block, instructions, path_trace, cycle_mapping,
+                                     helper_call_costs, op_info_by_name, target_profile))
+
+    for start_pc in sorted(pcs):
+        for end_pc in sorted(pcs):
+            if start_pc == end_pc:
+                continue
+
+            max_gap: int | None = None
+            for steps in all_steps:
+                for gap, _start_iteration, _end_iteration in find_gaps(
+                    steps, start_pc, end_pc
+                ):
+                    if max_gap is None or gap > max_gap:
+                        max_gap = gap
+
+            if max_gap is not None:
+                yield start_pc, end_pc, max_gap
 
 def main():
     args = parser.parse_args()
