@@ -56,6 +56,72 @@ def find_gaps(steps: list[tuple[int, str, int, int, "int | None"]],
 
     return gaps
 
+def findGaps1(steps: list[tuple[int, str, int, int, "int | None"]],
+              start_pc: int, end_pc: int,
+              disallowed: set[int]) -> list[tuple[int, "int | None", "int | None"]]:
+    """Return FIFO-matched gaps that do not cross a disallowed PC.
+
+    Encountering a disallowed instruction invalidates every unmatched start
+    seen so far.  A later start can still form a valid gap, since only the
+    portion of the path between the matched endpoints is constrained.
+    """
+    gaps: list[tuple[int, "int | None", "int | None"]] = []
+    pending: deque[tuple[int, "int | None"]] = deque()
+
+    for pc, _name, _cost, cumulative, iteration in steps:
+        if pc in disallowed:
+            pending.clear()
+            continue
+        if pc == end_pc and pending:
+            start_cumulative, start_iteration = pending.popleft()
+            gaps.append((cumulative - start_cumulative, start_iteration, iteration))
+        if pc == start_pc:
+            pending.append((cumulative, iteration))
+
+    return gaps
+
+
+def _gaps_in_steps(
+    pcs: set[int],
+    all_steps: list[list[tuple[int, str, int, int, "int | None"]]],
+    whole_program_entry: "int | None" = None,
+) -> tuple[list[tuple[int, int, int]], "int | None"]:
+    """Compute constrained boundary gaps and an unconstrained entry span.
+
+    Boundary-pair gaps may not cross another PC in ``pcs``.  The optional
+    whole-program span deliberately uses :func:`find_gaps` instead, so reaching
+    another boundary between the program entry and a reachable endpoint does
+    not invalidate it.
+    """
+    boundary_gaps: list[tuple[int, int, int]] = []
+    max_entry_gap: int | None = None
+
+    for start_pc in sorted(pcs):
+        for end_pc in sorted(pcs):
+            if start_pc == end_pc:
+                continue
+
+            disallowed = pcs - {start_pc, end_pc}
+            max_gap: int | None = None
+            for steps in all_steps:
+                for gap, _start_iteration, _end_iteration in findGaps1(
+                    steps, start_pc, end_pc, disallowed
+                ):
+                    if max_gap is None or gap > max_gap:
+                        max_gap = gap
+
+                if start_pc == whole_program_entry:
+                    for gap, _start_iteration, _end_iteration in find_gaps(
+                        steps, start_pc, end_pc
+                    ):
+                        if max_entry_gap is None or gap > max_entry_gap:
+                            max_entry_gap = gap
+
+            if max_gap is not None:
+                boundary_gaps.append((start_pc, end_pc, max_gap))
+
+    return boundary_gaps, max_entry_gap
+
 def gapsInSet(
     pcs: set[int],
     filename: Path,
@@ -70,6 +136,22 @@ def gapsInSet(
     ``max_unrolled_blocks`` mirror their command-line defaults. Pairs for which
     no path reaches ``end`` after ``start`` are omitted.
     """
+    gaps, _max_entry_gap = gapAnalysisInSet(
+        pcs, filename, trace, profile, max_unrolled_blocks=max_unrolled_blocks
+    )
+    yield from gaps
+
+
+def gapAnalysisInSet(
+    pcs: set[int],
+    filename: Path,
+    trace: Path,
+    profile: str = "polarfire",
+    *,
+    whole_program_entry: "int | None" = None,
+    max_unrolled_blocks: int = DEFAULT_MAX_UNROLLED_BLOCKS,
+) -> tuple[list[tuple[int, int, int]], "int | None"]:
+    """Return boundary gaps and the unrestricted maximum entry span."""
     target_profile = PROFILES[profile]
 
     path_results, metadata = load_trace(trace)
@@ -95,21 +177,7 @@ def gapsInSet(
         all_steps.append(replay_path(unrolled_block, instructions, path_trace, cycle_mapping,
                                      helper_call_costs, op_info_by_name, target_profile))
 
-    for start_pc in sorted(pcs):
-        for end_pc in sorted(pcs):
-            if start_pc == end_pc:
-                continue
-
-            max_gap: int | None = None
-            for steps in all_steps:
-                for gap, _start_iteration, _end_iteration in find_gaps(
-                    steps, start_pc, end_pc
-                ):
-                    if max_gap is None or gap > max_gap:
-                        max_gap = gap
-
-            if max_gap is not None:
-                yield start_pc, end_pc, max_gap
+    return _gaps_in_steps(pcs, all_steps, whole_program_entry)
 
 def main():
     args = parser.parse_args()
