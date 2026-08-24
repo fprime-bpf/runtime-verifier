@@ -92,78 +92,127 @@ def _read_case(path: Path, test_case: TestCase) -> CaseData:
     return _case_from_document(document, path, test_case)
 
 
-def _gaps(
-    test_case: TestCase, boundaries: set[int], entry: int
-) -> tuple[list[tuple[int, int, int]], int]:
-    cache_path = test_case.directory / ".gaps.yml"
-    cached_boundaries = sorted(boundaries)
-    try:
-        with cache_path.open(encoding="utf-8") as file:
-            cache = yaml.safe_load(file)
-        cached_pcs = {int(pc) for pc in cache["boundaries"]}
-        cached_gaps = [tuple(map(int, gap)) for gap in cache["gaps"]]
-        cached_entry = int(cache["whole_program_entry"])
-        cached_max_cycle_count = int(cache["max_cycle_count"])
+GapAnalysis = tuple[list[tuple[int, int, int]], int | None]
+GAP_CACHE_VERSION: Final = 2
 
-        if boundaries <= cached_pcs and entry == cached_entry:
-            # Keep all cached entry spans so the whole-program denominator is
-            # independent of which split files were selected.  Per-split
-            # candidates are filtered below.
-            return cached_gaps, cached_max_cycle_count
-    except (OSError, KeyError, TypeError, ValueError, yaml.YAMLError):
-        pass
 
-    gaps, max_cycle_count = pc_gap.gapAnalysisInSet(
-        boundaries,
-        test_case.directory / PROG_NAME,
-        test_case.directory / TRACE_NAME,
-        whole_program_entry=entry,
-    )
-    if max_cycle_count is None:
-        raise ValueError(f"{test_case.title!r}: no cycle counts from entry PC {entry}")
+def _read_gap_cache(
+    cache_path: Path, entry: int
+) -> dict[frozenset[int], GapAnalysis]:
+    """Read exact-boundary analyses; legacy superset caches are ignored."""
+    with cache_path.open(encoding="utf-8") as file:
+        cache = yaml.safe_load(file)
+    if not isinstance(cache, dict) or cache.get("version") != GAP_CACHE_VERSION:
+        return {}
+    if int(cache["whole_program_entry"]) != entry:
+        return {}
+
+    analyses: dict[frozenset[int], GapAnalysis] = {}
+    for item in cache["analyses"]:
+        boundaries = frozenset(int(pc) for pc in item["boundaries"])
+        gaps = [tuple(map(int, gap)) for gap in item["gaps"]]
+        raw_max_entry_gap = item["max_entry_gap"]
+        max_entry_gap = None if raw_max_entry_gap is None else int(raw_max_entry_gap)
+        analyses[boundaries] = (gaps, max_entry_gap)
+    return analyses
+
+
+def _write_gap_cache(
+    cache_path: Path,
+    entry: int,
+    analyses: dict[frozenset[int], GapAnalysis],
+) -> None:
+    records = []
+    for boundaries in sorted(analyses, key=lambda pcs: tuple(sorted(pcs))):
+        gaps, max_entry_gap = analyses[boundaries]
+        records.append(
+            {
+                "boundaries": sorted(boundaries),
+                "gaps": gaps,
+                "max_entry_gap": max_entry_gap,
+            }
+        )
     with cache_path.open("w", encoding="utf-8") as file:
         yaml.safe_dump(
             {
-                "boundaries": cached_boundaries,
-                "gaps": gaps,
+                "version": GAP_CACHE_VERSION,
                 "whole_program_entry": entry,
-                "max_cycle_count": max_cycle_count,
+                "analyses": records,
             },
             file,
         )
-    return gaps, max_cycle_count
+
+
+def _gap_analyses(
+    test_case: TestCase, boundary_sets: Iterable[set[int]], entry: int
+) -> dict[frozenset[int], GapAnalysis]:
+    """Return exact-set analyses, replaying once if any cache entries are missing."""
+    cache_path = test_case.directory / ".gaps.yml"
+    requested = {frozenset(boundaries) for boundaries in boundary_sets}
+    try:
+        cached = _read_gap_cache(cache_path, entry)
+    except (OSError, KeyError, TypeError, ValueError, yaml.YAMLError):
+        cached = {}
+
+    missing = requested - cached.keys()
+    if missing:
+        computed = pc_gap.gap_analyses_in_sets(
+            [set(boundaries) for boundaries in missing],
+            test_case.directory / PROG_NAME,
+            test_case.directory / TRACE_NAME,
+            whole_program_entry=entry,
+        )
+        cached.update(computed)
+        _write_gap_cache(cache_path, entry, cached)
+
+    return {boundaries: cached[boundaries] for boundaries in requested}
 
 
 def _process_test_case(
     test_case: TestCase, cases: dict[int, CaseData]
 ) -> tuple[TestCase, list[ProcCaseData]]:
-    all_boundaries = set().union(*(case.boundaries for case in cases.values()))
     points: list[ProcCaseData] = []
 
     entries = {case.entry for case in cases.values()}
     if len(entries) != 1:
         raise ValueError(f"{test_case.title!r}: inconsistent program entry PCs: {entries}")
     entry = entries.pop()
-    gaps, max_cycle_count = _gaps(test_case, all_boundaries, entry)
+    analyses = _gap_analyses(
+        test_case,
+        (case.boundaries for case in cases.values()),
+        entry,
+    )
     # A program can have multiple exits, and the PC numerically closest to an
     # exit need not be the last one executed.  The longest reachable span from
-    # entry is therefore the whole-program maximum used by every split. Unlike
-    # boundary gaps, this span is allowed to cross every internal boundary.
+    # entry across every exact-set analysis is therefore the whole-program
+    # maximum used by every split. Unlike boundary gaps, this span is allowed
+    # to cross every internal boundary.
+    entry_gaps = [
+        max_entry_gap
+        for _gaps, max_entry_gap in analyses.values()
+        if max_entry_gap is not None
+    ]
+    if not entry_gaps:
+        raise ValueError(f"{test_case.title!r}: no cycle counts from entry PC {entry}")
+    max_cycle_count = max(entry_gaps)
     if max_cycle_count <= 0:
         raise ValueError(f"{test_case.title!r}: program cycle count must be positive")
 
     for split_into, case in cases.items():
+        gaps, _max_entry_gap = analyses[frozenset(case.boundaries)]
         candidates = [
             (gap, start_pc, end_pc)
             for start_pc, end_pc, gap in gaps
-            if start_pc in case.boundaries
-            and end_pc in case.boundaries
-            and (start_pc, end_pc) != (case.entry, case.exit)
+            if (start_pc, end_pc) != (case.entry, case.exit)
         ]
         # With no internal boundary, entry -> exit is the only meaningful gap.
         if not candidates:
-            # Some datasets represent exit as a sentinel just beyond the last
-            # executable PC, so there may be no literal gap ending at it.
+            internal_boundaries = case.boundaries - {case.entry, case.exit}
+            if internal_boundaries:
+                raise ValueError(
+                    f"{test_case.title!r}: split_into={split_into} has internal "
+                    "boundaries but no reachable boundary-to-boundary gap"
+                )
             candidates = [(max_cycle_count, case.entry, case.exit)]
 
         max_gap, start_pc, end_pc = max(candidates)
@@ -182,7 +231,7 @@ def _process_test_case(
             )
         )
 
-    return test_case, sorted(points, key=lambda point: point.cycleRatio)
+    return test_case, points
 
 
 def load_all(files: Iterable[Path]) -> dict[TestCase, list[ProcCaseData]]:
@@ -238,24 +287,34 @@ def _baseline(points: list[ProcCaseData]) -> ProcCaseData:
         raise ValueError("normalizing plots requires data for split_into=1") from error
 
 
+def _plotted_points(points: list[ProcCaseData]) -> list[ProcCaseData]:
+    """Exclude the normalization baseline from the graph itself."""
+    plotted = [point for point in points if point.splitInto != 1]
+    if not plotted:
+        raise ValueError("plotting requires data for a split_into value other than 1")
+    return plotted
+
+
 def _configure_axes(
-    axis, title: str, statistic: str, ratios: np.ndarray, lower: np.ndarray, upper: np.ndarray
+    axis, title: str, statistic: str, cycles: np.ndarray, lower: np.ndarray, upper: np.ndarray
 ) -> None:
+    if np.any(cycles <= 0):
+        raise ValueError(f"{title!r}: maximum gap must be positive for a log-scale plot")
+
     axis.set_title(f"{title} — {statistic}")
-    axis.set_xlabel("Maximum gap / entry-to-exit cycles")
+    axis.set_xlabel("Maximum gap (cycles)")
     axis.set_ylabel("Time / splitInto=1 time")
-    axis.set_xscale("linear")
+    axis.set_xscale("log")
     axis.set_yscale("log")
-    axis.set_xticks(ratios)
+    axis.set_xticks(cycles)
     axis.tick_params(axis="x", labelrotation=90)
     axis.grid(True, which="both", alpha=0.35)
 
-    min_x = float(ratios.min())
-    max_x = float(ratios.max())
+    min_x = float(cycles.min())
+    max_x = float(cycles.max())
     if min_x == max_x:
-        # A non-zero span is required by Matplotlib. Keep it inside [0, 1].
-        padding = 0.05
-        axis.set_xlim(max(0.0, min_x - padding), min(1.0, max_x + padding))
+        # A non-zero, positive span is required on a logarithmic axis.
+        axis.set_xlim(min_x / 1.1, max_x * 1.1)
     else:
         axis.set_xlim(min_x, max_x)
 
@@ -268,11 +327,12 @@ def _configure_axes(
 
 
 def _draw_mean(axis, test_case: TestCase, points: list[ProcCaseData]) -> None:
-    x = np.asarray([point.cycleRatio for point in points])
-    means, intervals = zip(*(_mean_with_ci(point.times) for point in points))
     baseline_mean, _baseline_interval = _mean_with_ci(_baseline(points).times)
     if baseline_mean <= 0:
         raise ValueError(f"{test_case.title!r}: split_into=1 mean must be positive")
+    points = _plotted_points(points)
+    x = np.asarray([point.maxGap for point in points])
+    means, intervals = zip(*(_mean_with_ci(point.times) for point in points))
     y = np.asarray(means) / baseline_mean
     ci = np.asarray(intervals) / baseline_mean
     axis.errorbar(x, y, yerr=ci, fmt="o", capsize=4, linestyle="none")
@@ -280,11 +340,12 @@ def _draw_mean(axis, test_case: TestCase, points: list[ProcCaseData]) -> None:
 
 
 def _draw_median(axis, test_case: TestCase, points: list[ProcCaseData]) -> None:
-    x = np.asarray([point.cycleRatio for point in points])
-    quartiles = np.asarray([np.percentile(point.times, [25, 50, 75]) for point in points])
     baseline_median = float(np.median(_baseline(points).times))
     if baseline_median <= 0:
         raise ValueError(f"{test_case.title!r}: split_into=1 median must be positive")
+    points = _plotted_points(points)
+    x = np.asarray([point.maxGap for point in points])
+    quartiles = np.asarray([np.percentile(point.times, [25, 50, 75]) for point in points])
     quartiles /= baseline_median
     lower, median, upper = quartiles.T
     axis.errorbar(
@@ -337,7 +398,7 @@ def draw(
                 plotter(individual_axis, test_case, points)
                 individual_figure.savefig(output_directory / f"{test_case.title}.png", dpi=150)
                 plt.close(individual_figure)
-        grouped_figure.suptitle(f"Normalized timing by relative maximum gap — {statistic.title()}")
+        grouped_figure.suptitle(f"Normalized timing by maximum gap cycles — {statistic.title()}")
 
         if not show:
             plot_directory.mkdir(parents=True, exist_ok=True)

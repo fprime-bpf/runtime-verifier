@@ -142,16 +142,14 @@ def gapsInSet(
     yield from gaps
 
 
-def gapAnalysisInSet(
-    pcs: set[int],
+def replay_steps(
     filename: Path,
     trace: Path,
     profile: str = "polarfire",
     *,
-    whole_program_entry: "int | None" = None,
     max_unrolled_blocks: int = DEFAULT_MAX_UNROLLED_BLOCKS,
-) -> tuple[list[tuple[int, int, int]], "int | None"]:
-    """Return boundary gaps and the unrestricted maximum entry span."""
+) -> list[list[tuple[int, str, int, int, "int | None"]]]:
+    """Replay every feasible path once and return its cumulative-cost steps."""
     target_profile = PROFILES[profile]
 
     path_results, metadata = load_trace(trace)
@@ -177,7 +175,58 @@ def gapAnalysisInSet(
         all_steps.append(replay_path(unrolled_block, instructions, path_trace, cycle_mapping,
                                      helper_call_costs, op_info_by_name, target_profile))
 
-    return _gaps_in_steps(pcs, all_steps, whole_program_entry)
+    return all_steps
+
+
+def gap_analyses_in_sets(
+    pc_sets: list[set[int]],
+    filename: Path,
+    trace: Path,
+    profile: str = "polarfire",
+    *,
+    whole_program_entry: "int | None" = None,
+    max_unrolled_blocks: int = DEFAULT_MAX_UNROLLED_BLOCKS,
+) -> dict[frozenset[int], tuple[list[tuple[int, int, int]], "int | None"]]:
+    """Analyze exact boundary sets while replaying the program only once.
+
+    A gap is constrained by every other PC in its own set, so an analysis for
+    a superset cannot be filtered to produce the analysis for a subset.
+    Duplicate sets are analyzed once.
+    """
+    unique_sets = {frozenset(pcs) for pcs in pc_sets}
+    if not unique_sets:
+        return {}
+
+    all_steps = replay_steps(
+        filename,
+        trace,
+        profile,
+        max_unrolled_blocks=max_unrolled_blocks,
+    )
+    return {
+        pcs: _gaps_in_steps(set(pcs), all_steps, whole_program_entry)
+        for pcs in unique_sets
+    }
+
+
+def gapAnalysisInSet(
+    pcs: set[int],
+    filename: Path,
+    trace: Path,
+    profile: str = "polarfire",
+    *,
+    whole_program_entry: "int | None" = None,
+    max_unrolled_blocks: int = DEFAULT_MAX_UNROLLED_BLOCKS,
+) -> tuple[list[tuple[int, int, int]], "int | None"]:
+    """Return boundary gaps and the unrestricted maximum entry span."""
+    return gap_analyses_in_sets(
+        [pcs],
+        filename,
+        trace,
+        profile,
+        whole_program_entry=whole_program_entry,
+        max_unrolled_blocks=max_unrolled_blocks,
+    )[frozenset(pcs)]
 
 def main():
     args = parser.parse_args()
