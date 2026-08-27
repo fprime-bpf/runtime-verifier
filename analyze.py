@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import colorsys
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
 from enum import Enum
@@ -43,9 +44,9 @@ LabeledData = LABELED_DATA
 @dataclass(frozen=True)
 class CaseData:
     times: np.ndarray
-    boundaries: set[int]
-    entry: int
-    exit: int
+    boundaries: set[int] | None
+    entry: int | None
+    exit: int | None
 
 
 @dataclass(frozen=True)
@@ -61,16 +62,23 @@ class ProcCaseData:
         return self.maxGap / self.maxCycleCount
 
 
-def _case_from_document(document, path: Path, test_case: TestCase) -> CaseData:
+def _case_from_document(
+    document, path: Path, test_case: TestCase, split_into: int
+) -> CaseData:
     try:
         case = document[test_case.title]
         samples = case["samples"]
         times = np.asarray([float(sample[0]) for sample in samples], dtype=np.float64)
-        boundaries = {int(pc) for pc in case["partition_pcs"]}
-        entry, exit = (int(pc) for pc in case["partition_pcs"][:2])
+        if split_into == 34:
+            boundaries = None
+            entry = exit = None
+        else:
+            boundaries = {int(pc) for pc in case["partition_pcs"]}
+            entry, exit = (int(pc) for pc in case["partition_pcs"][:2])
     except (KeyError, TypeError, ValueError, IndexError) as error:
+        expected = "samples" if split_into == 34 else "samples and partition_pcs"
         raise ValueError(
-            f"{path}: invalid data for {test_case.title!r}; expected samples and partition_pcs"
+            f"{path}: invalid data for {test_case.title!r}; expected {expected}"
         ) from error
 
     if times.size == 0:
@@ -89,7 +97,7 @@ def _read_case(path: Path, test_case: TestCase) -> CaseData:
     """Read and validate one program's measurements from a dataset file."""
     with path.open(encoding="utf-8") as file:
         document = yaml.safe_load(file)
-    return _case_from_document(document, path, test_case)
+    return _case_from_document(document, path, test_case, int(document["split_into"]))
 
 
 GapAnalysis = tuple[list[tuple[int, int, int]], int | None]
@@ -172,14 +180,24 @@ def _process_test_case(
     test_case: TestCase, cases: dict[int, CaseData]
 ) -> tuple[TestCase, list[ProcCaseData]]:
     points: list[ProcCaseData] = []
+    partitioned_cases = {
+        split_into: case
+        for split_into, case in cases.items()
+        if case.boundaries is not None
+    }
 
-    entries = {case.entry for case in cases.values()}
+    entries = {case.entry for case in partitioned_cases.values()}
     if len(entries) != 1:
         raise ValueError(f"{test_case.title!r}: inconsistent program entry PCs: {entries}")
     entry = entries.pop()
+    assert entry is not None
     analyses = _gap_analyses(
         test_case,
-        (case.boundaries for case in cases.values()),
+        (
+            case.boundaries
+            for case in partitioned_cases.values()
+            if case.boundaries is not None
+        ),
         entry,
     )
     # A program can have multiple exits, and the PC numerically closest to an
@@ -199,6 +217,30 @@ def _process_test_case(
         raise ValueError(f"{test_case.title!r}: program cycle count must be positive")
 
     for split_into, case in cases.items():
+        if split_into == 34:
+            all_steps = pc_gap.replay_steps(
+                test_case.directory / PROG_NAME,
+                test_case.directory / TRACE_NAME,
+            )
+            instructions = [step for steps in all_steps for step in steps]
+            if not instructions:
+                raise ValueError(f"{test_case.title!r}: trace contains no instructions")
+            instruction_pc, _name, max_gap, _cumulative, _iteration = max(
+                instructions, key=lambda step: step[2]
+            )
+            points.append(
+                ProcCaseData(
+                    times=case.times,
+                    maxGap=max_gap,
+                    splitInto=split_into,
+                    maxGapPair=(instruction_pc, instruction_pc),
+                    maxCycleCount=max_cycle_count,
+                )
+            )
+            continue
+
+        assert case.boundaries is not None
+        assert case.entry is not None and case.exit is not None
         gaps, _max_entry_gap = analyses[frozenset(case.boundaries)]
         candidates = [
             (gap, start_pc, end_pc)
@@ -250,7 +292,9 @@ def load_all(files: Iterable[Path]) -> dict[TestCase, list[ProcCaseData]]:
                 raise ValueError(
                     f"duplicate data for {test_case.title!r} with split_into={split_into}"
                 )
-            raw[test_case][split_into] = _case_from_document(document, path, test_case)
+            raw[test_case][split_into] = _case_from_document(
+                document, path, test_case, split_into
+            )
 
     if not any(raw.values()):
         raise ValueError("no input data files were supplied")
@@ -326,6 +370,34 @@ def _configure_axes(
             axis.set_ylim(min_y, max_y)
 
 
+def _special_color(split_into: int) -> tuple[float, float, float]:
+    """Give each special configuration a stable color distinct from normal data."""
+    hue = ((split_into - 33) * 0.618033988749895 + 0.04) % 1.0
+    return colorsys.hsv_to_rgb(hue, 0.75, 0.85)
+
+
+def _draw_errorbars(axis, points, x, y, yerr) -> None:
+    normal_indices = [index for index, point in enumerate(points) if point.splitInto <= 32]
+    if normal_indices:
+        normal_error = yerr[..., normal_indices]
+        axis.errorbar(
+            x[normal_indices], y[normal_indices], yerr=normal_error,
+            fmt="o", capsize=4, linestyle="none", color="C0", label="splitInto 0–32",
+        )
+
+    for index, point in enumerate(points):
+        if point.splitInto <= 32:
+            continue
+        special_error = yerr[..., index:index + 1]
+        axis.errorbar(
+            x[index:index + 1], y[index:index + 1], yerr=special_error,
+            fmt="o", capsize=4, linestyle="none",
+            color=_special_color(point.splitInto), label=f"splitInto {point.splitInto}",
+        )
+    if any(point.splitInto > 32 for point in points):
+        axis.legend()
+
+
 def _draw_mean(axis, test_case: TestCase, points: list[ProcCaseData]) -> None:
     baseline_mean, _baseline_interval = _mean_with_ci(_baseline(points).times)
     if baseline_mean <= 0:
@@ -335,7 +407,7 @@ def _draw_mean(axis, test_case: TestCase, points: list[ProcCaseData]) -> None:
     means, intervals = zip(*(_mean_with_ci(point.times) for point in points))
     y = np.asarray(means) / baseline_mean
     ci = np.asarray(intervals) / baseline_mean
-    axis.errorbar(x, y, yerr=ci, fmt="o", capsize=4, linestyle="none")
+    _draw_errorbars(axis, points, x, y, ci)
     _configure_axes(axis, test_case.title, "Normalized mean (95% t CI)", x, y - ci, y + ci)
 
 
@@ -348,13 +420,8 @@ def _draw_median(axis, test_case: TestCase, points: list[ProcCaseData]) -> None:
     quartiles = np.asarray([np.percentile(point.times, [25, 50, 75]) for point in points])
     quartiles /= baseline_median
     lower, median, upper = quartiles.T
-    axis.errorbar(
-        x,
-        median,
-        yerr=np.vstack((median - lower, upper - median)),
-        fmt="o",
-        capsize=4,
-        linestyle="none",
+    _draw_errorbars(
+        axis, points, x, median, np.vstack((median - lower, upper - median))
     )
     _configure_axes(axis, test_case.title, "Normalized median (IQR)", x, lower, upper)
 
@@ -368,7 +435,8 @@ def print_summary(data: dict[TestCase, list[ProcCaseData]]) -> None:
             print(
                 f"{test_case.title}: splitInto={point.splitInto}, "
                 f"pair={start_pc}->{end_pc}, max_gap={point.maxGap} cycles, "
-                f"program_cycles={point.maxCycleCount}, ratio={point.cycleRatio:.6g}"
+                f"program_cycles={point.maxCycleCount}, "
+                f"mean={np.mean(point.times):.6g}, median={np.median(point.times):.6g}"
             )
 
 
