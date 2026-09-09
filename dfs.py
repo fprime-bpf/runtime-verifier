@@ -7,7 +7,7 @@ from block import Block
 from bpf import BpfClass, BpfCode, BpfInstruction, Mask, Shift, BPF_INFO, BPF_INFO_FPU
 from machine_profile import MachineProfile
 from mem_access import process_instruction, State, MemEvent, fresh_gp_var, fresh_fp_var, get_all_var_names, get_vars_from_expr, \
-    normalize_huge_bv
+    normalize_huge_bv, decompose_addr, _LOAD_PREFIXES, _STORE_PREFIXES
 from z3 import Solver, sat, unsat, BoolRef, Not, unknown, Z3Exception, simplify
 from collections import deque
 from typing import Optional, Set
@@ -73,23 +73,8 @@ def classify_mem_event_cost(
     op_info_by_name: dict[str, MachineProfile],
     profile: MachineProfile,
 ) -> int:
-    """Converts a single pending load MemEvent into a cycle cost using the cache profile
-    bundled into its instruction's MachineProfile. Assumes an inclusive cache hierarchy.
-
-    Filters distances to same-line accesses (addr_delta < line_size_bytes), takes the
-    minimum recency among those, then classifies into L1/L2/L3/miss by comparing against
-    each level's associativity threshold. Falls back to the target `profile`'s fields
-    when the instruction's MachineProfile has no cache profile set (in practice
-    unreachable today, since build_op_info_by_name always populates every instruction
-    from `profile` -- kept as defensive handling for `op is None`).
-
-    profile.cache_mode short-circuits this classification entirely: "always_hit" charges
-    L1_hit_cycles and "always_miss" charges miss_cycles, regardless of recency/associativity
-    or whether a same-line entry was even found -- these are the best-/worst-case bounding
-    profiles (see profiles/polarfire.py's *_ALL_HIT_PROFILE/*_ALL_MISS_PROFILE), not just
-    extreme tuning of the realistic model.
-    """
-    op = op_info_by_name.get(event.load_name)
+    """Costs a MemEvent: same-line via floored line-index (assumes bases are line-aligned, see decompose_addr), then L1/L2/L3/miss by recency vs associativity; cache_mode can short-circuit to always_hit/always_miss."""
+    op = op_info_by_name.get(event.instr_name)
 
     l1_cost   = op.l1_hit_cycles if op and op.l1_hit_cycles is not None else profile.l1_hit_cycles
     miss_cost = op.miss_cycles   if op and op.miss_cycles   is not None else profile.miss_cycles
@@ -104,8 +89,9 @@ def classify_mem_event_cost(
     l2_cost   = op.l2_hit_cycles    if op and op.l2_hit_cycles    is not None else profile.l2_hit_cycles
     l3_cost   = op.l3_hit_cycles    if op and op.l3_hit_cycles    is not None else profile.l3_hit_cycles
 
-    same_line = sorted(recency for addr_delta, recency in event.distances
-                       if addr_delta < line_size)
+    mine = event.offset // line_size
+    same_line = sorted(recency for off, recency in event.same_anchor
+                       if off // line_size == mine)
 
     cost = miss_cost
     for recency in same_line:
@@ -170,7 +156,12 @@ def save_trace(path_results: list[ExecutionTraceProfile], out_path: str, *, prog
             {
                 "instr_counts": dict(trace.instr_counts),
                 "mem_events": [
-                    {"load_name": e.load_name, "distances": [list(d) for d in e.distances]}
+                    {
+                        "instr_name": e.instr_name,
+                        "anchor_id": e.anchor_id,
+                        "offset": e.offset,
+                        "same_anchor": [list(t) for t in e.same_anchor],
+                    }
                     for e in trace.mem_events
                 ],
                 "decision_path": list(trace.decision_path),
@@ -301,33 +292,43 @@ def _iter_mem_events(events):
         if not isinstance(ev, yaml.MappingStartEvent):
             raise ValueError(f"trace stream: expected a mem_event mapping, got {ev!r}")
 
-        load_name = None
-        distances: list[tuple[int, int]] = []
+        instr_name = None
+        anchor_id = None
+        offset = None
+        same_anchor: list[tuple[int, int]] = []
         while True:
             ev2 = next(events)
             if isinstance(ev2, yaml.MappingEndEvent):
                 break
             key = ev2.value
-            if key == "load_name":
-                load_name = _expect_scalar(events)
-            elif key == "distances":
+            if key == "instr_name":
+                instr_name = _expect_scalar(events)
+            elif key == "anchor_id":
+                anchor_id = int(_expect_scalar(events))
+            elif key == "offset":
+                offset = int(_expect_scalar(events))
+            elif key == "same_anchor":
                 _expect(events, yaml.SequenceStartEvent)
                 while True:
                     ev3 = next(events)
                     if isinstance(ev3, yaml.SequenceEndEvent):
                         break
                     if not isinstance(ev3, yaml.SequenceStartEvent):
-                        raise ValueError(f"trace stream: expected a [delta, recency] pair, got {ev3!r}")
-                    addr_delta = int(_expect_scalar(events))
+                        raise ValueError(f"trace stream: expected an [offset, recency] pair, got {ev3!r}")
+                    off = int(_expect_scalar(events))
                     recency = int(_expect_scalar(events))
                     _expect(events, yaml.SequenceEndEvent)
-                    distances.append((addr_delta, recency))
+                    same_anchor.append((off, recency))
             else:
                 _skip_value(events)
 
-        if load_name is None:
-            raise ValueError("trace stream: mem_event with no load_name")
-        yield MemEvent(load_name, distances)
+        if instr_name is None:
+            raise ValueError("trace stream: mem_event with no instr_name")
+        if anchor_id is None:
+            raise ValueError("trace stream: mem_event with no anchor_id")
+        if offset is None:
+            raise ValueError("trace stream: mem_event with no offset")
+        yield MemEvent(instr_name, anchor_id, offset, same_anchor)
 
 
 def _read_bool_list(events) -> list[bool]:
@@ -638,33 +639,24 @@ def dfs_blocks(
                 if branch_cond is not None:
                     last_branch_cond = branch_cond
 
-                is_load = mem_addr is not None and instr_op_info is not None and "LD" in instr_op_info.name
+                is_load = mem_addr is not None and instr_op_info is not None and instr_op_info.name.startswith(_LOAD_PREFIXES)
+                is_store = mem_addr is not None and instr_op_info is not None and instr_op_info.name.startswith(_STORE_PREFIXES)
 
-                if is_load:
-                    # Compute (addr_delta, recency) pairs now, while the solver has this
-                    # path's full constraint set. recent_window[0] = most recent (recency 0).
-                    # addr_delta is the concrete byte distance between the two addresses;
-                    # symbolic pairs where we can't get a concrete delta are skipped
-                    # (conservative: missed alias => predicted miss => higher cost).
-                    distances = []
-                    for recency, cached_addr in enumerate(state.recent_window):
-                        try:
-                            diff = simplify(mem_addr - cached_addr)
-                            if hasattr(diff, 'as_signed_long'):
-                                distances.append((abs(diff.as_signed_long()), recency))
-                        except Z3Exception:
-                            pass
-                    state.mem_events.append(MemEvent(instr_name, distances))
+                if mem_addr is not None:
+                    anchor_id, offset, state.next_anchor_id = decompose_addr(
+                        mem_addr, state.anchors, state.next_anchor_id)
+
+                if is_load or is_store:
+                    same_anchor = [(off, recency) for recency, (_, a_id, off) in enumerate(state.recent_window)
+                                   if a_id == anchor_id]
+                    state.mem_events.append(MemEvent(instr_name, anchor_id, offset, same_anchor))
                 else:
-                    # Everything else (ALU/branch/CALL/stores) has a profile-independent
-                    # cost, so tally it directly.
+                    # Everything else (ALU/branch/CALL) has a profile-independent cost, so tally it directly.
                     state.hist[instr_name] = state.hist.get(instr_name, 0) + 1
 
                 if mem_addr is not None:
-                    # Both loads and stores refresh the recency window (stores populate
-                    # the cache too), capped at profile.cache_size — the largest
-                    # associativity we'll ever realize against. Index 0 = most recently used.
-                    state.recent_window.insert(0, mem_addr)
+                    # Loads and stores both refresh the recency window (stores populate the cache too).
+                    state.recent_window.insert(0, (mem_addr, anchor_id, offset))
                     if len(state.recent_window) > profile.cache_size:
                         state.recent_window.pop()
 

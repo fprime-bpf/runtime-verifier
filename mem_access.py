@@ -1,7 +1,7 @@
-from z3 import (ArithRef, BoolRef, ExprRef, If, BitVecVal,Extract, ZeroExt, SignExt, UDiv, 
+from z3 import (ArithRef, BoolRef, ExprRef, If, BitVecVal,Extract, ZeroExt, SignExt, UDiv,
                 URem, SRem, LShR, If, And, Real, BitVecRef, BitVec, RealVal, BV2Int,
                 UGT, UGE, ULT, ULE, BoolVal, is_bv, is_arith, is_bool, Int2BV, ToInt, ToReal, BV2Int,
-                is_true, is_false, simplify, is_bv_value, is_app, Z3_OP_UNINTERPRETED)
+                is_true, is_false, simplify, is_bv_value, is_app, Z3_OP_UNINTERPRETED, Z3Exception)
 
 from dataclasses import dataclass, field
 from bpf import BpfClass, BpfCode, BpfInstruction, Mask, Shift, BPF_INFO, BPF_INFO_FPU
@@ -61,19 +61,11 @@ def normalize_huge_bv(expr):
 
 @dataclass
 class MemEvent:
-    """
-    A single load instruction's memory access. `distances` holds the LRU recency distances
-    (0 = most recent, increasing toward older) of every prior address in the path's rolling
-    window that Z3 confirmed aliases this load's address (i.e. falls on the same cache line).
-    Distances are computed inline during the DFS while the solver context — and thus the
-    path's full constraint set — is live. Entries where Z3 returned unknown are omitted,
-    making missed-aliasing the conservative fallback.
-
-    Realization: sort distances ascending; the minimum distance ≤ profile.associativity is
-    a cache hit at that distance. If no such distance exists, it is a miss.
-    """
-    load_name: str
-    distances: List[tuple]  # (addr_delta, recency) — addr_delta in bytes, recency 0 = most recent
+    """A memory access, decomposed into an anchor + offset (see decompose_addr) for cache-line classification."""
+    instr_name: str
+    anchor_id: int
+    offset: int
+    same_anchor: List[tuple]  # (offset, recency) of prior same-anchor accesses, recency 0 = most recent
 
 
 @dataclass
@@ -82,15 +74,17 @@ class State:
     fp: List[ArithRef] = field(default_factory=list)
     memory: Dict[ExprRef, ExprRef] = field(default_factory=dict)
     # Per-path tally of how many times each instruction (by BPF_INFO name) has executed.
-    # Loads are excluded here — they're recorded in mem_events instead, since their
+    # Loads and stores are excluded here — they're recorded in mem_events instead, since their
     # final histogram key depends on a cache profile chosen after the DFS completes.
     hist: Dict[str, int] = field(default_factory=dict)
-    # Pending (unclassified) load accesses for this path, in execution order.
+    # Pending (unclassified) load and store accesses for this path, in execution order.
     mem_events: List[MemEvent] = field(default_factory=list)
-    # Rolling window of the last (up to) CACHE_SIZE memory addresses (loads and stores)
-    # touched on this path so far, oldest first. Capped externally by the DFS (dfs.py
-    # owns CACHE_SIZE, to keep this module free of cache-policy specifics).
-    recent_window: List[BitVecRef] = field(default_factory=list)
+    # Last (up to) CACHE_SIZE (addr_expr, anchor_id, offset) accesses, index 0 = most recent (do not invert).
+    recent_window: List[Tuple[BitVecRef, int, int]] = field(default_factory=list)
+    # Fixed {0: R10_FP, 1: R1_CTX}, seeded in __post_init__; never grows.
+    anchors: Dict[int, BitVecRef] = field(default_factory=dict)
+    # Next id to hand out for an untracked (non-R10/R1) access; monotonic, never reused, never stored in anchors.
+    next_anchor_id: int = 0
     # True/False choice made at each 2-successor branch reached so far on this path,
     # in order -- used by dfs.py's multiprocess split to identify/replay a specific subtree.
     decision_path: List[bool] = field(default_factory=list)
@@ -108,9 +102,17 @@ class State:
         for i in range(NUM_REGS):
             self.fp[i] = RealVal(0)
 
-        self.set_gp(10, BitVec("R10_FP", WORD))
-        self.set_gp(1, BitVec("R1_CTX", WORD))
+        r10_fp = BitVec("R10_FP", WORD)
+        r1_ctx = BitVec("R1_CTX", WORD)
+        self.set_gp(10, r10_fp)
+        self.set_gp(1, r1_ctx)
         self.set_gp(0, BitVec("R0_RET", WORD))
+        # Only R10 (stack, alloca'd once by llvmbpf) and R1 (mem, the JIT call's
+        # argument) are seeded as anchors -- both are single, runtime-fixed pointers.
+        # Everything else (map lookups, PKT_BASE, post-helper-call R1) never matches
+        # these and gets no anchor, so classify_mem_event_cost always misses it.
+        self.anchors = {0: r10_fp, 1: r1_ctx}
+        self.next_anchor_id = 2
 
     def fork(self) -> "State":
         return State(
@@ -120,6 +122,8 @@ class State:
             hist=self.hist.copy(),
             mem_events=self.mem_events.copy(),
             recent_window=self.recent_window.copy(),
+            anchors=self.anchors.copy(),
+            next_anchor_id=self.next_anchor_id,
             decision_path=self.decision_path.copy(),
             _is_initial=False,
         )
@@ -564,6 +568,20 @@ def _mem_addr(decoded_instr: DecodedInstr, state: State) -> BitVecRef:
     base: BitVecRef = state.get_gp(base_idx)
     off = BitVecVal(decoded_instr.offset, WORD)
     return base + off
+
+
+def decompose_addr(
+    mem_addr: BitVecRef, anchors: Dict[int, BitVecRef], next_id: int
+) -> Tuple[int, int, int]:
+    """Matches mem_addr against anchors via Z3; returns (anchor_id, offset, updated_next_id). No match gets a fresh, untracked id -- always a miss."""
+    for anchor_id, anchor in anchors.items():
+        try:
+            diff = simplify(mem_addr - anchor)
+        except Z3Exception:
+            continue
+        if hasattr(diff, "as_signed_long"):
+            return anchor_id, diff.as_signed_long(), next_id
+    return next_id, 0, next_id + 1
 
 
 def _fresh_mem_val(is_float: bool, reg: int, unique_id: str) -> ExprRef:

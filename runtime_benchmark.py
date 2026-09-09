@@ -12,7 +12,7 @@ from dfs import (
     load_trace, check_trace_soundness, ExecutionTraceProfile,
     DEFAULT_MAX_UNROLLED_BLOCKS,
 )
-from mem_access import _decode_instruction, _LOAD_PREFIXES
+from mem_access import _decode_instruction, _LOAD_PREFIXES, _STORE_PREFIXES
 from main import read_bpf_file, get_blocks_tree
 from machine_profile import MachineProfile
 from profiles import PROFILES
@@ -41,6 +41,11 @@ def is_real_load(name: str) -> bool:
     if name.startswith("LD_IMM_") or name.startswith("LDX_IMM_") or name == "LDDW":
         return False
     return name.startswith(_LOAD_PREFIXES)
+
+
+def is_real_store(name: str) -> bool:
+    # True for stores now recorded as a MemEvent; no immediate-only exclusion (ST_IMM_*/STX_IMM_* still write memory).
+    return name.startswith(_STORE_PREFIXES)
 
 
 def block_iteration(block) -> "tuple[int, ...] | None":
@@ -74,7 +79,7 @@ def replay_path(unrolled_block, instructions: dict, trace: ExecutionTraceProfile
             if name == "CALL":
                 name = f"CALL_{decoded.imm}"
 
-            if is_real_load(name):
+            if is_real_load(name) or is_real_store(name):
                 try:
                     event = next(events)
                 except StopIteration:
